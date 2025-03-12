@@ -1,0 +1,24 @@
+/* DashboardFarmer.css */
+.dashboard {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+  }
+  
+  .dashboard h1 {
+    color: #333;
+  }
+  
+  .dashboard section {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  .dashboard h2 {
+    color: #555;
+  }
+  
+  .dashboard p {
+    color: #777;
+  }
