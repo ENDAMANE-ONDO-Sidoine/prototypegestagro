@@ -5,13 +5,12 @@ import {
 import {
   Brightness4, Brightness7, Menu as MenuIcon, Home, Info, ShoppingCart, People, Contacts, Login, ExpandLess, ExpandMore,
 } from "@mui/icons-material";
-import { useTranslation } from "react-i18next"; // Importez useTranslation
-import { useTheme as useMuiTheme } from "@mui/material/styles"; // Renommez pour éviter les conflits
+import { useTheme as useMuiTheme } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
 import { green, purple, blue, orange, red } from "@mui/material/colors";
 import { useNavigate } from "react-router-dom";
-import { useTheme } from "../utils/ThemeProvider"; // Importez useTheme depuis ThemeContext
-import LogoutButton from "../components/LogoutButton"; // Importez le composant LogoutButton
+import { useTheme } from "../utils/ThemeProvider";
+import LogoutButton from "../components/LogoutButton";
 
 // Composant pour les sous-menus (Services et Partenaires)
 const SubMenu = ({ label, icon, items, handleNavigation }) => {
@@ -38,15 +37,15 @@ const SubMenu = ({ label, icon, items, handleNavigation }) => {
 };
 
 const Navbar = ({ isAuthenticated, userRole, handleLogout }) => {
-  const { t, i18n } = useTranslation(); // Utilisez useTranslation pour obtenir t et i18n
-  const theme = useMuiTheme(); // Utilisez useMuiTheme pour le thème MUI
+  const theme = useMuiTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const navigate = useNavigate();
-  const { mode, toggleTheme } = useTheme(); // Utilisez mode et toggleTheme
+  const { mode, toggleTheme } = useTheme();
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [anchorElPartners, setAnchorElPartners] = useState(null);
+  const [language, setLanguage] = useState('fr'); // Ajout d'un état pour la langue
 
   const toggleDrawer = (open) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -57,22 +56,22 @@ const Navbar = ({ isAuthenticated, userRole, handleLogout }) => {
 
   const handleNavigation = (path) => {
     navigate(path);
-    setMenuOpen(false); // Fermer le Drawer après la navigation
-    setAnchorEl(null); // Fermer les menus déroulants
+    setMenuOpen(false);
+    setAnchorEl(null);
     setAnchorElPartners(null);
   };
 
-  // Données pour les sous-menus
+  // Données pour les sous-menus (textes statiques en français)
   const servicesItems = [
-    { path: "/dashboard/farmer", label: t("Agriculteur") },
-    { path: "/dashboard/buyer", label: t("Acheteur") },
-    { path: "/dashboard/supplier", label: t("Fournisseur") },
+    { path: "/dashboard/farmer", label: "Agriculteur" },
+    { path: "/dashboard/buyer", label: "Acheteur" },
+    { path: "/dashboard/supplier", label: "Fournisseur" },
   ];
 
   const partnersItems = [
-    { path: "/dashboard/transporter", label: t("Transporteurs") },
-    { path: "/dashboard/agronomist", label: t("Agronomes") },
-    { path: "/dashboard/ngo", label: t("ONG") },
+    { path: "/dashboard/transporter", label: "Transporteurs" },
+    { path: "/dashboard/agronomist", label: "Agronomes" },
+    { path: "/dashboard/ngo", label: "ONG" },
   ];
 
   return (
@@ -94,18 +93,18 @@ const Navbar = ({ isAuthenticated, userRole, handleLogout }) => {
                 {/* Accueil */}
                 <ListItem button onClick={() => handleNavigation("/")}>
                   <Home sx={{ mr: 1, color: blue[500] }} />
-                  <ListItemText primary={t("Accueil")} />
+                  <ListItemText primary="Accueil" />
                 </ListItem>
 
                 {/* À propos */}
                 <ListItem button onClick={() => handleNavigation("/about")}>
                   <Info sx={{ mr: 1, color: orange[500] }} />
-                  <ListItemText primary={t("À propos")} />
+                  <ListItemText primary="À propos" />
                 </ListItem>
 
                 {/* Services */}
                 <SubMenu
-                  label={t("Services")}
+                  label="Services"
                   icon={<ShoppingCart sx={{ mr: 1, color: red[500] }} />}
                   items={servicesItems}
                   handleNavigation={handleNavigation}
@@ -113,7 +112,7 @@ const Navbar = ({ isAuthenticated, userRole, handleLogout }) => {
 
                 {/* Partenaires */}
                 <SubMenu
-                  label={t("Partenaires")}
+                  label="Partenaires"
                   icon={<People sx={{ mr: 1, color: purple[500] }} />}
                   items={partnersItems}
                   handleNavigation={handleNavigation}
@@ -122,26 +121,26 @@ const Navbar = ({ isAuthenticated, userRole, handleLogout }) => {
                 {/* Contact */}
                 <ListItem button onClick={() => handleNavigation("/contact")}>
                   <Contacts sx={{ mr: 1, color: green[500] }} />
-                  <ListItemText primary={t("Contact")} />
+                  <ListItemText primary="Contact" />
                 </ListItem>
 
                 {/* Mode Sombre/Lumière */}
                 <ListItem>
                   <IconButton
-                    onClick={toggleTheme} // Utilisez toggleTheme directement
+                    onClick={toggleTheme}
                     color="inherit"
                     sx={{ width: "100%", justifyContent: "flex-start" }}
                   >
-                    {mode === "dark" ? <Brightness7 /> : <Brightness4 />} {/* Utilisez mode pour déterminer l'icône */}
-                    <Typography sx={{ ml: 2 }}>{mode === "dark" ? t("Mode Clair") : t("Mode Sombre")}</Typography>
+                    {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
+                    <Typography sx={{ ml: 2 }}>{mode === "dark" ? "Mode Clair" : "Mode Sombre"}</Typography>
                   </IconButton>
                 </ListItem>
 
-                {/* Sélecteur de langue */}
+                {/* Sélecteur de langue (maintenu mais simplifié) */}
                 <ListItem>
                   <Select
-                    value={i18n.language}
-                    onChange={(e) => i18n.changeLanguage(e.target.value)} // Utilisez i18n.changeLanguage
+                    value={language}
+                    onChange={(e) => setLanguage(e.target.value)}
                     variant="outlined"
                     size="small"
                     fullWidth
@@ -155,7 +154,7 @@ const Navbar = ({ isAuthenticated, userRole, handleLogout }) => {
                 {/* Bouton Se Connecter/Déconnexion */}
                 <ListItem>
                   {isAuthenticated ? (
-                    <LogoutButton handleLogout={handleLogout} /> // Utilisez LogoutButton ici
+                    <LogoutButton handleLogout={handleLogout} />
                   ) : (
                     <Button
                       variant="contained"
@@ -164,7 +163,7 @@ const Navbar = ({ isAuthenticated, userRole, handleLogout }) => {
                       sx={{ backgroundColor: purple[500], color: "white", "&:hover": { backgroundColor: purple[700] } }}
                       onClick={() => handleNavigation("/login")}
                     >
-                      {t("Se Connecter")}
+                      Se Connecter
                     </Button>
                   )}
                 </ListItem>
@@ -175,15 +174,15 @@ const Navbar = ({ isAuthenticated, userRole, handleLogout }) => {
           <>
             {/* Mode Desktop */}
             <Button color="inherit" startIcon={<Home sx={{ color: blue[500] }} />} onClick={() => handleNavigation("/")}>
-              {t("Accueil")}
+              Accueil
             </Button>
             <Button color="inherit" startIcon={<Info sx={{ color: orange[500] }} />} onClick={() => handleNavigation("/about")}>
-              {t("À propos")}
+              À propos
             </Button>
 
             {/* Services */}
             <Button color="inherit" onClick={(e) => setAnchorEl(e.currentTarget)} startIcon={<ShoppingCart sx={{ color: red[500] }} />}>
-              {t("Services")}
+              Services
             </Button>
             <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
               {servicesItems.map((item, index) => (
@@ -195,7 +194,7 @@ const Navbar = ({ isAuthenticated, userRole, handleLogout }) => {
 
             {/* Partenaires */}
             <Button color="inherit" onClick={(e) => setAnchorElPartners(e.currentTarget)} startIcon={<People sx={{ color: purple[500] }} />}>
-              {t("Partenaires")}
+              Partenaires
             </Button>
             <Menu anchorEl={anchorElPartners} open={Boolean(anchorElPartners)} onClose={() => setAnchorElPartners(null)}>
               {partnersItems.map((item, index) => (
@@ -207,21 +206,18 @@ const Navbar = ({ isAuthenticated, userRole, handleLogout }) => {
 
             {/* Contact */}
             <Button color="inherit" startIcon={<Contacts sx={{ color: green[500] }} />} onClick={() => handleNavigation("/contact")}>
-              {t("Contact")}
+              Contact
             </Button>
 
             {/* Mode Sombre/Lumière */}
-            <IconButton
-              onClick={toggleTheme} // Utilisez toggleTheme directement
-              color="inherit"
-            >
-              {mode === "dark" ? <Brightness7 /> : <Brightness4 />} {/* Utilisez mode pour déterminer l'icône */}
+            <IconButton onClick={toggleTheme} color="inherit">
+              {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
             </IconButton>
 
-            {/* Sélecteur de langue */}
+            {/* Sélecteur de langue (maintenu mais simplifié) */}
             <Select
-              value={i18n.language}
-              onChange={(e) => i18n.changeLanguage(e.target.value)} // Utilisez i18n.changeLanguage
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
               variant="outlined"
               size="small"
               sx={{ mx: 2, color: "white", borderColor: "white" }}
@@ -232,7 +228,7 @@ const Navbar = ({ isAuthenticated, userRole, handleLogout }) => {
 
             {/* Bouton Se Connecter/Déconnexion */}
             {isAuthenticated ? (
-              <LogoutButton handleLogout={handleLogout} /> // Utilisez LogoutButton ici
+              <LogoutButton handleLogout={handleLogout} />
             ) : (
               <Button
                 variant="contained"
@@ -240,7 +236,7 @@ const Navbar = ({ isAuthenticated, userRole, handleLogout }) => {
                 sx={{ backgroundColor: purple[500], color: "white", "&:hover": { backgroundColor: purple[700] } }}
                 onClick={() => handleNavigation("/login")}
               >
-                {t("Se Connecter")}
+                Se Connecter
               </Button>
             )}
           </>
