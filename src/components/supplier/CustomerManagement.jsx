@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Grid,
   Paper,
@@ -14,288 +14,560 @@ import {
   IconButton,
   Pagination,
   InputAdornment,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Snackbar,
+  Alert,
+  Chip,
+  CircularProgress,
+  Backdrop,
+  Tooltip,
+  Box,
+  Avatar,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from '@mui/material';
-import { Edit as EditIcon, Delete as DeleteIcon, Search as SearchIcon } from '@mui/icons-material';
+import {
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  Search as SearchIcon,
+  Save as SaveIcon,
+  Add as AddIcon,
+  Close as CloseIcon,
+  CheckCircle as CheckCircleIcon,
+  Cancel as CancelIcon,
+  PictureAsPdf as PdfIcon,
+  Print as PrintIcon,
+  Person as PersonIcon
+} from '@mui/icons-material';
 import * as XLSX from 'xlsx';
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 const CustomerManagement = () => {
   // États pour la liste des clients
-  const [customers, setCustomers] = useState([
-    {
-      id: 1,
-      name: 'Jean Okouyi',
-      email: 'jean.okouyi@example.com',
-      phone: '+241 01 23 45 67',
-      cni: '1234567890',
-      address: 'Quartier Louis, Libreville',
-      createdAt: '2023-10-01 10:30',
-    },
-    {
-      id: 2,
-      name: 'Marie Mba',
-      email: 'marie.mba@example.com',
-      phone: '+241 07 89 01 23',
-      cni: '0987654321',
-      address: 'Quartier Nzeng-Ayong, Libreville',
-      createdAt: '2023-10-02 14:45',
-    },
-  ]);
-
-  // États pour le formulaire d'ajout/mise à jour
-  const [newCustomer, setNewCustomer] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    cni: '',
-    address: '',
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [editIndex, setEditIndex] = useState(null);
+  const [deleteIndex, setDeleteIndex] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [page, setPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
   });
 
-  // États pour la mise à jour d'un client
-  const [editIndex, setEditIndex] = useState(null);
-
-  // États pour les erreurs de validation
-  const [errors, setErrors] = useState({});
-
-  // Pagination
-  const [page, setPage] = useState(1);
   const rowsPerPage = 5;
 
-  // Recherche
-  const [searchTerm, setSearchTerm] = useState('');
+  // États pour le formulaire
+  const initialCustomerState = {
+    name: '',
+    email: '',
+    phone: '+241 ',
+    cni: '',
+    address: '',
+    status: 'active'
+  };
 
-  // Gestion des changements dans le formulaire
+  const [newCustomer, setNewCustomer] = useState(initialCustomerState);
+  const [errors, setErrors] = useState({});
+
+  // Simuler le chargement des données
+  useEffect(() => {
+    setLoading(true);
+    setTimeout(() => {
+      const mockCustomers = [
+        {
+          id: 1,
+          name: 'Jean Okouyi',
+          email: 'jeanokouyi@gmail.com',
+          phone: '+241 01 23 45 67',
+          cni: '1234567890',
+          address: 'Quartier Louis, Libreville',
+          createdAt: format(new Date('2023-10-01'), 'PPpp', { locale: fr }),
+          status: 'active'
+        },
+        {
+          id: 2,
+          name: 'Marie Mba',
+          email: 'mariemba@gmail.com',
+          phone: '+241 07 89 01 23',
+          cni: '0987654321',
+          address: 'Quartier Nzeng-Ayong, Libreville',
+          createdAt: format(new Date('2023-10-02'), 'PPpp', { locale: fr }),
+          status: 'inactive'
+        }
+      ];
+      setCustomers(mockCustomers);
+      setLoading(false);
+    }, 1500);
+  }, []);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewCustomer({ ...newCustomer, [name]: value });
+    if (errors[name]) setErrors({ ...errors, [name]: '' });
   };
 
-  // Validation du formulaire
   const validateForm = () => {
     const newErrors = {};
-    if (!newCustomer.name) newErrors.name = 'Le nom est obligatoire';
-    if (!newCustomer.email) newErrors.email = 'L\'email est obligatoire';
-    if (!newCustomer.phone) newErrors.phone = 'Le téléphone est obligatoire';
-    if (!newCustomer.cni) newErrors.cni = 'Le numéro de CNI est obligatoire';
-    if (!newCustomer.address) newErrors.address = 'L\'adresse est obligatoire';
+    if (!newCustomer.name.trim()) newErrors.name = 'Nom obligatoire';
+    if (!/^\S+@\S+\.\S+$/.test(newCustomer.email)) newErrors.email = 'Email invalide';
+    if (!/^\+241 \d{2} \d{2} \d{2} \d{2}$/.test(newCustomer.phone)) newErrors.phone = 'Format: +241 XX XX XX XX';
+    if (!/^\d{10}$/.test(newCustomer.cni)) newErrors.cni = 'CNI invalide (10 chiffres)';
+    if (!newCustomer.address.trim()) newErrors.address = 'Adresse obligatoire';
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Ajouter ou mettre à jour un client
   const handleAddOrUpdateCustomer = () => {
-    if (!validateForm()) return; // Arrêter si le formulaire n'est pas valide
+    if (!validateForm()) return;
 
-    if (editIndex !== null) {
-      // Mettre à jour un client existant
-      const updatedCustomers = [...customers];
-      updatedCustomers[editIndex] = {
-        ...newCustomer,
-        id: customers[editIndex].id,
-        createdAt: customers[editIndex].createdAt, // Conserver la date d'origine
-      };
-      setCustomers(updatedCustomers);
+    setLoading(true);
+    setTimeout(() => {
+      if (editIndex !== null) {
+        // Mise à jour
+        const updatedCustomers = [...customers];
+        updatedCustomers[editIndex] = {
+          ...newCustomer,
+          id: customers[editIndex].id,
+          createdAt: customers[editIndex].createdAt
+        };
+        setCustomers(updatedCustomers);
+        setSnackbar({ open: true, message: 'Client mis à jour', severity: 'success' });
+      } else {
+        // Nouveau client
+        const newId = customers.length > 0 ? Math.max(...customers.map(c => c.id)) + 1 : 1;
+        setCustomers([
+          ...customers,
+          {
+            ...newCustomer,
+            id: newId,
+            createdAt: format(new Date(), 'PPpp', { locale: fr })
+          }
+        ]);
+        setSnackbar({ open: true, message: 'Client ajouté', severity: 'success' });
+      }
+      
+      setNewCustomer(initialCustomerState);
       setEditIndex(null);
-    } else {
-      // Ajouter un nouveau client
-      const now = new Date();
-      const formattedDate = `${now.toISOString().split('T')[0]} ${now.toLocaleTimeString()}`;
-      setCustomers([
-        ...customers,
-        {
-          id: customers.length + 1,
-          name: newCustomer.name,
-          email: newCustomer.email,
-          phone: newCustomer.phone,
-          cni: newCustomer.cni,
-          address: newCustomer.address,
-          createdAt: formattedDate, // Ajouter la date et l'heure actuelles
-        },
-      ]);
-    }
-    setNewCustomer({ name: '', email: '', phone: '', cni: '', address: '' });
+      setLoading(false);
+    }, 1000);
   };
 
-  // Supprimer un client
-  const handleDeleteCustomer = (index) => {
-    const updatedCustomers = customers.filter((_, i) => i !== index);
-    setCustomers(updatedCustomers);
+  const handleDeleteCustomer = () => {
+    setLoading(true);
+    setTimeout(() => {
+      const updatedCustomers = customers.filter((_, i) => i !== deleteIndex);
+      setCustomers(updatedCustomers);
+      setOpenDialog(false);
+      setSnackbar({ open: true, message: 'Client supprimé', severity: 'success' });
+      setLoading(false);
+    }, 800);
   };
 
-  // Éditer un client
   const handleEditCustomer = (index) => {
     setNewCustomer(customers[index]);
     setEditIndex(index);
   };
 
-  // Exportation en Excel
   const handleExportExcel = () => {
-    const data = customers.map((customer) => ({
-      'ID Client': customer.id,
-      Nom: customer.name,
-      Email: customer.email,
-      Téléphone: customer.phone,
-      'Numéro CNI': customer.cni,
-      Adresse: customer.address,
-      'Date et heure d\'ajout': customer.createdAt,
-    }));
-
-    const worksheet = XLSX.utils.json_to_sheet(data);
+    const worksheet = XLSX.utils.json_to_sheet(
+      filteredCustomers.map(customer => ({
+        ID: customer.id,
+        Nom: customer.name,
+        Email: customer.email,
+        Téléphone: customer.phone,
+        'Numéro CNI': customer.cni,
+        Adresse: customer.address,
+        Statut: customer.status === 'active' ? 'Actif' : 'Inactif',
+        'Date création': customer.createdAt
+      }))
+    );
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Clients');
-    XLSX.writeFile(workbook, 'clients_gabon.xlsx');
+    XLSX.writeFile(workbook, `clients_${format(new Date(), 'yyyyMMdd')}.xlsx`);
   };
 
-  // Pagination
-  const handlePageChange = (event, value) => {
-    setPage(value);
+  const handleExportPDF = () => {
+    const doc = new jsPDF();
+    doc.text('Liste des Clients', 14, 16);
+    doc.autoTable({
+      head: [['ID', 'Nom', 'Email', 'Téléphone', 'Statut']],
+      body: filteredCustomers.map(customer => [
+        customer.id,
+        customer.name,
+        customer.email,
+        customer.phone,
+        customer.status === 'active' ? 'Actif' : 'Inactif'
+      ]),
+      startY: 20,
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [25, 118, 210] }
+    });
+    doc.save(`clients_${format(new Date(), 'yyyyMMdd')}.pdf`);
   };
 
-  // Filtrage des clients par recherche
-  const filteredCustomers = customers.filter((customer) =>
-    customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    customer.cni.toLowerCase().includes(searchTerm.toLowerCase())
+  const handlePrint = () => {
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Liste des Clients</title>
+          <style>
+            body { font-family: Arial; margin: 20px; }
+            h1 { color: #1976d2; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #1976d2; color: white; }
+            .status-active { color: green; }
+            .status-inactive { color: red; }
+          </style>
+        </head>
+        <body>
+          <h1>Liste des Clients</h1>
+          <p>Généré le ${format(new Date(), 'PPpp', { locale: fr })}</p>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Téléphone</th>
+                <th>CNI</th>
+                <th>Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filteredCustomers.map(customer => `
+                <tr>
+                  <td>${customer.id}</td>
+                  <td>${customer.name}</td>
+                  <td>${customer.email}</td>
+                  <td>${customer.phone}</td>
+                  <td>${customer.cni}</td>
+                  <td class="status-${customer.status}">
+                    ${customer.status === 'active' ? 'Actif' : 'Inactif'}
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+  };
+
+  const handlePageChange = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const filteredCustomers = customers.filter(customer =>
+    Object.values(customer).some(
+      value => value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+    )
   );
 
-  const paginatedCustomers = filteredCustomers.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+  const paginatedCustomers = filteredCustomers.slice(
+    (page - 1) * rowsPerPage,
+    page * rowsPerPage
+  );
 
   return (
     <Grid container spacing={3}>
-      <Grid item xs={12}>
-        <Typography variant="h5">Gestion des clients (Contexte Gabonais)</Typography>
+      <Backdrop open={loading} sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
 
-        {/* Formulaire pour ajouter ou mettre à jour un client */}
-        <Paper sx={{ padding: '20px', marginBottom: '20px', boxShadow: 3, borderRadius: 2 }}>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert severity={snackbar.severity}>{snackbar.message}</Alert>
+      </Snackbar>
+
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+        <DialogTitle>Confirmer la suppression</DialogTitle>
+        <DialogContent>
+          Êtes-vous sûr de vouloir supprimer ce client ?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)} color="primary">
+            Annuler
+          </Button>
+          <Button onClick={handleDeleteCustomer} color="error" variant="contained">
+            Supprimer
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Grid item xs={12}>
+        <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold' }}>
+          Gestion des Clients
+        </Typography>
+
+        {/* Formulaire */}
+        <Paper sx={{ p: 3, mb: 3, borderRadius: 2, boxShadow: 3 }}>
+          <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+            {editIndex !== null ? (
+              <>
+                <EditIcon color="primary" sx={{ mr: 1 }} />
+                Modifier un client
+              </>
+            ) : (
+              <>
+                <AddIcon color="primary" sx={{ mr: 1 }} />
+                Ajouter un nouveau client
+              </>
+            )}
+          </Typography>
+
           <Grid container spacing={2}>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
-                label="Nom complet"
+                label="Nom complet *"
                 name="name"
                 value={newCustomer.name}
                 onChange={handleInputChange}
                 error={!!errors.name}
-                helperText={errors.name}
+                helperText={errors.name || " "}
+                size="small"
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
-                label="Email"
+                label="Email *"
                 name="email"
+                type="email"
                 value={newCustomer.email}
                 onChange={handleInputChange}
                 error={!!errors.email}
-                helperText={errors.email}
+                helperText={errors.email || " "}
+                size="small"
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
-                label="Téléphone"
+                label="Téléphone *"
                 name="phone"
                 value={newCustomer.phone}
                 onChange={handleInputChange}
                 error={!!errors.phone}
-                helperText={errors.phone}
-                placeholder="+241 01 23 45 67"
+                helperText={errors.phone || "Format: +241 XX XX XX XX"}
+                size="small"
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
-                label="Numéro CNI"
+                label="Numéro CNI *"
                 name="cni"
                 value={newCustomer.cni}
                 onChange={handleInputChange}
                 error={!!errors.cni}
-                helperText={errors.cni}
+                helperText={errors.cni || "10 chiffres"}
+                size="small"
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
-                label="Adresse (Quartier, Ville)"
+                label="Adresse *"
                 name="address"
                 value={newCustomer.address}
                 onChange={handleInputChange}
                 error={!!errors.address}
-                helperText={errors.address}
+                helperText={errors.address || "Quartier, Ville"}
+                size="small"
               />
             </Grid>
-            <Grid item xs={12}>
-              <Button variant="contained" color="primary" onClick={handleAddOrUpdateCustomer}>
-                {editIndex !== null ? 'Mettre à jour' : 'Ajouter'}
+            <Grid item xs={12} md={4}>
+              <FormControl fullWidth size="small">
+                <InputLabel>Statut *</InputLabel>
+                <Select
+                  name="status"
+                  value={newCustomer.status}
+                  onChange={handleInputChange}
+                  label="Statut *"
+                >
+                  <MenuItem value="active">Actif</MenuItem>
+                  <MenuItem value="inactive">Inactif</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+              {editIndex !== null && (
+                <Button
+                  variant="outlined"
+                  color="error"
+                  onClick={() => {
+                    setNewCustomer(initialCustomerState);
+                    setEditIndex(null);
+                  }}
+                  startIcon={<CloseIcon />}
+                >
+                  Annuler
+                </Button>
+              )}
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleAddOrUpdateCustomer}
+                startIcon={editIndex !== null ? <SaveIcon /> : <AddIcon />}
+                disabled={loading}
+              >
+                {editIndex !== null ? 'Enregistrer' : 'Ajouter'}
               </Button>
             </Grid>
           </Grid>
         </Paper>
 
-        {/* Champ de recherche */}
-        <TextField
-          fullWidth
-          label="Rechercher un client"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          sx={{ mb: 2 }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
+        {/* Recherche et actions */}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+          <TextField
+            variant="outlined"
+            size="small"
+            placeholder="Rechercher..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+            sx={{ width: 300 }}
+          />
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Tooltip title="Exporter en Excel">
+              <IconButton color="success" onClick={handleExportExcel}>
+                <PdfIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Exporter en PDF">
+              <IconButton color="error" onClick={handleExportPDF}>
+                <PdfIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Imprimer">
+              <IconButton color="info" onClick={handlePrint}>
+                <PrintIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </Box>
 
-        {/* Tableau des clients */}
-        <TableContainer component={Paper} sx={{ boxShadow: 3, borderRadius: 2 }}>
+        {/* Tableau */}
+        <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 3 }}>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>ID Client</TableCell>
-                <TableCell>Nom complet</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Téléphone</TableCell>
-                <TableCell>Numéro CNI</TableCell>
+                <TableCell>ID</TableCell>
+                <TableCell>Client</TableCell>
+                <TableCell>Contact</TableCell>
+                <TableCell>CNI</TableCell>
                 <TableCell>Adresse</TableCell>
-                <TableCell>Date et heure d'ajout</TableCell>
-                <TableCell>Actions</TableCell>
+                <TableCell>Création</TableCell>
+                <TableCell>Statut</TableCell>
+                <TableCell align="center">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {paginatedCustomers.map((customer, index) => (
-                <TableRow key={customer.id}>
-                  <TableCell>{customer.id}</TableCell>
-                  <TableCell>{customer.name}</TableCell>
-                  <TableCell>{customer.email}</TableCell>
-                  <TableCell>{customer.phone}</TableCell>
-                  <TableCell>{customer.cni}</TableCell>
-                  <TableCell>{customer.address}</TableCell>
-                  <TableCell>{customer.createdAt}</TableCell>
-                  <TableCell>
-                    <IconButton onClick={() => handleEditCustomer(index)}>
-                      <EditIcon color="primary" />
-                    </IconButton>
-                    <IconButton onClick={() => handleDeleteCustomer(index)}>
-                      <DeleteIcon color="error" />
-                    </IconButton>
+              {paginatedCustomers.length > 0 ? (
+                paginatedCustomers.map((customer, index) => (
+                  <TableRow key={customer.id} hover>
+                    <TableCell>{customer.id}</TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Avatar sx={{ bgcolor: 'primary.main' }}>
+                          <PersonIcon />
+                        </Avatar>
+                        <Typography fontWeight="medium">{customer.name}</Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Typography>{customer.email}</Typography>
+                      <Typography color="text.secondary">{customer.phone}</Typography>
+                    </TableCell>
+                    <TableCell>{customer.cni}</TableCell>
+                    <TableCell sx={{ maxWidth: 200 }}>
+                      <Typography noWrap>{customer.address}</Typography>
+                    </TableCell>
+                    <TableCell>{customer.createdAt}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={customer.status === 'active' ? 'Actif' : 'Inactif'}
+                        color={customer.status === 'active' ? 'success' : 'error'}
+                        size="small"
+                        icon={customer.status === 'active' ? <CheckCircleIcon /> : <CancelIcon />}
+                      />
+                    </TableCell>
+                    <TableCell align="center">
+                      <Tooltip title="Modifier">
+                        <IconButton
+                          color="primary"
+                          onClick={() => handleEditCustomer((page - 1) * rowsPerPage + index)}
+                        >
+                          <EditIcon />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Supprimer">
+                        <IconButton
+                          color="error"
+                          onClick={() => {
+                            setDeleteIndex((page - 1) * rowsPerPage + index);
+                            setOpenDialog(true);
+                          }}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
+                    <Typography color="text.secondary">
+                      Aucun client trouvé
+                    </Typography>
                   </TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </TableContainer>
-        <Pagination
-          count={Math.ceil(filteredCustomers.length / rowsPerPage)}
-          page={page}
-          onChange={handlePageChange}
-          sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}
-        />
 
-        {/* Bouton d'exportation sous le tableau */}
-        <Button variant="contained" color="success" onClick={handleExportExcel} sx={{ mt: 2 }}>
-          Exporter en Excel
-        </Button>
+        {/* Pagination */}
+        {filteredCustomers.length > 0 && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+            <Pagination
+              count={Math.ceil(filteredCustomers.length / rowsPerPage)}
+              page={page}
+              onChange={handlePageChange}
+              color="primary"
+              showFirstButton
+              showLastButton
+            />
+          </Box>
+        )}
       </Grid>
     </Grid>
   );

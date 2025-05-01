@@ -12,7 +12,7 @@ import {
   IconButton,
   useTheme,
   Box,
-  Button, // Ajout d'un bouton pour remplacer LogoutButton
+  Button,
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
@@ -23,80 +23,71 @@ import {
   BarChart as BarChartIcon,
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
+  Logout as LogoutIcon,
 } from '@mui/icons-material';
 
-const SidebarSupplier = ({ onSelectSection }) => {
+const SidebarSupplier = ({ onSelectSection, isOpen, onToggleOpen, isMobile }) => {
   const theme = useTheme();
   const navigate = useNavigate();
-
-  // États pour gérer l'ouverture/fermeture de la sidebar
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [selectedSection, setSelectedSection] = useState('summary');
 
-  // Fonction pour gérer la sélection d'une section
   const handleSelect = (section) => {
     setSelectedSection(section);
     onSelectSection(section);
+    if (isMobile) onToggleOpen(false);
   };
 
-  // Fonction pour basculer l'état de la sidebar
   const handleDrawerToggle = () => {
-    setIsSidebarOpen(!isSidebarOpen);
+    onToggleOpen(!isOpen);
   };
 
-  // Fonction pour gérer la déconnexion
   const handleLogout = () => {
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('userRole');
-    navigate('/'); // Redirection vers la page d'accueil
-    window.location.reload(); // Rechargement de la page
+    navigate('/');
+    window.location.reload();
   };
 
   return (
     <Drawer
-      variant="permanent"
+      variant={isMobile ? "temporary" : "permanent"}
       anchor="left"
-      open={isSidebarOpen}
+      open={isOpen}
+      onClose={() => onToggleOpen(false)}
       sx={{
-        width: isSidebarOpen ? 240 : 72, // Largeur de la sidebar
+        width: isOpen ? 240 : 72,
         flexShrink: 0,
-        whiteSpace: 'nowrap',
-        transition: theme.transitions.create('width', {
-          easing: theme.transitions.easing.sharp,
-          duration: theme.transitions.duration.enteringScreen,
-        }),
-        '& .MuiDrawer-paper': {
-          width: isSidebarOpen ? 240 : 72, // Largeur du papier (contenu de la sidebar)
-          overflowX: 'hidden',
-          transition: theme.transitions.create('width', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-          }),
-          backgroundColor: theme.palette.primary.main, // Fond coloré
-          color: theme.palette.primary.contrastText, // Couleur du texte
-          boxShadow: '4px 0 10px rgba(0, 0, 0, 0.1)', // Ombre portée
+        [`& .MuiDrawer-paper`]: { 
+          width: isOpen ? 240 : 72,
+          boxSizing: 'border-box',
+          backgroundColor: theme.palette.primary.main,
+          color: theme.palette.primary.contrastText,
+          boxShadow: '4px 0 10px rgba(0, 0, 0, 0.1)',
         },
+      }}
+      ModalProps={{
+        keepMounted: true,
       }}
     >
       <Toolbar
         sx={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: isSidebarOpen ? 'space-between' : 'center',
+          justifyContent: isOpen ? 'space-between' : 'center',
           padding: theme.spacing(0, 2),
+          minHeight: '64px !important',
         }}
       >
-        {isSidebarOpen && (
+        {isOpen ? (
           <Typography variant="h6" noWrap sx={{ fontWeight: 'bold' }}>
             GESTAGRO
           </Typography>
-        )}
+        ) : null}
         <IconButton
           onClick={handleDrawerToggle}
           sx={{ color: theme.palette.primary.contrastText }}
-          aria-label={isSidebarOpen ? 'Fermer la sidebar' : 'Ouvrir la sidebar'}
         >
-          {isSidebarOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+          {isOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
         </IconButton>
       </Toolbar>
       <Divider sx={{ backgroundColor: theme.palette.primary.light }} />
@@ -116,36 +107,53 @@ const SidebarSupplier = ({ onSelectSection }) => {
             onClick={() => handleSelect(item.section)}
             sx={{
               '&:hover': {
-                backgroundColor: '#1976d2', // Couleur bleue au survol
+                backgroundColor: theme.palette.primary.dark,
               },
               '&.Mui-selected': {
-                backgroundColor: theme.palette.primary.dark, // Couleur de fond pour l'élément sélectionné
+                backgroundColor: theme.palette.primary.dark,
               },
-              padding: theme.spacing(1, 2), // Réduction de l'espacement
+              padding: theme.spacing(1, 2),
             }}
           >
             <ListItemIcon sx={{ color: theme.palette.primary.contrastText, minWidth: '40px' }}>
               {item.icon}
             </ListItemIcon>
-            {isSidebarOpen && (
+            {isOpen && (
               <ListItemText
                 primary={item.text}
-                primaryTypographyProps={{ fontWeight: 'bold' }} // Texte en gras
+                primaryTypographyProps={{ fontWeight: 'medium' }}
               />
             )}
           </ListItem>
         ))}
       </List>
 
-      {/* Bouton de déconnexion dans le Sidebar */}
-      <Box sx={{ position: 'absolute', bottom: 20, left: 20, right: 20 }}>
+      {/* Responsive logout button */}
+      <Box sx={{ 
+        position: 'absolute', 
+        bottom: 20, 
+        left: isOpen ? 20 : '50%',
+        right: isOpen ? 20 : 'auto',
+        transform: isOpen ? 'none' : 'translateX(-50%)',
+        width: isOpen ? 'calc(100% - 40px)' : '40px'
+      }}>
         <Button
           onClick={handleLogout}
           variant="contained"
           color="secondary"
-          fullWidth
+          fullWidth={isOpen}
+          size={isOpen ? "medium" : "small"}
+          sx={{
+            minWidth: 0,
+            padding: isOpen ? '' : '8px',
+            borderRadius: isOpen ? '4px' : '50%',
+            '& .MuiButton-startIcon': {
+              margin: 0
+            }
+          }}
+          startIcon={isOpen ? null : <LogoutIcon />}
         >
-          Déconnexion
+          {isOpen ? 'Déconnexion' : ''}
         </Button>
       </Box>
     </Drawer>

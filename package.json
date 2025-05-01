@@ -30,6 +30,7 @@
     "leaflet": "^1.9.4",
     "lucide-react": "^0.477.0",
     "luxon": "^3.5.0",
+    "material-ui-confirm": "^4.0.0",
     "postcss-flexbugs-fixes": "^5.0.2",
     "postcss-import": "^16.1.0",
     "postcss-loader": "^8.1.1",
