@@ -1,19 +1,23 @@
 import React, { useState } from "react";
-import { Box, CssBaseline, Typography } from "@mui/material";
+import { Box, CssBaseline, IconButton, useMediaQuery, useTheme } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
 import Sidebar from "../components/farmer/Sidebar";
 import Summary from "../components/farmer/Summary";
 import Products from "../components/farmer/Products";
 import Orders from "../components/farmer/Orders";
 import Billing from "../components/farmer/Billing";
-import Trends from "../components/farmer/Trends"; // Remplacez Messaging par Trends
+import Trends from "../components/farmer/Trends";
 import Tools from "../components/farmer/Tools";
 import ProductionTracking from "../components/farmer/ProductionTracking";
 import StockManagement from "../components/farmer/StockManagement";
 import Weather from "../components/farmer/Weather";
-import Directory from "../components/farmer/Directory"; // Importez le composant Directory
+import Directory from "../components/farmer/Directory";
 
 const DashboardFarmer = () => {
   const [activeTab, setActiveTab] = useState("summary");
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
 
   const renderContent = () => {
     switch (activeTab) {
@@ -25,7 +29,7 @@ const DashboardFarmer = () => {
         return <Orders />;
       case "billing":
         return <Billing />;
-      case "trends": // Remplacez "messaging" par "trends"
+      case "trends":
         return <Trends />;
       case "tools":
         return <Tools />;
@@ -35,7 +39,7 @@ const DashboardFarmer = () => {
         return <StockManagement />;
       case "weather":
         return <Weather />;
-      case "directory": // Ajoutez le cas pour l'annuaire
+      case "directory":
         return <Directory />;
       default:
         return <Summary />;
@@ -46,22 +50,54 @@ const DashboardFarmer = () => {
     <Box sx={{ display: "flex", height: "100vh", overflow: "hidden" }}>
       <CssBaseline />
 
-      {/* Barre latérale */}
-      <Sidebar setActiveTab={setActiveTab} />
+      <Sidebar 
+        setActiveTab={setActiveTab} 
+        isMobile={isMobile} 
+        sidebarOpen={sidebarOpen} 
+        setSidebarOpen={setSidebarOpen}
+      />
 
-      {/* Contenu principal */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          p: 3,
-          overflowY: "auto", // Permettre le défilement vertical si nécessaire
-          backgroundColor: "#f5f5f5", // Couleur de fond pour le contenu principal
+          p: { xs: 1, sm: 2, md: 3 },
+          overflowY: "auto",
+          backgroundColor: "#f5f5f5",
+          marginLeft: { 
+            xs: sidebarOpen ? '260px' : 0,
+            sm: 0 // Suppression de la marge à gauche sur grand écran
+          },
+          transition: theme.transitions.create('margin', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+          }),
         }}
       >
-        <Typography variant="h4" sx={{ mb: 2 }}>
-          Tableau de Bord
-        </Typography>
+        {isMobile && (
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            onClick={() => setSidebarOpen(true)}
+            edge="start"
+            sx={{ 
+              mr: 2,
+              color: 'primary.main',
+              backgroundColor: 'rgba(255,255,255,0.9)',
+              position: 'fixed',
+              top: 16,
+              left: 16,
+              zIndex: 1200,
+              boxShadow: 3,
+              '&:hover': {
+                backgroundColor: 'rgba(255,255,255,1)',
+              }
+            }}
+          >
+            <MenuIcon />
+          </IconButton>
+        )}
+        
         {renderContent()}
       </Box>
     </Box>

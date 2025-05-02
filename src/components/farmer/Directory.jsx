@@ -408,7 +408,7 @@ const Directory = () => {
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" sx={{ mb: 3 }}>
-        Annuaire des Fournisseurs Agricoles
+        ANNUAIRE DES FOURNISSEUR AGRICOLES
       </Typography>
 
       {/* Barre de recherche et filtres */}

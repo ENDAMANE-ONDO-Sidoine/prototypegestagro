@@ -1,4 +1,4 @@
-import React, { useState} from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -22,20 +22,20 @@ import {
   FormControl,
   InputLabel,
   Snackbar,
+  Alert,
 } from '@mui/material';
 import { Visibility, Edit, Delete, Add } from '@mui/icons-material';
 import { styled } from '@mui/system';
-//import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
 // Styles personnalisés
-const OrdersContainer = styled(Box)({
-  padding: '24px',
-  backgroundColor: '#f5f5f5',
-  borderRadius: '8px',
-});
+const OrdersContainer = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(3),
+  backgroundColor: theme.palette.grey[100],
+  borderRadius: theme.shape.borderRadius,
+}));
 
 // Données mockées pour les commandes
 const initialOrders = [
@@ -43,37 +43,41 @@ const initialOrders = [
     id: 1,
     orderNumber: 'ORD001',
     customer: 'Client A',
-    date: '2023-10-01',
+    date: '2025-05-01',
     status: 'En attente',
     items: [
-      { product: 'Poulet de chair', quantity: 10, price: '50 000 FCFA' },
-      { product: 'Régime de banane', quantity: 2, price: '150 000 FCFA' },
+      { product: 'Poulet de chair', quantity: 10, price: 50000, amount: 500000 },
+      { product: 'Régime de banane', quantity: 2, price: 150000, amount: 300000 },
     ],
-    total: '800 000 FCFA',
+    total: 800000,
   },
   {
     id: 2,
     orderNumber: 'ORD002',
     customer: 'Client B',
-    date: '2023-09-15',
+    date: '2025-04-15',
     status: 'Expédiée',
     items: [
-      { product: 'Poulet de chair', quantity: 5, price: '50 000 FCFA' },
+      { product: 'Poulet de chair', quantity: 5, price: 50000, amount: 250000 },
     ],
-    total: '250 000 FCFA',
+    total: 250000,
   },
   {
     id: 3,
     orderNumber: 'ORD003',
     customer: 'Client C',
-    date: '2023-08-30',
+    date: '2025-04-30',
     status: 'Livrée',
     items: [
-      { product: 'Régime de banane', quantity: 3, price: '150 000 FCFA' },
+      { product: 'Régime de banane', quantity: 3, price: 150000, amount: 450000 },
     ],
-    total: '450 000 FCFA',
+    total: 450000,
   },
 ];
+
+const formatCurrency = (amount) => {
+  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XAF' }).format(amount);
+};
 
 const Orders = () => {
   const [orders, setOrders] = useState(initialOrders);
@@ -86,29 +90,34 @@ const Orders = () => {
   const [notification, setNotification] = useState({
     open: false,
     message: '',
+    severity: 'success',
   });
 
-  // États pour le formulaire de commande
   const [orderForm, setOrderForm] = useState({
     orderNumber: '',
     customer: '',
     date: '',
     status: 'En attente',
     items: [],
-    total: '',
+    total: 0,
   });
 
-  // États pour un nouveau produit
   const [newProduct, setNewProduct] = useState({
     product: '',
     quantity: 1,
     price: '',
   });
 
-  // Fonction pour ouvrir le formulaire de création/modification de commande
-  const handleOpenOrderDialog = (order = null) => {
+  const filteredOrders = orders.filter(order => {
+    return (
+      (filters.status === '' || order.status === filters.status) &&
+      (filters.date === '' || order.date === filters.date)
+    );
+  });
+
+  const handleOpenOrderDialog = useCallback((order = null) => {
     if (order) {
-      setOrderForm(order);
+      setOrderForm({ ...order });
     } else {
       setOrderForm({
         orderNumber: `ORD${orders.length + 1}`,
@@ -116,14 +125,13 @@ const Orders = () => {
         date: new Date().toISOString().split('T')[0],
         status: 'En attente',
         items: [],
-        total: '',
+        total: 0,
       });
     }
     setOpenOrderDialog(true);
-  };
+  }, [orders.length]);
 
-  // Fonction pour fermer le formulaire de commande
-  const handleCloseOrderDialog = () => {
+  const handleCloseOrderDialog = useCallback(() => {
     setOpenOrderDialog(false);
     setOrderForm({
       orderNumber: '',
@@ -131,14 +139,19 @@ const Orders = () => {
       date: '',
       status: 'En attente',
       items: [],
-      total: '',
+      total: 0,
     });
-  };
+  }, []);
 
-  // Fonction pour ajouter un produit à la commande
-  const addProduct = () => {
-    const amount = newProduct.quantity * parseFloat(newProduct.price);
-    const updatedItems = [...orderForm.items, { ...newProduct, amount }];
+  const addProduct = useCallback(() => {
+    if (!newProduct.product || !newProduct.price) return;
+
+    const amount = parseInt(newProduct.quantity) * parseFloat(newProduct.price);
+    const updatedItems = [...orderForm.items, { 
+      ...newProduct, 
+      price: parseFloat(newProduct.price),
+      amount 
+    }];
     const total = updatedItems.reduce((sum, item) => sum + item.amount, 0);
 
     setOrderForm({
@@ -152,47 +165,84 @@ const Orders = () => {
       quantity: 1,
       price: '',
     });
-  };
+  }, [newProduct, orderForm]);
 
-  // Fonction pour enregistrer une commande
-  const saveOrder = () => {
+  const removeProduct = useCallback((index) => {
+    const updatedItems = orderForm.items.filter((_, i) => i !== index);
+    const total = updatedItems.reduce((sum, item) => sum + item.amount, 0);
+    setOrderForm({ ...orderForm, items: updatedItems, total });
+  }, [orderForm]);
+
+  const saveOrder = useCallback(() => {
+    if (!orderForm.customer || orderForm.items.length === 0) {
+      setNotification({
+        open: true,
+        message: 'Veuillez remplir tous les champs obligatoires',
+        severity: 'error'
+      });
+      return;
+    }
+
     if (orderForm.id) {
-      // Modifier une commande existante
-      setOrders((prevOrders) =>
-        prevOrders.map((order) => (order.id === orderForm.id ? orderForm : order))
+      setOrders(prevOrders =>
+        prevOrders.map(order => (order.id === orderForm.id ? orderForm : order))
       );
-      setNotification({ open: true, message: 'Commande modifiée avec succès !' });
+      setNotification({
+        open: true,
+        message: 'Commande modifiée avec succès !',
+        severity: 'success'
+      });
     } else {
-      // Ajouter une nouvelle commande
       setOrders([...orders, { ...orderForm, id: orders.length + 1 }]);
-      setNotification({ open: true, message: 'Commande créée avec succès !' });
+      setNotification({
+        open: true,
+        message: 'Commande créée avec succès !',
+        severity: 'success'
+      });
     }
     handleCloseOrderDialog();
-  };
+  }, [orderForm, orders, handleCloseOrderDialog]);
 
-  // Fonction pour exporter les commandes en Excel
-  const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(orders);
+  const deleteOrder = useCallback((id) => {
+    setOrders(orders.filter(order => order.id !== id));
+    setNotification({
+      open: true,
+      message: 'Commande supprimée avec succès !',
+      severity: 'success'
+    });
+  }, [orders]);
+
+  const exportToExcel = useCallback(() => {
+    const data = filteredOrders.map(order => ({
+      'Numéro': order.orderNumber,
+      'Client': order.customer,
+      'Date': order.date,
+      'Statut': order.status,
+      'Montant': formatCurrency(order.total),
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Commandes');
     XLSX.writeFile(workbook, 'Commandes.xlsx');
-  };
+  }, [filteredOrders]);
 
-  // Fonction pour exporter les commandes en PDF
-  const exportToPDF = () => {
+  const exportToPDF = useCallback(() => {
     const doc = new jsPDF();
+    doc.text('Liste des Commandes', 14, 16);
     doc.autoTable({
+      startY: 20,
       head: [['Numéro', 'Client', 'Date', 'Statut', 'Montant']],
-      body: orders.map((order) => [
+      body: filteredOrders.map(order => [
         order.orderNumber,
         order.customer,
         order.date,
         order.status,
-        order.total,
+        formatCurrency(order.total),
       ]),
     });
     doc.save('Commandes.pdf');
-  };
+  }, [filteredOrders]);
 
   return (
     <OrdersContainer>
@@ -201,7 +251,7 @@ const Orders = () => {
       </Typography>
 
       {/* Boutons d'action */}
-      <Box sx={{ marginBottom: '24px', display: 'flex', gap: '16px' }}>
+      <Box sx={{ marginBottom: 3, display: 'flex', gap: 2 }}>
         <Button
           variant="contained"
           startIcon={<Add />}
@@ -209,16 +259,16 @@ const Orders = () => {
         >
           Créer une commande
         </Button>
-        <Button variant="contained" onClick={exportToExcel}>
+        <Button variant="outlined" onClick={exportToExcel}>
           Exporter en Excel
         </Button>
-        <Button variant="contained" onClick={exportToPDF}>
+        <Button variant="outlined" onClick={exportToPDF}>
           Exporter en PDF
         </Button>
       </Box>
 
       {/* Filtres */}
-      <Box sx={{ marginBottom: '24px' }}>
+      <Box sx={{ marginBottom: 3 }}>
         <Typography variant="h6" gutterBottom>
           Filtres
         </Typography>
@@ -270,22 +320,22 @@ const Orders = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {orders.map((order) => (
+              {filteredOrders.map((order) => (
                 <TableRow key={order.id}>
                   <TableCell>{order.orderNumber}</TableCell>
                   <TableCell>{order.customer}</TableCell>
                   <TableCell>{order.date}</TableCell>
                   <TableCell>{order.status}</TableCell>
-                  <TableCell>{order.total}</TableCell>
+                  <TableCell>{formatCurrency(order.total)}</TableCell>
                   <TableCell>
                     <IconButton onClick={() => setSelectedOrder(order)}>
-                      <Visibility />
+                      <Visibility color="info" />
                     </IconButton>
                     <IconButton onClick={() => handleOpenOrderDialog(order)}>
-                      <Edit />
+                      <Edit color="primary" />
                     </IconButton>
-                    <IconButton onClick={() => setOrders(orders.filter((o) => o.id !== order.id))}>
-                      <Delete />
+                    <IconButton onClick={() => deleteOrder(order.id)}>
+                      <Delete color="error" />
                     </IconButton>
                   </TableCell>
                 </TableRow>
@@ -296,7 +346,12 @@ const Orders = () => {
       </Box>
 
       {/* Détails de la commande */}
-      <Dialog open={!!selectedOrder} onClose={() => setSelectedOrder(null)} fullWidth maxWidth="md">
+      <Dialog 
+        open={!!selectedOrder} 
+        onClose={() => setSelectedOrder(null)} 
+        fullWidth 
+        maxWidth="md"
+      >
         <DialogTitle>Détails de la commande</DialogTitle>
         <DialogContent>
           {selectedOrder && (
@@ -321,7 +376,8 @@ const Orders = () => {
                       <TableRow>
                         <TableCell>Produit</TableCell>
                         <TableCell>Quantité</TableCell>
-                        <TableCell>Prix</TableCell>
+                        <TableCell>Prix unitaire</TableCell>
+                        <TableCell>Montant</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -329,7 +385,8 @@ const Orders = () => {
                         <TableRow key={index}>
                           <TableCell>{item.product}</TableCell>
                           <TableCell>{item.quantity}</TableCell>
-                          <TableCell>{item.price}</TableCell>
+                          <TableCell>{formatCurrency(item.price)}</TableCell>
+                          <TableCell>{formatCurrency(item.amount)}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -337,7 +394,9 @@ const Orders = () => {
                 </TableContainer>
               </Grid>
               <Grid item xs={12}>
-                <Typography variant="h6">Montant total : {selectedOrder.total}</Typography>
+                <Typography variant="h6">
+                  Montant total : {formatCurrency(selectedOrder.total)}
+                </Typography>
               </Grid>
             </Grid>
           )}
@@ -348,12 +407,17 @@ const Orders = () => {
       </Dialog>
 
       {/* Formulaire de commande */}
-      <Dialog open={openOrderDialog} onClose={handleCloseOrderDialog} fullWidth maxWidth="md">
+      <Dialog 
+        open={openOrderDialog} 
+        onClose={handleCloseOrderDialog} 
+        fullWidth 
+        maxWidth="md"
+      >
         <DialogTitle>
           {orderForm.id ? 'Modifier la commande' : 'Créer une commande'}
         </DialogTitle>
         <DialogContent>
-          <Grid container spacing={2} sx={{ marginTop: '8px' }}>
+          <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -366,10 +430,11 @@ const Orders = () => {
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="Client"
+                label="Client *"
                 variant="outlined"
                 value={orderForm.customer}
                 onChange={(e) => setOrderForm({ ...orderForm, customer: e.target.value })}
+                required
               />
             </Grid>
             <Grid item xs={12}>
@@ -397,16 +462,17 @@ const Orders = () => {
                 </Select>
               </FormControl>
             </Grid>
+            
             {/* Ajouter des produits */}
             <Grid item xs={12}>
               <Typography variant="h6" gutterBottom>
-                Produits
+                Produits *
               </Typography>
               <Grid container spacing={2}>
-                <Grid item xs={4}>
+                <Grid item xs={5}>
                   <TextField
                     fullWidth
-                    label="Produit"
+                    label="Produit *"
                     variant="outlined"
                     value={newProduct.product}
                     onChange={(e) => setNewProduct({ ...newProduct, product: e.target.value })}
@@ -415,35 +481,38 @@ const Orders = () => {
                 <Grid item xs={2}>
                   <TextField
                     fullWidth
-                    label="Quantité"
+                    label="Quantité *"
                     type="number"
                     variant="outlined"
                     value={newProduct.quantity}
                     onChange={(e) => setNewProduct({ ...newProduct, quantity: e.target.value })}
+                    inputProps={{ min: 1 }}
                   />
                 </Grid>
                 <Grid item xs={3}>
                   <TextField
                     fullWidth
-                    label="Prix unitaire"
+                    label="Prix unitaire *"
                     type="number"
                     variant="outlined"
                     value={newProduct.price}
                     onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
+                    inputProps={{ min: 0 }}
                   />
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={2}>
                   <Button
                     variant="contained"
-                    color="primary"
                     onClick={addProduct}
-                    sx={{ height: '100%' }}
+                    sx={{ height: '56px' }}
+                    disabled={!newProduct.product || !newProduct.price}
                   >
                     Ajouter
                   </Button>
                 </Grid>
               </Grid>
             </Grid>
+            
             {/* Liste des produits */}
             <Grid item xs={12}>
               <TableContainer component={Paper}>
@@ -462,15 +531,11 @@ const Orders = () => {
                       <TableRow key={index}>
                         <TableCell>{item.product}</TableCell>
                         <TableCell>{item.quantity}</TableCell>
-                        <TableCell>{item.price}</TableCell>
-                        <TableCell>{item.amount}</TableCell>
+                        <TableCell>{formatCurrency(item.price)}</TableCell>
+                        <TableCell>{formatCurrency(item.amount)}</TableCell>
                         <TableCell>
-                          <IconButton onClick={() => {
-                            const updatedItems = orderForm.items.filter((_, i) => i !== index);
-                            const total = updatedItems.reduce((sum, item) => sum + item.amount, 0);
-                            setOrderForm({ ...orderForm, items: updatedItems, total });
-                          }}>
-                            <Delete />
+                          <IconButton onClick={() => removeProduct(index)}>
+                            <Delete color="error" />
                           </IconButton>
                         </TableCell>
                       </TableRow>
@@ -479,17 +544,22 @@ const Orders = () => {
                 </Table>
               </TableContainer>
             </Grid>
+            
             {/* Montant total */}
             <Grid item xs={12}>
               <Typography variant="h6" gutterBottom>
-                Montant total : {orderForm.total}
+                Montant total : {formatCurrency(orderForm.total)}
               </Typography>
             </Grid>
           </Grid>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseOrderDialog}>Annuler</Button>
-          <Button variant="contained" color="primary" onClick={saveOrder}>
+          <Button 
+            variant="contained" 
+            onClick={saveOrder}
+            disabled={!orderForm.customer || orderForm.items.length === 0}
+          >
             {orderForm.id ? 'Modifier' : 'Créer'}
           </Button>
         </DialogActions>
@@ -500,8 +570,15 @@ const Orders = () => {
         open={notification.open}
         autoHideDuration={3000}
         onClose={() => setNotification({ ...notification, open: false })}
-        message={notification.message}
-      />
+      >
+        <Alert 
+          onClose={() => setNotification({ ...notification, open: false })}
+          severity={notification.severity}
+          sx={{ width: '100%' }}
+        >
+          {notification.message}
+        </Alert>
+      </Snackbar>
     </OrdersContainer>
   );
 };
