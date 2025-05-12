@@ -25,12 +25,15 @@ import {
   Storage, 
   Cloud, 
   Menu, 
-  Contacts 
+  Contacts,
+  Article as ArticleIcon,
+  School as SchoolIcon
 } from "@mui/icons-material";
 import LogoutButton from "../../components/LogoutButton";
 
 const Sidebar = ({ setActiveTab, isMobile, sidebarOpen, setSidebarOpen }) => {
   const [openTools, setOpenTools] = React.useState(false);
+  const [openInfo, setOpenInfo] = React.useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -57,6 +60,11 @@ const Sidebar = ({ setActiveTab, isMobile, sidebarOpen, setSidebarOpen }) => {
     { tab: "production", icon: <Grass />, text: "SUIVI DE PRODUCTION" },
     { tab: "stocks", icon: <Storage />, text: "GESTION DES STOCKS" },
     { tab: "weather", icon: <Cloud />, text: "MÉTÉO" },
+  ];
+
+  const infoItems = [
+    { tab: "news", icon: <ArticleIcon />, text: "ACTUALITÉS" },
+    { tab: "training", icon: <SchoolIcon />, text: "FORMATIONS" },
   ];
 
   return (
@@ -122,6 +130,7 @@ const Sidebar = ({ setActiveTab, isMobile, sidebarOpen, setSidebarOpen }) => {
           </ListItemButton>
         ))}
 
+        {/* Section OUTILS */}
         <ListItemButton 
           onClick={() => setOpenTools(!openTools)} 
           sx={{ 
@@ -146,6 +155,52 @@ const Sidebar = ({ setActiveTab, isMobile, sidebarOpen, setSidebarOpen }) => {
         <Collapse in={openTools && sidebarOpen} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
             {toolItems.map((item) => (
+              <ListItemButton 
+                key={item.tab}
+                sx={{ 
+                  pl: 4, 
+                  "&:hover": { backgroundColor: "#60A5FA" },
+                  minHeight: 48,
+                }} 
+                onClick={() => {
+                  setActiveTab(item.tab);
+                  if (isMobile) setSidebarOpen(false);
+                }}
+              >
+                <ListItemIcon sx={{ color: "white" }}>
+                  {item.icon}
+                </ListItemIcon>
+                {sidebarOpen && <ListItemText primary={item.text} />}
+              </ListItemButton>
+            ))}
+          </List>
+        </Collapse>
+
+        {/* Section INFORMATIONS (Nouvelle section) */}
+        <ListItemButton 
+          onClick={() => setOpenInfo(!openInfo)} 
+          sx={{ 
+            "&:hover": { backgroundColor: "#3B82F6" },
+            minHeight: 48,
+            justifyContent: sidebarOpen ? 'initial' : 'center',
+            px: 2.5,
+          }}
+        >
+          <ListItemIcon sx={{
+            minWidth: 0,
+            mr: sidebarOpen ? 3 : 'auto',
+            justifyContent: 'center',
+            color: "white",
+          }}>
+            <ArticleIcon />
+          </ListItemIcon>
+          {sidebarOpen && <ListItemText primary="INFORMATIONS" />}
+          {sidebarOpen && (openInfo ? <ExpandLess /> : <ExpandMore />)}
+        </ListItemButton>
+
+        <Collapse in={openInfo && sidebarOpen} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            {infoItems.map((item) => (
               <ListItemButton 
                 key={item.tab}
                 sx={{ 

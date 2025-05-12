@@ -12,6 +12,8 @@ import ProductionTracking from "../components/farmer/ProductionTracking";
 import StockManagement from "../components/farmer/StockManagement";
 import Weather from "../components/farmer/Weather";
 import Directory from "../components/farmer/Directory";
+import News from "../components/farmer/News";
+import Training from "../components/farmer/Training";
 
 const DashboardFarmer = () => {
   const [activeTab, setActiveTab] = useState("summary");
@@ -41,6 +43,10 @@ const DashboardFarmer = () => {
         return <Weather />;
       case "directory":
         return <Directory />;
+      case "news":
+        return <News />;
+      case "training":
+        return <Training />;
       default:
         return <Summary />;
     }
@@ -66,7 +72,7 @@ const DashboardFarmer = () => {
           backgroundColor: "#f5f5f5",
           marginLeft: { 
             xs: sidebarOpen ? '260px' : 0,
-            sm: 0 // Suppression de la marge à gauche sur grand écran
+            sm: 0
           },
           transition: theme.transitions.create('margin', {
             easing: theme.transitions.easing.sharp,
