@@ -1,6 +1,7 @@
 import os
 from decouple import config
 from .base import *
+import dj_database_url
 
 DEBUG = False
 ALLOWED_HOSTS = ['*']
@@ -10,14 +11,9 @@ SECRET_KEY = config('SECRET_KEY')
 
 # Base de données PostgreSQL
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DATABASE_URL', '').split('/')[-1],
-        'USER': config('DATABASE_URL', '').split('://')[1].split(':')[0],
-        'PASSWORD': config('DATABASE_URL', '').split(':')[2].split('@')[0],
-        'HOST': config('DATABASE_URL', '').split('@')[1].split(':')[0],
-        'PORT': config('DATABASE_URL', '').split(':')[-1].split('/')[0],
-    }
+    'default': dj_database_url.parse(
+        config('DATABASE_URL', default='postgresql://gestagro_user:gestagro_password@localhost:5432/gestagro_db')
+    )
 }
 
 # Configuration Redis
