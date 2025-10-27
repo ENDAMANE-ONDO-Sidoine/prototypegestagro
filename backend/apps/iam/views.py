@@ -1,0 +1,223 @@
+"""
+Vues pour l'application IAM
+"""
+from rest_framework import status, generics, permissions
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
+from django.contrib.auth import login, logout
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from .models import User, Membership, Role, Permission
+from apps.organizations.models import Organization
+from .serializers import (
+    UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer,
+    OrganizationSerializer, MembershipSerializer, RoleSerializer, PermissionSerializer
+)
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    """
+    Vue personnalisée pour l'obtention des tokens JWT
+    """
+    def post(self, request, *args, **kwargs):
+        serializer = UserLoginSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.validated_data['user']
+            refresh = RefreshToken.for_user(user)
+            
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'user': UserProfileSerializer(user).data
+            })
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserRegistrationView(APIView):
+    """
+    Vue pour l'inscription d'un utilisateur
+    """
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = UserRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            refresh = RefreshToken.for_user(user)
+            
+            return Response({
+                'message': 'Utilisateur créé avec succès',
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'user': UserProfileSerializer(user).data
+            }, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserProfileView(APIView):
+    """
+    Vue pour le profil utilisateur
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        serializer = UserProfileSerializer(request.user)
+        return Response(serializer.data)
+
+    def put(self, request):
+        serializer = UserProfileSerializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserLogoutView(APIView):
+    """
+    Vue pour la déconnexion
+    """
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        try:
+            refresh_token = request.data.get("refresh")
+            if not refresh_token:
+                return Response({'error': 'Refresh token requis'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Vérifier que le refresh token est valide
+            try:
+                token = RefreshToken(refresh_token)
+                # Optionnel : blacklister le token (nécessite django-rest-framework-simplejwt[blacklist])
+                # token.blacklist()
+            except Exception as token_error:
+                return Response({'error': f'Refresh token invalide: {str(token_error)}'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            return Response({'message': 'Déconnexion réussie'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': f'Erreur lors de la déconnexion: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class OrganizationListView(generics.ListCreateAPIView):
+    """
+    Vue pour lister et créer des organisations
+    """
+    queryset = Organization.objects.filter(is_active=True)
+    serializer_class = OrganizationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        # L'utilisateur qui crée l'organisation devient automatiquement admin
+        organization = serializer.save()
+        Membership.objects.create(
+            user=self.request.user,
+            organization=organization,
+            role='admin',
+            status='active'
+        )
+
+
+class OrganizationDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Vue pour les détails d'une organisation
+    """
+    queryset = Organization.objects.all()
+    serializer_class = OrganizationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Un utilisateur ne peut voir que les organisations dont il est membre
+        user_orgs = self.request.user.memberships.filter(status='active').values_list('organization_id', flat=True)
+        return Organization.objects.filter(id__in=user_orgs)
+
+
+class MembershipListView(generics.ListCreateAPIView):
+    """
+    Vue pour lister et créer des adhésions
+    """
+    serializer_class = MembershipSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Un utilisateur ne peut voir que ses propres adhésions
+        return Membership.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user, status='pending')
+
+
+class MembershipDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Vue pour les détails d'une adhésion
+    """
+    serializer_class = MembershipSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Membership.objects.filter(user=self.request.user)
+
+
+class RoleListView(generics.ListAPIView):
+    """
+    Vue pour lister les rôles
+    """
+    queryset = Role.objects.all()
+    serializer_class = RoleSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class PermissionListView(generics.ListAPIView):
+    """
+    Vue pour lister les permissions
+    """
+    queryset = Permission.objects.all()
+    serializer_class = PermissionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def user_organizations(request):
+    """
+    Endpoint pour récupérer les organisations de l'utilisateur
+    """
+    memberships = request.user.memberships.filter(status='active')
+    organizations = [membership.organization for membership in memberships]
+    serializer = OrganizationSerializer(organizations, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def join_organization(request):
+    """
+    Endpoint pour rejoindre une organisation
+    """
+    organization_id = request.data.get('organization_id')
+    role = request.data.get('role', 'member')
+    
+    try:
+        organization = Organization.objects.get(id=organization_id)
+        membership, created = Membership.objects.get_or_create(
+            user=request.user,
+            organization=organization,
+            defaults={'role': role, 'status': 'pending'}
+        )
+        
+        if created:
+            return Response({
+                'message': 'Demande d\'adhésion envoyée',
+                'membership': MembershipSerializer(membership).data
+            }, status=status.HTTP_201_CREATED)
+        else:
+            return Response({
+                'message': 'Vous êtes déjà membre de cette organisation'
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+    except Organization.DoesNotExist:
+        return Response({
+            'error': 'Organisation non trouvée'
+        }, status=status.HTTP_404_NOT_FOUND)
