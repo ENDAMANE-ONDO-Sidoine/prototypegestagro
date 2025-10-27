@@ -4,7 +4,7 @@
 	"values": [
 		{
 			"key": "base_url",
-			"value": "http://localhost:8000",
+			"value": "https://gestagro-api.onrender.com",
 			"type": "default",
 			"enabled": true
 		},
@@ -82,7 +82,7 @@
 		},
 		{
 			"key": "media_base_url",
-			"value": "http://localhost:8000/media",
+			"value": "https://gestagro-api.onrender.com/media",
 			"type": "default",
 			"enabled": true
 		},
