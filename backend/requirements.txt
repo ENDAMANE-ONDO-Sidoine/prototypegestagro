@@ -14,3 +14,4 @@ pillow==10.4.0
 dj-database-url==2.1.0
 setuptools==75.6.0
 django-filter==24.2
+django-celery-beat==2.7.0
