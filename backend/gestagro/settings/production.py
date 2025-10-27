@@ -12,7 +12,7 @@ SECRET_KEY = config('SECRET_KEY')
 # Base de données PostgreSQL
 DATABASES = {
     'default': dj_database_url.parse(
-        config('DATABASE_URL', default='postgresql://gestagro_user:gestagro_password@localhost:5432/gestagro_db')
+        config('DATABASE_URL', default='sqlite:///db.sqlite3')
     )
 }
 
