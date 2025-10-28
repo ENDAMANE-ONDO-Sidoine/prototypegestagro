@@ -10,6 +10,9 @@ ALLOWED_HOSTS = ['*']
 # Configuration Render
 SECRET_KEY = config('SECRET_KEY')
 
+# Désactiver health_check.cache en production (pas de Redis sur plan gratuit)
+INSTALLED_APPS = [app for app in INSTALLED_APPS if app != 'health_check.cache']
+
 # Base de données PostgreSQL
 DATABASES = {
     'default': dj_database_url.parse(
