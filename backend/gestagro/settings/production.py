@@ -31,10 +31,9 @@ CACHES = {
 # Configuration des fichiers statiques
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Désactiver la vérification des fichiers statiques manquants en production
-WHITENOISE_MANIFEST_STRICT = False
+# Utiliser Whitenoise sans compression pour éviter les erreurs de manifest
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # Configuration des médias
 MEDIA_URL = '/media/'
