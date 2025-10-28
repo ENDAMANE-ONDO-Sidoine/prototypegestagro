@@ -2,6 +2,7 @@ import os
 from decouple import config
 from .base import *
 import dj_database_url
+from datetime import timedelta
 
 DEBUG = False
 ALLOWED_HOSTS = ['*']
@@ -31,6 +32,9 @@ CACHES = {
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Désactiver la vérification des fichiers statiques manquants en production
+WHITENOISE_MANIFEST_STRICT = False
 
 # Configuration des médias
 MEDIA_URL = '/media/'
