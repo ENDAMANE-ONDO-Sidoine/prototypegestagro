@@ -16,18 +16,8 @@ services:
         fromDatabase:
           name: gestagro-db
           property: connectionString
-      - key: REDIS_URL
-        fromService:
-          name: gestagro-redis
-          type: redis
-          property: connectionString
     healthCheckPath: /api/v1/
 
 databases:
   - name: gestagro-db
-    plan: free
-
-services:
-  - type: redis
-    name: gestagro-redis
     plan: free

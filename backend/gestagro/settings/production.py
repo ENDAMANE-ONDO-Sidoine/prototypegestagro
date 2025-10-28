@@ -17,16 +17,29 @@ DATABASES = {
     )
 }
 
-# Configuration Redis
-CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': config('REDIS_URL', 'redis://localhost:6379/1'),
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+# Configuration Redis (optionnel pour plan gratuit)
+# Si REDIS_URL est défini, utiliser Redis, sinon utiliser cache en mémoire
+REDIS_URL = config('REDIS_URL', default=None)
+
+if REDIS_URL:
+    # Redis configuré (plan payant ou Redis externe)
+    CACHES = {
+        'default': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': REDIS_URL,
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            }
         }
     }
-}
+else:
+    # Cache en mémoire locale (plan gratuit sans Redis)
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'gestagro-cache',
+        }
+    }
 
 # Configuration des fichiers statiques
 STATIC_URL = '/static/'
