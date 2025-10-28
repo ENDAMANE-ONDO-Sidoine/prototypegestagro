@@ -7,10 +7,15 @@ from django.conf import settings
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from apps.core.media_views import MinIOMediaView, MinIOStaticView
+from apps.core.views_admin import trigger_migrations, check_database
 
 urlpatterns = [
     # Admin
     path("admin/", admin.site.urls),
+    
+    # ⚠️ TEMPORAIRE - Endpoints de migration (À SUPPRIMER après utilisation)
+    path("api/v1/admin/migrate/", trigger_migrations, name="trigger_migrations"),
+    path("api/v1/admin/check-db/", check_database, name="check_database"),
     
     # API Documentation
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
