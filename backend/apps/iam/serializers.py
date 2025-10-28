@@ -91,14 +91,15 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     def _get_membership_role_for_user_role(self, user_role):
         """
         Mappe le rôle utilisateur vers le rôle de membership
+        CORRIGÉ: Chaque user_role a maintenant son propre rôle de membership spécifique
         """
-        # Mapping des user_role vers les choix disponibles dans Membership
+        # Mapping direct des user_role vers les rôles de membership
         role_mapping = {
-            'farmer': 'member',      # Agriculteur = membre
-            'buyer': 'member',       # Acheteur = membre  
-            'transporter': 'member', # Transporteur = membre
-            'agronomist': 'member',  # Agronome = membre
-            'admin': 'admin'         # Admin = admin
+            'farmer': 'farmer',           # Agriculteur
+            'buyer': 'buyer',             # Acheteur
+            'transporter': 'transporter', # Transporteur
+            'agronomist': 'agronomist',   # Agronome
+            'admin': 'admin'              # Admin
         }
         return role_mapping.get(user_role, 'member')
 

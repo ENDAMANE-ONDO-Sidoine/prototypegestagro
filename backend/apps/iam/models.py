@@ -46,6 +46,10 @@ class Membership(models.Model):
     role = models.CharField(_('role'), max_length=50, choices=[
         ('admin', _('Administrator')),
         ('manager', _('Manager')),
+        ('farmer', _('Farmer')),
+        ('buyer', _('Buyer')),
+        ('transporter', _('Transporter')),
+        ('agronomist', _('Agronomist')),
         ('member', _('Member')),
         ('viewer', _('Viewer')),
     ])

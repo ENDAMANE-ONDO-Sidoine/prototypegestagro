@@ -77,7 +77,7 @@ class IsAdmin(permissions.BasePermission):
 
 class IsFarmerOrAdmin(permissions.BasePermission):
     """
-    Permission pour les agriculteurs et administrateurs
+    Permission pour les agriculteurs et administrateurs UNIQUEMENT
     """
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
@@ -87,9 +87,10 @@ class IsFarmerOrAdmin(permissions.BasePermission):
         if request.user.is_superuser:
             return True
         
-        # Vérifier si l'utilisateur a le rôle farmer, member (dans une coopérative agricole) ou admin
+        # Vérifier si l'utilisateur a le rôle farmer ou admin UNIQUEMENT
+        # NOTE: 'member' a été retiré car il était trop permissif
         return request.user.memberships.filter(
-            role__in=['farmer', 'member', 'admin'],
+            role__in=['farmer', 'admin'],
             status='active'
         ).exists()
 

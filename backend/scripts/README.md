@@ -4,6 +4,33 @@ Ce dossier contient les scripts utilitaires essentiels pour le projet GestAgro.
 
 ## 📋 Scripts disponibles
 
+### 🔄 `migrate_user_roles.py` ⭐ IMPORTANT
+**Description** : Migre les rôles utilisateurs existants de `'member'` vers les rôles spécifiques (`farmer`, `buyer`, `transporter`, `agronomist`) basés sur leurs profils.
+
+**Usage** :
+```bash
+# Exécution directe (avec dry-run puis confirmation)
+python scripts/migrate_user_roles.py
+
+# OU via Django shell
+python manage.py shell
+>>> exec(open('scripts/migrate_user_roles.py').read())
+>>> migrate_user_roles(dry_run=True)   # Simuler
+>>> migrate_user_roles(dry_run=False)  # Appliquer
+>>> verify_migration()                 # Vérifier
+```
+
+**Fonctionnalités** :
+- Mode dry-run pour simuler les changements
+- Détection automatique des rôles basée sur les profils
+- Statistiques détaillées de migration
+- Vérification post-migration
+- Demande de confirmation avant application
+
+**Documentation** : Voir `README_MIGRATE_ROLES.md` pour le guide complet
+
+---
+
 ### 🔧 `add_patch_to_postman.py`
 **Description** : Ajoute automatiquement les endpoints PATCH manquants à la collection Postman.
 
@@ -45,19 +72,29 @@ Les scripts suivants ont été supprimés car ils ne sont plus nécessaires main
 
 ## 🚀 Workflow actuel
 
-1. **Données de test** : Créées manuellement via shell Django
-2. **Tests API** : Utiliser `test_api.py` dans le root du projet
-3. **Tests Postman** : Utiliser la collection `GestAgro_API_Collection.json`
-4. **Mise à jour Postman** : `python scripts/add_patch_to_postman.py` si nécessaire
+1. **Migration des rôles** : `python scripts/migrate_user_roles.py` (à exécuter sur Render après déploiement)
+2. **Données de test** : Créées manuellement via shell Django
+3. **Tests API** : Utiliser `test_api.py` dans le root du projet
+4. **Tests Postman** : Utiliser la collection `GestAgro_API_Collection.json`
+5. **Mise à jour Postman** : `python scripts/add_patch_to_postman.py` si nécessaire
 
 ## 📚 Documentation
 
 Pour plus d'informations sur l'utilisation des scripts, consultez :
+- [README_MIGRATE_ROLES.md](README_MIGRATE_ROLES.md) - Guide complet de migration des rôles
 - [Guide de Développement](../md/development/GUIDE_DEVELOPPEMENT.md)
 - [Documentation API](../md/api/DOCUMENTATION_API.md)
-- [Données de Test](../md/DONNEES_TEST.md)
+- [Corrections Rôles et Permissions](../CORRECTIONS_ROLES_PERMISSIONS.md)
+
+## 🗑️ Scripts temporaires supprimés (28/10/2025)
+
+Les scripts de diagnostic suivants ont été supprimés après validation des corrections :
+- ❌ `check_profiles.py` - Diagnostic des profils utilisateurs
+- ❌ `check_orphan_profiles.py` - Vérification des profils orphelins
+- ❌ `test_permissions.py` - Test des permissions après migration
+- ❌ `SUMMARY_SCRIPTS.md` - Ancien résumé
 
 ---
 
-*Scripts GestAgro - Version 2.0 - 26/10/2025*
-*Nettoyage effectué après création des données fraîches*
+*Scripts GestAgro - Version 2.1 - 28/10/2025*
+*Ajout du script de migration des rôles utilisateurs*

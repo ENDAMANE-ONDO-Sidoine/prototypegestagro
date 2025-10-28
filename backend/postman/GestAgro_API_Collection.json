@@ -722,17 +722,57 @@
               "raw": "{\"description\": \"Description mise \\u00e0 jour via PATCH\"}"
             },
             "url": {
-              "raw": "{base_url}/api/v1/organizations/1/",
+              "raw": "{{base_url}}/api/v1/organizations/1/",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
+                "api",
+                "v1",
                 "organizations",
                 "1",
                 ""
               ]
             },
-            "description": "Mise à jour partielle de une organisation"
+            "description": "Mise à jour partielle d'une organisation"
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Organization Logo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "logo",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/organizations/1/logo/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "organizations",
+                "1",
+                "logo",
+                ""
+              ]
+            },
+            "description": "Uploader le logo d'une organisation (réservé aux admins)"
           },
           "response": []
         }
@@ -918,18 +958,20 @@
                   "raw": "{\"description\": \"Cat\\u00e9gorie mise \\u00e0 jour via PATCH\"}"
                 },
                 "url": {
-                  "raw": "{base_url}/api/v1/farmers/categories/1/",
+                  "raw": "{{base_url}}/api/v1/farmers/categories/1/",
                   "host": [
                     "{{base_url}}"
                   ],
                   "path": [
+                    "api",
+                    "v1",
                     "farmers",
                     "categories",
                     "1",
                     ""
                   ]
                 },
-                "description": "Mise à jour partielle de une catégorie"
+                "description": "Mise à jour partielle d'une catégorie"
               },
               "response": []
             }
@@ -1111,18 +1153,20 @@
                   "raw": "{\"description\": \"Produit mis \\u00e0 jour via PATCH\"}"
                 },
                 "url": {
-                  "raw": "{base_url}/api/v1/farmers/products/1/",
+                  "raw": "{{base_url}}/api/v1/farmers/products/1/",
                   "host": [
                     "{{base_url}}"
                   ],
                   "path": [
+                    "api",
+                    "v1",
                     "farmers",
                     "products",
                     "1",
                     ""
                   ]
                 },
-                "description": "Mise à jour partielle de un produit"
+                "description": "Mise à jour partielle d'un produit"
               },
               "response": []
             }
@@ -1637,18 +1681,20 @@
                   "raw": "{\"notes\": \"Notes mises \\u00e0 jour via PATCH\"}"
                 },
                 "url": {
-                  "raw": "{base_url}/api/v1/buyers/cart/1/",
+                  "raw": "{{base_url}}/api/v1/buyers/cart/1/",
                   "host": [
                     "{{base_url}}"
                   ],
                   "path": [
+                    "api",
+                    "v1",
                     "buyers",
                     "cart",
                     "1",
                     ""
                   ]
                 },
-                "description": "Mise à jour partielle de le panier"
+                "description": "Mise à jour partielle du panier"
               },
               "response": []
             }
@@ -1731,18 +1777,20 @@
                   "raw": "{\"notes\": \"Notes de commande mises \\u00e0 jour via PATCH\"}"
                 },
                 "url": {
-                  "raw": "{base_url}/api/v1/buyers/orders/1/",
+                  "raw": "{{base_url}}/api/v1/buyers/orders/1/",
                   "host": [
                     "{{base_url}}"
                   ],
                   "path": [
+                    "api",
+                    "v1",
                     "buyers",
                     "orders",
                     "1",
                     ""
                   ]
                 },
-                "description": "Mise à jour partielle de une commande"
+                "description": "Mise à jour partielle d'une commande"
               },
               "response": []
             }
@@ -3133,18 +3181,20 @@
                   "raw": "{\"notes\": \"Champ mis \\u00e0 jour via PATCH\"}"
                 },
                 "url": {
-                  "raw": "{base_url}/api/v1/agronomy/fields/1/",
+                  "raw": "{{base_url}}/api/v1/agronomy/fields/1/",
                   "host": [
                     "{{base_url}}"
                   ],
                   "path": [
+                    "api",
+                    "v1",
                     "agronomy",
                     "fields",
                     "1",
                     ""
                   ]
                 },
-                "description": "Mise à jour partielle de un champ"
+                "description": "Mise à jour partielle d'un champ"
               },
               "response": []
             }
@@ -3326,18 +3376,20 @@
                   "raw": "{\"notes\": \"Culture mise \\u00e0 jour via PATCH\"}"
                 },
                 "url": {
-                  "raw": "{base_url}/api/v1/agronomy/crops/1/",
+                  "raw": "{{base_url}}/api/v1/agronomy/crops/1/",
                   "host": [
                     "{{base_url}}"
                   ],
                   "path": [
+                    "api",
+                    "v1",
                     "agronomy",
                     "crops",
                     "1",
                     ""
                   ]
                 },
-                "description": "Mise à jour partielle de une culture"
+                "description": "Mise à jour partielle d'une culture"
               },
               "response": []
             }
@@ -3519,18 +3571,20 @@
                   "raw": "{\"notes\": \"Visite mise \\u00e0 jour via PATCH\"}"
                 },
                 "url": {
-                  "raw": "{base_url}/api/v1/agronomy/visits/1/",
+                  "raw": "{{base_url}}/api/v1/agronomy/visits/1/",
                   "host": [
                     "{{base_url}}"
                   ],
                   "path": [
+                    "api",
+                    "v1",
                     "agronomy",
                     "visits",
                     "1",
                     ""
                   ]
                 },
-                "description": "Mise à jour partielle de une visite de champ"
+                "description": "Mise à jour partielle d'une visite de champ"
               },
               "response": []
             }
@@ -3712,18 +3766,20 @@
                   "raw": "{\"notes\": \"Diagnostic mis \\u00e0 jour via PATCH\"}"
                 },
                 "url": {
-                  "raw": "{base_url}/api/v1/agronomy/diagnostics/1/",
+                  "raw": "{{base_url}}/api/v1/agronomy/diagnostics/1/",
                   "host": [
                     "{{base_url}}"
                   ],
                   "path": [
+                    "api",
+                    "v1",
                     "agronomy",
                     "diagnostics",
                     "1",
                     ""
                   ]
                 },
-                "description": "Mise à jour partielle de un diagnostic"
+                "description": "Mise à jour partielle d'un diagnostic"
               },
               "response": []
             }
@@ -3905,18 +3961,20 @@
                   "raw": "{\"notes\": \"Recommandation mise \\u00e0 jour via PATCH\"}"
                 },
                 "url": {
-                  "raw": "{base_url}/api/v1/agronomy/recommendations/1/",
+                  "raw": "{{base_url}}/api/v1/agronomy/recommendations/1/",
                   "host": [
                     "{{base_url}}"
                   ],
                   "path": [
+                    "api",
+                    "v1",
                     "agronomy",
                     "recommendations",
                     "1",
                     ""
                   ]
                 },
-                "description": "Mise à jour partielle de une recommandation"
+                "description": "Mise à jour partielle d'une recommandation"
               },
               "response": []
             }
@@ -4126,18 +4184,20 @@
                   "raw": "{\"notes\": \"Alerte m\\u00e9t\\u00e9o mise \\u00e0 jour via PATCH\"}"
                 },
                 "url": {
-                  "raw": "{base_url}/api/v1/agronomy/weather-alerts/1/",
+                  "raw": "{{base_url}}/api/v1/agronomy/weather-alerts/1/",
                   "host": [
                     "{{base_url}}"
                   ],
                   "path": [
+                    "api",
+                    "v1",
                     "agronomy",
                     "weather-alerts",
                     "1",
                     ""
                   ]
                 },
-                "description": "Mise à jour partielle de une alerte météo"
+                "description": "Mise à jour partielle d'une alerte météo"
               },
               "response": []
             }
