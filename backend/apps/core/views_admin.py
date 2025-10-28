@@ -2,7 +2,7 @@
 Vues d'administration temporaires
 ⚠️ À SUPPRIMER après la migration initiale
 """
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from django.core.management import call_command
@@ -11,6 +11,7 @@ import sys
 
 
 @api_view(['POST'])
+@authentication_classes([])  # Désactiver l'authentification
 @permission_classes([AllowAny])  # ⚠️ TEMPORAIRE - À sécuriser
 def trigger_migrations(request):
     """
@@ -51,10 +52,12 @@ def trigger_migrations(request):
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@authentication_classes([])  # Désactiver l'authentification
+@permission_classes([AllowAny])  # Pas d'authentification requise
 def check_database(request):
     """
     Vérifier l'état de la base de données
+    ⚠️ TEMPORAIRE - Endpoint de diagnostic
     """
     from django.db import connection
     
