@@ -1,0 +1,9 @@
+# Ignore tous les fichiers dans ce dossier
+*
+
+# SAUF le script de migration (nécessaire pour Render)
+!migrate_user_roles.py
+
+# Et ce fichier .gitignore lui-même
+!.gitignore
+

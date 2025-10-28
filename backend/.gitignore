@@ -480,6 +480,7 @@ md/
 postman/
 
 # Scripts utilitaires (peuvent contenir des données sensibles)
+# Note: scripts/migrate_user_roles.py est autorisé via scripts/.gitignore
 scripts/
 
 # Test data
