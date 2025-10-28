@@ -476,6 +476,12 @@ credentials.json
 # Documentation
 md/
 
+# Postman collections (sensibles - contiennent des exemples d'API)
+postman/
+
+# Scripts utilitaires (peuvent contenir des données sensibles)
+scripts/
+
 # Test data
 test_data/
 sample_data/
