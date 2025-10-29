@@ -12,7 +12,7 @@ from .views import (
     admin_approve_organization, admin_approve_membership,
     admin_suspend_user, admin_activate_user
 )
-from . import views_admin
+# views_admin supprimé - endpoints d'urgence supprimés
 
 @api_view(['GET'])
 def api_root(request):
