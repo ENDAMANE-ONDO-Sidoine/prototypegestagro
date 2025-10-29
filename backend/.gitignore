@@ -483,6 +483,13 @@ postman/
 # Note: scripts/migrate_user_roles.py est autorisé via scripts/.gitignore
 scripts/
 
+# Scripts d'administration Django (sensibles - contiennent credentials)
+run_admin_*.bat
+run_admin_*.py
+run_admin_*.ps1
+launch_admin.bat
+manage_admin.py
+
 # Test data
 test_data/
 sample_data/
