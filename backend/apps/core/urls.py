@@ -58,7 +58,4 @@ urlpatterns = [
     path('admin/dashboard/stats/', admin_dashboard_stats, name='admin_dashboard_stats'),
     path('admin/analytics/', admin_analytics, name='admin_analytics'),
     
-    # ⚠️ ENDPOINTS TEMPORAIRES - À SUPPRIMER après migration
-    path('admin/migrate/', views_admin.trigger_migrations, name='admin_migrate'),
-    path('admin/check-db/', views_admin.check_database, name='admin_check_db'),
 ]
