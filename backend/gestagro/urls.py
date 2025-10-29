@@ -43,9 +43,12 @@ urlpatterns = [
     # Health Check
     path("health/", include("health_check.urls")),
     
-    # MinIO Media Serving (Production)
-    path("media/<path:path>", MinIOMediaView.as_view(), name="minio_media"),
-    path("static/<path:path>", MinIOStaticView.as_view(), name="minio_static"),
+    # MinIO Media/Static (conditionnel)
+    # Active uniquement si MINIO_ENABLED est True (ou endpoint défini)
+    # Sinon, Whitenoise/Django sert les fichiers statiques
+    *([path("media/<path:path>", MinIOMediaView.as_view(), name="minio_media"),
+       path("static/<path:path>", MinIOStaticView.as_view(), name="minio_static")] 
+      if (getattr(settings, "MINIO_ENABLED", False) or getattr(settings, "MINIO_STORAGE_ENDPOINT", None)) else []),
 ]
 
 # Serve media files in development
