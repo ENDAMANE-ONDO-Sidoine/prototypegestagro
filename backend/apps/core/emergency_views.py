@@ -117,12 +117,24 @@ def emergency_create_superuser(request):
     """
     try:
         from django.contrib.auth import get_user_model
+        import json
         User = get_user_model()
         
-        # Récupérer les données
-        username = request.POST.get('username', 'admin')
-        email = request.POST.get('email', 'admin@gestagro.com')
-        password = request.POST.get('password', 'admin123')
+        # Récupérer les données (support JSON et form-data)
+        if request.content_type == 'application/json':
+            try:
+                data = json.loads(request.body)
+                username = data.get('username', 'admin')
+                email = data.get('email', 'admin@gestagro.com')
+                password = data.get('password', 'admin123')
+            except:
+                username = 'admin'
+                email = 'admin@gestagro.com'
+                password = 'admin123'
+        else:
+            username = request.POST.get('username', 'admin')
+            email = request.POST.get('email', 'admin@gestagro.com')
+            password = request.POST.get('password', 'admin123')
         
         # Créer le superutilisateur
         if User.objects.filter(username=username).exists():
@@ -142,6 +154,63 @@ def emergency_create_superuser(request):
         return JsonResponse({
             'status': 'success',
             'message': 'Superutilisateur créé avec succès',
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'is_superuser': user.is_superuser,
+                'is_staff': user.is_staff
+            }
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=500)
+
+
+def simple_create_admin(request):
+    """
+    Créer un superutilisateur simple (GET)
+    Accès: GET /create-admin/
+    """
+    try:
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        
+        username = 'admin'
+        email = 'admin@gestagro.com'
+        password = 'admin123'
+        
+        # Créer le superutilisateur
+        if User.objects.filter(username=username).exists():
+            return JsonResponse({
+                'status': 'warning',
+                'message': f'Superutilisateur "{username}" existe déjà',
+                'admin_url': 'https://gestagro-api.onrender.com/admin/',
+                'credentials': {
+                    'username': username,
+                    'password': password
+                }
+            })
+        
+        user = User.objects.create_superuser(
+            username=username,
+            email=email,
+            password=password,
+            first_name='Admin',
+            last_name='GestAgro'
+        )
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Superutilisateur créé avec succès !',
+            'admin_url': 'https://gestagro-api.onrender.com/admin/',
+            'credentials': {
+                'username': username,
+                'password': password
+            },
             'user': {
                 'id': user.id,
                 'username': user.username,

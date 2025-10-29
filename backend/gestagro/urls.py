@@ -23,6 +23,9 @@ urlpatterns = [
     path("emergency/migrate/", emergency_views.emergency_migrate, name="emergency_migrate"),
     path("emergency/create-superuser/", emergency_views.emergency_create_superuser, name="emergency_create_superuser"),
     
+    # 🚨 URGENCE - Endpoint simple pour créer superuser (GET)
+    path("create-admin/", emergency_views.simple_create_admin, name="simple_create_admin"),
+    
     # API Documentation
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
