@@ -8,6 +8,7 @@ from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from apps.core.media_views import MinIOMediaView, MinIOStaticView
 from apps.core.views_admin import trigger_migrations, check_database
+from apps.core import emergency_views
 
 urlpatterns = [
     # Admin
@@ -16,6 +17,10 @@ urlpatterns = [
     # ⚠️ TEMPORAIRE - Endpoints de migration (À SUPPRIMER après utilisation)
     path("api/v1/admin/migrate/", trigger_migrations, name="trigger_migrations"),
     path("api/v1/admin/check-db/", check_database, name="check_database"),
+    
+    # 🚨 URGENCE - Endpoints de diagnostic (sans authentification)
+    path("emergency/check-db/", emergency_views.emergency_check_db, name="emergency_check_db"),
+    path("emergency/migrate/", emergency_views.emergency_migrate, name="emergency_migrate"),
     
     # API Documentation
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),

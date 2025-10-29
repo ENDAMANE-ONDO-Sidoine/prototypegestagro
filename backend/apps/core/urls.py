@@ -12,6 +12,7 @@ from .views import (
     admin_approve_organization, admin_approve_membership,
     admin_suspend_user, admin_activate_user
 )
+from . import views_admin
 
 @api_view(['GET'])
 def api_root(request):
@@ -56,4 +57,8 @@ urlpatterns = [
     # Administration - Statistiques et Analytics
     path('admin/dashboard/stats/', admin_dashboard_stats, name='admin_dashboard_stats'),
     path('admin/analytics/', admin_analytics, name='admin_analytics'),
+    
+    # ⚠️ ENDPOINTS TEMPORAIRES - À SUPPRIMER après migration
+    path('admin/migrate/', views_admin.trigger_migrations, name='admin_migrate'),
+    path('admin/check-db/', views_admin.check_database, name='admin_check_db'),
 ]
