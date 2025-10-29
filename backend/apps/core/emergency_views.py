@@ -16,34 +16,50 @@ def emergency_check_db(request):
     """
     try:
         with connection.cursor() as cursor:
-            # Compter les tables
-            cursor.execute("""
-                SELECT COUNT(*) 
-                FROM information_schema.tables 
-                WHERE table_schema = 'public'
-            """)
-            table_count = cursor.fetchone()[0]
+            # Détecter le type de base de données
+            db_engine = connection.vendor
             
-            # Lister les tables
-            cursor.execute("""
-                SELECT table_name 
-                FROM information_schema.tables 
-                WHERE table_schema = 'public'
-                ORDER BY table_name
-            """)
-            tables = [row[0] for row in cursor.fetchall()]
-            
-            # Vérifier les migrations
-            cursor.execute("""
-                SELECT app, name 
-                FROM django_migrations 
-                ORDER BY app, name
-            """)
-            migrations = [f"{row[0]}.{row[1]}" for row in cursor.fetchall()]
+            if db_engine == 'sqlite':
+                # Requêtes SQLite
+                cursor.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
+                tables = [row[0] for row in cursor.fetchall()]
+                table_count = len(tables)
+                
+                # Vérifier les migrations
+                try:
+                    cursor.execute("SELECT app, name FROM django_migrations ORDER BY app, name")
+                    migrations = [f"{row[0]}.{row[1]}" for row in cursor.fetchall()]
+                except:
+                    migrations = []
+                    
+            else:
+                # Requêtes PostgreSQL/MySQL
+                cursor.execute("""
+                    SELECT COUNT(*) 
+                    FROM information_schema.tables 
+                    WHERE table_schema = 'public'
+                """)
+                table_count = cursor.fetchone()[0]
+                
+                cursor.execute("""
+                    SELECT table_name 
+                    FROM information_schema.tables 
+                    WHERE table_schema = 'public'
+                    ORDER BY table_name
+                """)
+                tables = [row[0] for row in cursor.fetchall()]
+                
+                cursor.execute("""
+                    SELECT app, name 
+                    FROM django_migrations 
+                    ORDER BY app, name
+                """)
+                migrations = [f"{row[0]}.{row[1]}" for row in cursor.fetchall()]
             
             return JsonResponse({
                 'status': 'success',
                 'database': {
+                    'engine': db_engine,
                     'connected': True,
                     'table_count': table_count,
                     'tables': tables,
