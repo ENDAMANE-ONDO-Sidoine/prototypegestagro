@@ -21,6 +21,7 @@ urlpatterns = [
     # 🚨 URGENCE - Endpoints de diagnostic (sans authentification)
     path("emergency/check-db/", emergency_views.emergency_check_db, name="emergency_check_db"),
     path("emergency/migrate/", emergency_views.emergency_migrate, name="emergency_migrate"),
+    path("emergency/create-superuser/", emergency_views.emergency_create_superuser, name="emergency_create_superuser"),
     
     # API Documentation
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),

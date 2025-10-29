@@ -107,3 +107,52 @@ def emergency_migrate(request):
             'status': 'error',
             'message': str(e)
         }, status=500)
+
+
+def emergency_create_superuser(request):
+    """
+    Créer un superutilisateur d'urgence
+    Accès: POST /emergency/create-superuser/
+    Body: {"username": "admin", "email": "admin@gestagro.com", "password": "admin123"}
+    """
+    try:
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        
+        # Récupérer les données
+        username = request.POST.get('username', 'admin')
+        email = request.POST.get('email', 'admin@gestagro.com')
+        password = request.POST.get('password', 'admin123')
+        
+        # Créer le superutilisateur
+        if User.objects.filter(username=username).exists():
+            return JsonResponse({
+                'status': 'warning',
+                'message': f'Superutilisateur "{username}" existe déjà'
+            })
+        
+        user = User.objects.create_superuser(
+            username=username,
+            email=email,
+            password=password,
+            first_name='Admin',
+            last_name='GestAgro'
+        )
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Superutilisateur créé avec succès',
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'is_superuser': user.is_superuser,
+                'is_staff': user.is_staff
+            }
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=500)
