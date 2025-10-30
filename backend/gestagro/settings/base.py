@@ -320,6 +320,8 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA': False,
     'COMPONENT_SPLIT_REQUEST': True,
     'SCHEMA_PATH_PREFIX': '/api/v1/',
+    # Masquer les endpoints d'administration dans la documentation publique
+    'EXCLUDE_PATHS': [r'^/api/v1/admin/.*'],
 }
 
 # Security Settings

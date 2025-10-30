@@ -8,6 +8,14 @@ DEBUG = True
 
 # Development specific settings
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    'http://localhost:8001',
+    'http://127.0.0.1:8001',
+]
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
 
 # Configuration PostgreSQL Render
 DATABASES = {
@@ -54,6 +62,10 @@ if DEBUG:
 
 # MinIO Configuration (désactivé pour admin local)
 MINIO_ENABLED = False
+
+# Forcer les stockages fichiers/statics en local pour servir correctement l'admin
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # JWT Configuration pour développement
 from datetime import timedelta

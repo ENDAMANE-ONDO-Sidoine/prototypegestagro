@@ -15,8 +15,11 @@ from apps.farmers.models import Product, Category
 from apps.buyers.models import Order
 from apps.transport.models import Vehicle, Driver, Shipment
 from apps.iam.serializers import UserProfileSerializer, OrganizationSerializer, MembershipSerializer
+from gestagro.utils.search_client import get_es_client
+from drf_spectacular.utils import extend_schema
 
 
+@extend_schema(exclude=True)
 class AdminUserListView(generics.ListAPIView):
     """
     Vue pour lister tous les utilisateurs (admin seulement)
@@ -50,6 +53,7 @@ class AdminUserListView(generics.ListAPIView):
         return queryset.order_by('-date_joined')
 
 
+@extend_schema(exclude=True)
 class AdminUserDetailView(generics.RetrieveUpdateAPIView):
     """
     Vue pour les détails d'un utilisateur (admin seulement)
@@ -59,6 +63,7 @@ class AdminUserDetailView(generics.RetrieveUpdateAPIView):
     permission_classes = [permissions.IsAdminUser]
 
 
+@extend_schema(exclude=True)
 class AdminOrganizationListView(generics.ListAPIView):
     """
     Vue pour lister toutes les organisations (admin seulement)
@@ -91,6 +96,7 @@ class AdminOrganizationListView(generics.ListAPIView):
         return queryset.order_by('-created_at')
 
 
+@extend_schema(exclude=True)
 class AdminOrganizationDetailView(generics.RetrieveUpdateAPIView):
     """
     Vue pour les détails d'une organisation (admin seulement)
@@ -100,6 +106,7 @@ class AdminOrganizationDetailView(generics.RetrieveUpdateAPIView):
     permission_classes = [permissions.IsAdminUser]
 
 
+@extend_schema(exclude=True)
 class AdminMembershipListView(generics.ListAPIView):
     """
     Vue pour lister toutes les adhésions (admin seulement)
@@ -128,6 +135,7 @@ class AdminMembershipListView(generics.ListAPIView):
         return queryset.order_by('-created_at')
 
 
+@extend_schema(exclude=True)
 class AdminMembershipDetailView(generics.RetrieveUpdateAPIView):
     """
     Vue pour les détails d'une adhésion (admin seulement)
@@ -137,6 +145,7 @@ class AdminMembershipDetailView(generics.RetrieveUpdateAPIView):
     permission_classes = [permissions.IsAdminUser]
 
 
+@extend_schema(exclude=True)
 @api_view(['GET'])
 @permission_classes([permissions.IsAdminUser])
 def admin_dashboard_stats(request):
@@ -206,6 +215,7 @@ def admin_dashboard_stats(request):
     })
 
 
+@extend_schema(exclude=True)
 @api_view(['GET'])
 @permission_classes([permissions.IsAdminUser])
 def admin_analytics(request):
@@ -275,6 +285,7 @@ def admin_analytics(request):
     })
 
 
+@extend_schema(exclude=True)
 @api_view(['POST'])
 @permission_classes([permissions.IsAdminUser])
 def admin_approve_organization(request, organization_id):
@@ -296,6 +307,41 @@ def admin_approve_organization(request, organization_id):
         )
 
 
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def search_products(request):
+    """
+    Recherche full-text basique sur les produits via Elasticsearch.
+    """
+    query = request.query_params.get('q', '')
+    size = int(request.query_params.get('size', 10))
+
+    es = get_es_client()
+    try:
+        resp = es.search(
+            index='products',
+            query={
+                'multi_match': {
+                    'query': query,
+                    'fields': [
+                        'name^2', 'description',
+                        'name.folded^2', 'description.folded',
+                        'category.folded'
+                    ]
+                }
+            },
+            size=size
+        )
+        hits = [
+            {"id": h.get("_id"), "score": h.get("_score"), **h.get("_source", {})}
+            for h in resp.get('hits', {}).get('hits', [])
+        ]
+        total = resp.get('hits', {}).get('total', {}).get('value', 0)
+        return Response({"results": hits, "total": total})
+    except Exception as exc:
+        return Response({"error": str(exc)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+@extend_schema(exclude=True)
 @api_view(['POST'])
 @permission_classes([permissions.IsAdminUser])
 def admin_approve_membership(request, membership_id):
@@ -317,6 +363,7 @@ def admin_approve_membership(request, membership_id):
         )
 
 
+@extend_schema(exclude=True)
 @api_view(['POST'])
 @permission_classes([permissions.IsAdminUser])
 def admin_suspend_user(request, user_id):
@@ -338,6 +385,7 @@ def admin_suspend_user(request, user_id):
         )
 
 
+@extend_schema(exclude=True)
 @api_view(['POST'])
 @permission_classes([permissions.IsAdminUser])
 def admin_activate_user(request, user_id):
