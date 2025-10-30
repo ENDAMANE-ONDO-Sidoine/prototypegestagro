@@ -4,6 +4,9 @@
 # SAUF les scripts nécessaires pour Render
 !migrate_user_roles.py
 !auto_migrate_roles.py
+!test_redis_connection.py
+!demo_redis_usage.py
+!clean_redis.py
 
 # Et ce fichier .gitignore lui-même
 !.gitignore
