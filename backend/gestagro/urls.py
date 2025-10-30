@@ -9,8 +9,8 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, Spec
 from apps.core.media_views import MinIOMediaView, MinIOStaticView
 
 urlpatterns = [
-    # Admin
-    path("admin/", admin.site.urls),
+    # Admin (désactivable via settings.DJANGO_ADMIN_ENABLED)
+    *([path("admin/", admin.site.urls)] if getattr(settings, "DJANGO_ADMIN_ENABLED", True) else []),
     
     
     # API Documentation

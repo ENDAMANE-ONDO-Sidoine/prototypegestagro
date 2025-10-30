@@ -66,6 +66,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'gestagro.urls'
 
+# Feature flags
+DJANGO_ADMIN_ENABLED = config('DJANGO_ADMIN_ENABLED', default=True, cast=bool)
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
