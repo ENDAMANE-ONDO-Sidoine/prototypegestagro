@@ -1,0 +1,153 @@
+{% extends "docs/base.html" %}
+
+{% block title %}Démarrage rapide - {{ api_info.title }}{% endblock %}
+
+{% block breadcrumb_current %}Démarrage rapide{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow-sm p-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-4">Démarrage rapide</h1>
+        <p class="text-lg text-gray-600">
+            Commencez à utiliser l'API GestAgro en quelques minutes. Ce guide vous aidera à configurer votre environnement et à effectuer votre première requête.
+        </p>
+    </div>
+
+    <!-- Étape 1 -->
+    <div class="mb-12">
+        <div class="flex items-center mb-4">
+            <div class="bg-green-100 text-green-600 rounded-full w-10 h-10 flex items-center justify-center font-bold text-lg mr-4">1</div>
+            <h2 class="text-2xl font-semibold text-gray-900">Configuration de l'environnement</h2>
+        </div>
+        <div class="ml-14 space-y-4">
+            <div class="bg-gray-50 border-l-4 border-blue-500 p-4">
+                <h3 class="font-semibold text-gray-900 mb-2">Base URL</h3>
+                <p class="text-gray-600 mb-2">L'API GestAgro est accessible à l'adresse suivante :</p>
+                <code class="bg-gray-900 text-green-400 px-3 py-2 rounded block">{{ api_base_url }}</code>
+            </div>
+            <div class="bg-gray-50 border-l-4 border-green-500 p-4">
+                <h3 class="font-semibold text-gray-900 mb-2">Production</h3>
+                <code class="bg-gray-900 text-green-400 px-3 py-2 rounded block">https://gestagro-api.onrender.com/api/v1/</code>
+            </div>
+        </div>
+    </div>
+
+    <!-- Étape 2 -->
+    <div class="mb-12">
+        <div class="flex items-center mb-4">
+            <div class="bg-green-100 text-green-600 rounded-full w-10 h-10 flex items-center justify-center font-bold text-lg mr-4">2</div>
+            <h2 class="text-2xl font-semibold text-gray-900">Créer un compte</h2>
+        </div>
+        <div class="ml-14 space-y-4">
+            <p class="text-gray-600 mb-4">Créez un compte utilisateur pour obtenir vos identifiants d'accès.</p>
+            <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
+                <pre class="text-green-400 text-sm"><code>POST {{ api_base_url }}auth/register/
+
+{
+  "email": "votre@email.com",
+  "password": "MotDePasse123!",
+  "first_name": "Prénom",
+  "last_name": "Nom",
+  "user_role": "buyer",
+  "phone": "+241 06 12 34 56 78"
+}</code></pre>
+            </div>
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p class="text-sm text-blue-800">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    <strong>Rôles disponibles :</strong> <code>farmer</code>, <code>buyer</code>, <code>transporter</code>, <code>agronomist</code>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Étape 3 -->
+    <div class="mb-12">
+        <div class="flex items-center mb-4">
+            <div class="bg-green-100 text-green-600 rounded-full w-10 h-10 flex items-center justify-center font-bold text-lg mr-4">3</div>
+            <h2 class="text-2xl font-semibold text-gray-900">Obtenir un token d'accès</h2>
+        </div>
+        <div class="ml-14 space-y-4">
+            <p class="text-gray-600 mb-4">Connectez-vous pour obtenir un token JWT.</p>
+            <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto mb-4">
+                <pre class="text-green-400 text-sm"><code>POST {{ api_base_url }}auth/login/
+
+{
+  "email": "votre@email.com",
+  "password": "MotDePasse123!"
+}</code></pre>
+            </div>
+            <p class="text-gray-600 mb-2">Réponse :</p>
+            <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
+                <pre class="text-green-400 text-sm"><code>{
+  "access": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+  "refresh": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+  "user": { ... }
+}</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Étape 4 -->
+    <div class="mb-12">
+        <div class="flex items-center mb-4">
+            <div class="bg-green-100 text-green-600 rounded-full w-10 h-10 flex items-center justify-center font-bold text-lg mr-4">4</div>
+            <h2 class="text-2xl font-semibold text-gray-900">Effectuer votre première requête</h2>
+        </div>
+        <div class="ml-14 space-y-4">
+            <p class="text-gray-600 mb-4">Utilisez le token dans l'en-tête <code class="bg-gray-100 px-2 py-1 rounded">Authorization</code> pour faire des requêtes authentifiées.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                {% for actor in actors|slice:":2" %}
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-center mb-3">
+                        <div class="{% if actor.color == 'green' %}bg-green-100 text-green-600{% elif actor.color == 'blue' %}bg-blue-100 text-blue-600{% elif actor.color == 'purple' %}bg-purple-100 text-purple-600{% elif actor.color == 'yellow' %}bg-yellow-100 text-yellow-600{% endif %} rounded-full p-2 mr-3">
+                            <i class="fas {{ actor.icon }}"></i>
+                        </div>
+                        <h3 class="font-semibold text-gray-900">{{ actor.name }}</h3>
+                    </div>
+                    <div class="bg-gray-900 rounded p-3 overflow-x-auto">
+                        <code class="text-green-400 text-xs">GET {{ actor.base_url }}{{ actor.key_endpoints.0.path }}</code>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
+                <pre class="text-green-400 text-sm"><code>curl -X GET "{{ api_base_url }}farmers/products/" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json"</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prochaines étapes -->
+    <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">Prochaines étapes</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <a href="{% url 'docs-authentication' %}" class="bg-white rounded-lg p-4 hover:shadow-md transition">
+                <div class="flex items-center mb-2">
+                    <i class="fas fa-lock text-green-600 text-xl mr-2"></i>
+                    <h3 class="font-semibold text-gray-900">Authentification</h3>
+                </div>
+                <p class="text-sm text-gray-600">Découvrez comment gérer les tokens et les sessions</p>
+            </a>
+            <a href="{% url 'docs-examples' %}" class="bg-white rounded-lg p-4 hover:shadow-md transition">
+                <div class="flex items-center mb-2">
+                    <i class="fas fa-code text-blue-600 text-xl mr-2"></i>
+                    <h3 class="font-semibold text-gray-900">Exemples</h3>
+                </div>
+                <p class="text-sm text-gray-600">Consultez des exemples de code pour chaque acteur</p>
+            </a>
+            <a href="{{ swagger_url }}" target="_blank" class="bg-white rounded-lg p-4 hover:shadow-md transition">
+                <div class="flex items-center mb-2">
+                    <i class="fas fa-file-code text-purple-600 text-xl mr-2"></i>
+                    <h3 class="font-semibold text-gray-900">Swagger UI</h3>
+                </div>
+                <p class="text-sm text-gray-600">Testez l'API directement dans votre navigateur</p>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,187 @@
+{% extends "docs/base.html" %}
+
+{% block title %}Support - {{ api_info.title }}{% endblock %}
+
+{% block breadcrumb_current %}Support{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow-sm p-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-4">Support et Contact</h1>
+        <p class="text-lg text-gray-600">
+            Besoin d'aide ? Vous trouverez ici toutes les ressources nécessaires pour obtenir de l'assistance 
+            et résoudre vos problèmes avec l'API GestAgro.
+        </p>
+    </div>
+
+    <!-- Ressources -->
+    <section class="mb-12">
+        <h2 class="text-2xl font-semibold text-gray-900 mb-6">Ressources disponibles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <a href="{% url 'docs-quickstart' %}" class="border border-gray-200 rounded-lg p-6 hover:shadow-md transition">
+                <div class="bg-green-100 text-green-600 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                    <i class="fas fa-rocket text-xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Démarrage rapide</h3>
+                <p class="text-sm text-gray-600">Guide pour commencer rapidement avec l'API</p>
+            </a>
+
+            <a href="{% url 'docs-examples' %}" class="border border-gray-200 rounded-lg p-6 hover:shadow-md transition">
+                <div class="bg-blue-100 text-blue-600 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                    <i class="fas fa-code text-xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Exemples de code</h3>
+                <p class="text-sm text-gray-600">Exemples pratiques pour chaque acteur</p>
+            </a>
+
+            <a href="{% url 'docs-errors' %}" class="border border-gray-200 rounded-lg p-6 hover:shadow-md transition">
+                <div class="bg-yellow-100 text-yellow-600 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                    <i class="fas fa-exclamation-triangle text-xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Gestion des erreurs</h3>
+                <p class="text-sm text-gray-600">Comprendre et résoudre les erreurs courantes</p>
+            </a>
+
+            <a href="{{ swagger_url }}" target="_blank" class="border border-gray-200 rounded-lg p-6 hover:shadow-md transition">
+                <div class="bg-purple-100 text-purple-600 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                    <i class="fas fa-file-code text-xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Swagger UI</h3>
+                <p class="text-sm text-gray-600">Tester l'API directement dans votre navigateur</p>
+            </a>
+
+            <a href="{% url 'docs-reference' %}" class="border border-gray-200 rounded-lg p-6 hover:shadow-md transition">
+                <div class="bg-indigo-100 text-indigo-600 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                    <i class="fas fa-book text-xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Référence API</h3>
+                <p class="text-sm text-gray-600">Documentation complète de tous les endpoints</p>
+            </a>
+
+            <a href="{% url 'docs-authentication' %}" class="border border-gray-200 rounded-lg p-6 hover:shadow-md transition">
+                <div class="bg-red-100 text-red-600 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                    <i class="fas fa-lock text-xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Authentification</h3>
+                <p class="text-sm text-gray-600">Guide complet sur l'authentification JWT</p>
+            </a>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="mb-12">
+        <h2 class="text-2xl font-semibold text-gray-900 mb-6">Questions fréquentes (FAQ)</h2>
+        <div class="space-y-4">
+            <div class="border border-gray-200 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-2 flex items-center">
+                    <i class="fas fa-question-circle text-blue-600 mr-2"></i>
+                    Comment obtenir un token d'accès ?
+                </h3>
+                <p class="text-gray-600">
+                    Vous devez d'abord créer un compte via <code class="bg-gray-100 px-2 py-1 rounded">POST /api/v1/auth/register/</code>, 
+                    puis vous connecter avec <code class="bg-gray-100 px-2 py-1 rounded">POST /api/v1/auth/login/</code>. 
+                    La réponse contiendra un <code class="bg-gray-100 px-2 py-1 rounded">access_token</code> et un <code class="bg-gray-100 px-2 py-1 rounded">refresh_token</code>.
+                </p>
+            </div>
+
+            <div class="border border-gray-200 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-2 flex items-center">
+                    <i class="fas fa-question-circle text-blue-600 mr-2"></i>
+                    Mon token a expiré, que faire ?
+                </h3>
+                <p class="text-gray-600">
+                    Utilisez votre <code class="bg-gray-100 px-2 py-1 rounded">refresh_token</code> pour obtenir un nouveau token d'accès 
+                    via <code class="bg-gray-100 px-2 py-1 rounded">POST /api/v1/auth/refresh/</code>. 
+                    Les tokens d'accès expirent après 1 heure, les refresh tokens après 7 jours.
+                </p>
+            </div>
+
+            <div class="border border-gray-200 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-2 flex items-center">
+                    <i class="fas fa-question-circle text-blue-600 mr-2"></i>
+                    Quelle est la limite de taux (rate limiting) ?
+                </h3>
+                <p class="text-gray-600">
+                    L'API limite à 1000 requêtes par heure par utilisateur. Si vous dépassez cette limite, 
+                    vous recevrez une erreur 429 avec un header <code class="bg-gray-100 px-2 py-1 rounded">Retry-After</code> 
+                    indiquant quand vous pourrez refaire des requêtes.
+                </p>
+            </div>
+
+            <div class="border border-gray-200 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-2 flex items-center">
+                    <i class="fas fa-question-circle text-blue-600 mr-2"></i>
+                    Comment gérer les erreurs 500 ?
+                </h3>
+                <p class="text-gray-600">
+                    Les erreurs 500 sont des erreurs serveur temporaires. Implémentez une logique de retry avec un délai exponentiel. 
+                    Si le problème persiste, contactez le support avec l'<code class="bg-gray-100 px-2 py-1 rounded">error_id</code> 
+                    fourni dans la réponse.
+                </p>
+            </div>
+
+            <div class="border border-gray-200 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-2 flex items-center">
+                    <i class="fas fa-question-circle text-blue-600 mr-2"></i>
+                    Puis-je utiliser l'API en production ?
+                </h3>
+                <p class="text-gray-600">
+                    Oui, l'API est disponible en production à l'adresse 
+                    <code class="bg-gray-100 px-2 py-1 rounded">https://gestagro-api.onrender.com/api/v1/</code>. 
+                    Assurez-vous d'utiliser HTTPS en production et de stocker vos tokens de manière sécurisée.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Besoin d'aide supplémentaire ?</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-lg p-6">
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-envelope text-blue-600 text-2xl mr-3"></i>
+                    <h3 class="text-lg font-semibold text-gray-900">Email</h3>
+                </div>
+                <p class="text-gray-600 mb-2">Contactez notre équipe de support :</p>
+                <a href="mailto:support@gestagro.com" class="text-blue-600 hover:underline">
+                    support@gestagro.com
+                </a>
+            </div>
+
+            <div class="bg-white rounded-lg p-6">
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-bug text-red-600 text-2xl mr-3"></i>
+                    <h3 class="text-lg font-semibold text-gray-900">Signaler un bug</h3>
+                </div>
+                <p class="text-gray-600 mb-2">En cas de problème technique :</p>
+                <ul class="text-sm text-gray-600 space-y-1">
+                    <li>• Incluez l'<code class="bg-gray-100 px-1 rounded">error_id</code> si disponible</li>
+                    <li>• Décrivez les étapes pour reproduire le problème</li>
+                    <li>• Indiquez votre version de l'API</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Status -->
+    <section class="mt-8">
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Statut de l'API</h3>
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600">Vérifiez le statut de l'API en temps réel</p>
+                    <a href="/health/" target="_blank" class="text-blue-600 hover:underline text-sm">
+                        <i class="fas fa-heartbeat mr-1"></i> Health Check
+                    </a>
+                </div>
+                <div class="flex items-center">
+                    <span class="w-3 h-3 bg-green-500 rounded-full mr-2 animate-pulse"></span>
+                    <span class="text-sm text-gray-600">Service opérationnel</span>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+

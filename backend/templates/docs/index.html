@@ -1,0 +1,333 @@
+{% extends "docs/base.html" %}
+
+{% block title %}{{ api_info.title }} - Documentation{% endblock %}
+
+{% block breadcrumb_current %}Documentation{% endblock %}
+
+{% block content %}
+<!-- Introduction -->
+<div class="bg-white rounded-lg shadow-sm p-8 mb-8">
+    <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ api_info.title }} - Documentation</h1>
+    <p class="text-lg text-gray-600 mb-6">
+        {{ api_info.description }}
+    </p>
+    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+        <p class="text-blue-800">
+            <strong>Base URL Production:</strong> 
+            <code class="bg-blue-100 px-2 py-1 rounded">{{ api_info.base_url_production }}</code>
+        </p>
+    </div>
+</div>
+
+<!-- Getting Started Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8" id="getting-started">
+    {% for item in getting_started %}
+    <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition">
+        <div class="flex items-center mb-4">
+            {% if item.color == 'green' %}
+            <div class="bg-green-100 rounded-full p-3">
+            {% elif item.color == 'blue' %}
+            <div class="bg-blue-100 rounded-full p-3">
+            {% elif item.color == 'purple' %}
+            <div class="bg-purple-100 rounded-full p-3">
+            {% else %}
+            <div class="bg-gray-100 rounded-full p-3">
+            {% endif %}
+                                {% if item.icon == 'rocket' %}
+                                <svg class="w-6 h-6 {% if item.color == 'green' %}text-green-600{% elif item.color == 'blue' %}text-blue-600{% elif item.color == 'purple' %}text-purple-600{% else %}text-gray-600{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                </svg>
+                                {% elif item.icon == 'check' %}
+                <svg class="w-6 h-6 {% if item.color == 'green' %}text-green-600{% elif item.color == 'blue' %}text-blue-600{% elif item.color == 'purple' %}text-purple-600{% else %}text-gray-600{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                {% elif item.icon == 'settings' %}
+                <svg class="w-6 h-6 {% if item.color == 'green' %}text-green-600{% elif item.color == 'blue' %}text-blue-600{% elif item.color == 'purple' %}text-purple-600{% else %}text-gray-600{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                {% elif item.icon == 'server' %}
+                <svg class="w-6 h-6 {% if item.color == 'green' %}text-green-600{% elif item.color == 'blue' %}text-blue-600{% elif item.color == 'purple' %}text-purple-600{% else %}text-gray-600{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>
+                </svg>
+                {% endif %}
+            </div>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ item.title }}</h3>
+        <p class="text-gray-600 mb-4">{{ item.description }}</p>
+        {% if item.color == 'green' %}
+        <a href="{{ item.link }}" {% if item.external %}target="_blank"{% endif %} class="inline-flex items-center text-green-600 hover:text-green-700 font-medium">
+            En savoir plus 
+            <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+        </a>
+        {% elif item.color == 'blue' %}
+        <a href="{{ item.link }}" {% if item.external %}target="_blank"{% endif %} class="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium">
+            En savoir plus 
+            <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+        </a>
+        {% elif item.color == 'purple' %}
+        <a href="{{ item.link }}" {% if item.external %}target="_blank"{% endif %} class="inline-flex items-center text-purple-600 hover:text-purple-700 font-medium">
+            En savoir plus 
+            <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+        </a>
+        {% else %}
+        <a href="{{ item.link }}" {% if item.external %}target="_blank"{% endif %} class="inline-flex items-center text-gray-600 hover:text-gray-700 font-medium">
+            En savoir plus 
+            <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+        </a>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Quick Links -->
+<div class="bg-white rounded-lg shadow-sm p-8 mb-8">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">Liens rapides</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% for link in quick_links %}
+        <a href="{{ link.url }}" {% if 'docs' in link.url or 'redoc' in link.url or 'schema' in link.url or link.url|slice:":4" == "http" %}target="_blank"{% endif %}
+           class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition">
+            <div>
+                <h3 class="font-semibold text-gray-900">{{ link.title }}</h3>
+                <p class="text-sm text-gray-600">{{ link.description }}</p>
+            </div>
+            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- API Overview - Acteurs -->
+<div class="bg-white rounded-lg shadow-sm p-8 mb-8" id="actors">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">Vue d'ensemble de l'API - Acteurs</h2>
+    <div class="space-y-6">
+        {% for actor in actors %}
+        <div class="border border-gray-200 rounded-lg p-6 hover:shadow-md transition">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center space-x-4">
+                    <div class="{% if actor.color == 'green' %}bg-green-100 text-green-600{% elif actor.color == 'blue' %}bg-blue-100 text-blue-600{% elif actor.color == 'purple' %}bg-purple-100 text-purple-600{% elif actor.color == 'yellow' %}bg-yellow-100 text-yellow-600{% else %}bg-gray-100 text-gray-600{% endif %} rounded-full p-4">
+                        <i class="fas {{ actor.icon }} text-3xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900">{{ actor.name }}</h3>
+                        <p class="text-gray-600">{{ actor.description }}</p>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    {% if actor.color == 'green' %}
+                    <a href="{{ actor.swagger_url }}" target="_blank" class="text-green-600 hover:text-green-700 font-medium text-sm border border-green-600 px-3 py-1 rounded hover:bg-green-50">
+                        Swagger →
+                    </a>
+                    {% elif actor.color == 'blue' %}
+                    <a href="{{ actor.swagger_url }}" target="_blank" class="text-blue-600 hover:text-blue-700 font-medium text-sm border border-blue-600 px-3 py-1 rounded hover:bg-blue-50">
+                        Swagger →
+                    </a>
+                    {% elif actor.color == 'purple' %}
+                    <a href="{{ actor.swagger_url }}" target="_blank" class="text-purple-600 hover:text-purple-700 font-medium text-sm border border-purple-600 px-3 py-1 rounded hover:bg-purple-50">
+                        Swagger →
+                    </a>
+                    {% elif actor.color == 'yellow' %}
+                    <a href="{{ actor.swagger_url }}" target="_blank" class="text-yellow-600 hover:text-yellow-700 font-medium text-sm border border-yellow-600 px-3 py-1 rounded hover:bg-yellow-50">
+                        Swagger →
+                    </a>
+                    {% else %}
+                    <a href="{{ swagger_url }}" target="_blank" class="text-gray-600 hover:text-gray-700 font-medium text-sm border border-gray-600 px-3 py-1 rounded hover:bg-gray-50">
+                        Swagger →
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'docs-examples-actor' actor.slug %}" 
+                       {% if actor.color == 'green' %}class="text-green-600 hover:text-green-700 font-medium text-sm border border-green-600 px-3 py-1 rounded hover:bg-green-50"
+                       {% elif actor.color == 'blue' %}class="text-blue-600 hover:text-blue-700 font-medium text-sm border border-blue-600 px-3 py-1 rounded hover:bg-blue-50"
+                       {% elif actor.color == 'purple' %}class="text-purple-600 hover:text-purple-700 font-medium text-sm border border-purple-600 px-3 py-1 rounded hover:bg-purple-50"
+                       {% elif actor.color == 'yellow' %}class="text-yellow-600 hover:text-yellow-700 font-medium text-sm border border-yellow-600 px-3 py-1 rounded hover:bg-yellow-50"
+                       {% else %}class="text-gray-600 hover:text-gray-700 font-medium text-sm border border-gray-600 px-3 py-1 rounded hover:bg-gray-50"{% endif %}>
+                        Exemples →
+                    </a>
+                </div>
+            </div>
+            <div class="bg-gray-50 rounded p-4">
+                <p class="text-sm font-medium text-gray-700 mb-2">Endpoints clés:</p>
+                <div class="space-y-2">
+                    {% for endpoint in actor.key_endpoints %}
+                    <div class="flex items-center space-x-3 text-sm">
+                        {% if actor.color == 'green' %}
+                        <span class="px-2 py-1 bg-green-100 text-green-700 rounded font-mono text-xs">{{ endpoint.method }}</span>
+                        {% elif actor.color == 'blue' %}
+                        <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded font-mono text-xs">{{ endpoint.method }}</span>
+                        {% elif actor.color == 'purple' %}
+                        <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded font-mono text-xs">{{ endpoint.method }}</span>
+                        {% elif actor.color == 'yellow' %}
+                        <span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded font-mono text-xs">{{ endpoint.method }}</span>
+                        {% else %}
+                        <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded font-mono text-xs">{{ endpoint.method }}</span>
+                        {% endif %}
+                        <code class="text-gray-700 font-mono">{{ actor.base_url }}{{ endpoint.path }}</code>
+                        <span class="text-gray-500">- {{ endpoint.description }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Statistics -->
+{% if stats %}
+<div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-8 mb-8">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">Statistiques de la plateforme</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {% if stats.total_users %}
+        <div class="bg-white rounded-lg p-4 text-center">
+            <div class="text-3xl font-bold text-green-600">{{ stats.total_users }}</div>
+            <div class="text-sm text-gray-600 mt-1">Utilisateurs</div>
+        </div>
+        {% endif %}
+        {% if stats.total_organizations %}
+        <div class="bg-white rounded-lg p-4 text-center">
+            <div class="text-3xl font-bold text-blue-600">{{ stats.total_organizations }}</div>
+            <div class="text-sm text-gray-600 mt-1">Organisations</div>
+        </div>
+        {% endif %}
+        {% if stats.total_products %}
+        <div class="bg-white rounded-lg p-4 text-center">
+            <div class="text-3xl font-bold text-purple-600">{{ stats.total_products }}</div>
+            <div class="text-sm text-gray-600 mt-1">Produits</div>
+        </div>
+        {% endif %}
+        {% if stats.total_orders %}
+        <div class="bg-white rounded-lg p-4 text-center">
+            <div class="text-3xl font-bold text-yellow-600">{{ stats.total_orders }}</div>
+            <div class="text-sm text-gray-600 mt-1">Commandes</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Quick Start -->
+<div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-8 mb-8">
+    <h2 class="text-2xl font-bold text-gray-900 mb-4">Démarrage rapide</h2>
+    <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto mb-4">
+        <pre class="text-green-400 text-sm"><code># 1. Authentification
+POST {{ api_base_url }}auth/login/
+{
+  "email": "votre@email.com",
+  "password": "votre_mot_de_passe"
+}
+
+# 2. Utiliser le token dans les requêtes
+Authorization: Bearer &lt;votre_access_token&gt;
+
+# 3. Exemple: Lister les produits
+GET {{ api_base_url }}farmers/products/</code></pre>
+    </div>
+    <div class="flex items-center justify-between">
+        <p class="text-gray-700">
+            Consultez la <a href="{% url 'docs-quickstart' %}" class="text-green-600 hover:underline font-medium">page de démarrage rapide</a> 
+            pour un guide complet étape par étape.
+        </p>
+        <a href="{% url 'docs-quickstart' %}" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition">
+            Commencer →
+        </a>
+    </div>
+</div>
+
+<!-- Ressources et Outils -->
+<div class="bg-white rounded-lg shadow-sm p-8 mb-8">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">Ressources et Outils</h2>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <a href="{{ swagger_url }}" target="_blank" class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition text-center">
+            <i class="fas fa-file-code text-3xl text-blue-600 mb-2"></i>
+            <h3 class="font-semibold text-gray-900 mb-1">Swagger UI</h3>
+            <p class="text-xs text-gray-600">Tester l'API interactivement</p>
+        </a>
+        <a href="{{ redoc_url }}" target="_blank" class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition text-center">
+            <i class="fas fa-book-open text-3xl text-green-600 mb-2"></i>
+            <h3 class="font-semibold text-gray-900 mb-1">ReDoc</h3>
+            <p class="text-xs text-gray-600">Documentation élégante</p>
+        </a>
+        <a href="{{ schema_url }}" target="_blank" class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition text-center">
+            <i class="fas fa-download text-3xl text-purple-600 mb-2"></i>
+            <h3 class="font-semibold text-gray-900 mb-1">Schéma OpenAPI</h3>
+            <p class="text-xs text-gray-600">Télécharger le schéma</p>
+        </a>
+        <a href="{% url 'docs-reference' %}" class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition text-center">
+            <i class="fas fa-list text-3xl text-yellow-600 mb-2"></i>
+            <h3 class="font-semibold text-gray-900 mb-1">Référence API</h3>
+            <p class="text-xs text-gray-600">Tous les endpoints</p>
+        </a>
+    </div>
+</div>
+
+<!-- Fonctionnalités clés -->
+<div class="bg-white rounded-lg shadow-sm p-8">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">Fonctionnalités clés</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="border-l-4 border-green-500 pl-4">
+            <div class="flex items-center mb-2">
+                <i class="fas fa-shield-alt text-green-600 text-xl mr-2"></i>
+                <h3 class="text-lg font-semibold text-gray-900">Sécurisé</h3>
+            </div>
+            <p class="text-sm text-gray-600">
+                Authentification JWT robuste, HTTPS obligatoire en production, et protection contre les attaques courantes.
+            </p>
+        </div>
+        <div class="border-l-4 border-blue-500 pl-4">
+            <div class="flex items-center mb-2">
+                <i class="fas fa-bolt text-blue-600 text-xl mr-2"></i>
+                <h3 class="text-lg font-semibold text-gray-900">Performant</h3>
+            </div>
+            <p class="text-sm text-gray-600">
+                Cache Redis, recherche Elasticsearch, et optimisations de requêtes pour des réponses rapides.
+            </p>
+        </div>
+        <div class="border-l-4 border-purple-500 pl-4">
+            <div class="flex items-center mb-2">
+                <i class="fas fa-users text-purple-600 text-xl mr-2"></i>
+                <h3 class="text-lg font-semibold text-gray-900">Multi-tenant</h3>
+            </div>
+            <p class="text-sm text-gray-600">
+                Architecture multi-organisations avec gestion fine des permissions et de l'isolation des données.
+            </p>
+        </div>
+        <div class="border-l-4 border-yellow-500 pl-4">
+            <div class="flex items-center mb-2">
+                <i class="fas fa-search text-yellow-600 text-xl mr-2"></i>
+                <h3 class="text-lg font-semibold text-gray-900">Recherche avancée</h3>
+            </div>
+            <p class="text-sm text-gray-600">
+                Recherche full-text avec Elasticsearch, filtrage avancé, et recherche insensible aux accents.
+            </p>
+        </div>
+        <div class="border-l-4 border-red-500 pl-4">
+            <div class="flex items-center mb-2">
+                <i class="fas fa-file-alt text-red-600 text-xl mr-2"></i>
+                <h3 class="text-lg font-semibold text-gray-900">Documentation complète</h3>
+            </div>
+            <p class="text-sm text-gray-600">
+                Documentation détaillée avec exemples de code, guides pas à pas, et référence complète.
+            </p>
+        </div>
+        <div class="border-l-4 border-indigo-500 pl-4">
+            <div class="flex items-center mb-2">
+                <i class="fas fa-plug text-indigo-600 text-xl mr-2"></i>
+                <h3 class="text-lg font-semibold text-gray-900">RESTful</h3>
+            </div>
+            <p class="text-sm text-gray-600">
+                API REST standard avec JSON, codes HTTP appropriés, et conventions de nommage cohérentes.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

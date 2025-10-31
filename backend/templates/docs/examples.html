@@ -1,0 +1,70 @@
+{% extends "docs/base.html" %}
+{% load static %}
+
+{% block title %}Exemples d'utilisation - {{ api_info.title }}{% endblock %}
+
+{% block breadcrumb_current %}Exemples d'utilisation{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow-sm p-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-4">Exemples d'utilisation</h1>
+        <p class="text-lg text-gray-600">
+            Découvrez des exemples pratiques d'utilisation de l'API GestAgro pour chaque acteur de la plateforme.
+            Ces exemples vous aideront à comprendre comment intégrer l'API dans votre application.
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        {% for actor in actors %}
+        <div class="border border-gray-200 rounded-lg p-6 hover:shadow-md transition">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center">
+                    <div class="{% if actor.color == 'green' %}bg-green-100 text-green-600{% elif actor.color == 'blue' %}bg-blue-100 text-blue-600{% elif actor.color == 'purple' %}bg-purple-100 text-purple-600{% elif actor.color == 'yellow' %}bg-yellow-100 text-yellow-600{% else %}bg-gray-100 text-gray-600{% endif %} rounded-full p-4 mr-4">
+                        <i class="fas {{ actor.icon }} text-3xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-900">{{ actor.name }}</h2>
+                        <p class="text-sm text-gray-500">{{ actor.description }}</p>
+                    </div>
+                </div>
+            </div>
+            <p class="text-gray-600 mb-4 text-sm">{{ actor.description }}</p>
+            <div class="flex items-center justify-between">
+                <a href="{% url 'docs-examples-actor' actor.slug %}" 
+                   {% if actor.color == 'green' %}class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+                   {% elif actor.color == 'blue' %}class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                   {% elif actor.color == 'purple' %}class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
+                   {% elif actor.color == 'yellow' %}class="inline-flex items-center px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 transition"
+                   {% else %}class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition"{% endif %}>
+                    Voir les exemples
+                    <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </a>
+                <a href="{{ actor.swagger_url }}" target="_blank" 
+                   class="text-sm text-gray-500 hover:text-gray-700">
+                    API →
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <div class="flex items-start">
+            <svg class="w-6 h-6 text-blue-600 mr-3 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+            </svg>
+            <div>
+                <h3 class="text-lg font-semibold text-blue-900 mb-2">Conseil</h3>
+                <p class="text-blue-800">
+                    Tous les exemples nécessitent une authentification JWT. Assurez-vous d'avoir obtenu un token d'accès 
+                    via l'endpoint <code class="bg-blue-100 px-2 py-1 rounded">/api/v1/auth/login/</code> avant de tester les exemples.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

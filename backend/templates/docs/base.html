@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ api_info.title }} - Documentation{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'docs-home' %}" class="flex items-center">
+                        <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
+                        </svg>
+                        <span class="ml-2 text-xl font-bold text-gray-900">{{ api_info.title }}</span>
+                    </a>
+                    <div class="hidden md:flex space-x-6">
+                        <a href="{% url 'docs-home' %}" class="{% if request.resolver_match.url_name == 'docs-home' %}text-green-600 font-medium border-b-2 border-green-600 pb-4{% else %}text-gray-600 hover:text-gray-900{% endif %} px-2">
+                            Accueil
+                        </a>
+                        <a href="{% url 'docs-quickstart' %}" class="{% if request.resolver_match.url_name == 'docs-quickstart' %}text-green-600 font-medium border-b-2 border-green-600 pb-4{% else %}text-gray-600 hover:text-gray-900{% endif %} px-2">
+                            Démarrage
+                        </a>
+                        <a href="{% url 'docs-examples' %}" class="{% if 'docs-examples' in request.resolver_match.url_name %}text-green-600 font-medium border-b-2 border-green-600 pb-4{% else %}text-gray-600 hover:text-gray-900{% endif %} px-2">
+                            Exemples
+                        </a>
+                        <a href="{% url 'docs-reference' %}" class="{% if request.resolver_match.url_name == 'docs-reference' %}text-green-600 font-medium border-b-2 border-green-600 pb-4{% else %}text-gray-600 hover:text-gray-900{% endif %} px-2">
+                            Référence
+                        </a>
+                        <a href="{{ swagger_url }}" target="_blank" class="text-gray-600 hover:text-gray-900 px-2">
+                            Swagger
+                        </a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <select class="text-sm border border-gray-300 rounded px-3 py-1 text-gray-700">
+                        <option>Version {{ version }}</option>
+                    </select>
+                    <a href="{{ swagger_url }}" target="_blank" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                        Essayer l'API
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Sidebar Navigation -->
+            <aside class="lg:col-span-1">
+                <div class="sticky top-20">
+                    <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
+                        <input type="search" placeholder="Rechercher..." 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    <nav class="bg-white rounded-lg shadow-sm p-4">
+                        <h3 class="font-semibold text-gray-900 mb-3">Documentation</h3>
+                        <ul class="space-y-2">
+                            <li><a href="{% url 'docs-home' %}" class="{% if request.resolver_match.url_name == 'docs-home' %}text-green-600 font-medium{% else %}text-gray-600 hover:text-green-600{% endif %} block py-1"><i class="fas fa-home mr-2"></i>Accueil</a></li>
+                            <li><a href="{% url 'docs-quickstart' %}" class="{% if request.resolver_match.url_name == 'docs-quickstart' %}text-green-600 font-medium{% else %}text-gray-600 hover:text-green-600{% endif %} block py-1"><i class="fas fa-rocket mr-2"></i>Démarrage rapide</a></li>
+                            <li><a href="{% url 'docs-concepts' %}" class="{% if request.resolver_match.url_name == 'docs-concepts' %}text-green-600 font-medium{% else %}text-gray-600 hover:text-green-600{% endif %} block py-1"><i class="fas fa-book mr-2"></i>Concepts</a></li>
+                            <li><a href="{% url 'docs-authentication' %}" class="{% if request.resolver_match.url_name == 'docs-authentication' %}text-green-600 font-medium{% else %}text-gray-600 hover:text-green-600{% endif %} block py-1"><i class="fas fa-lock mr-2"></i>Authentification</a></li>
+                            <li><a href="{% url 'docs-examples' %}" class="{% if request.resolver_match.url_name == 'docs-examples' %}text-green-600 font-medium{% else %}text-gray-600 hover:text-green-600{% endif %} block py-1"><i class="fas fa-code mr-2"></i>Exemples</a></li>
+                            <li class="ml-4">
+                                <ul class="space-y-1 mt-1">
+                                    {% if actors %}
+                                    {% for actor in actors %}
+                                    <li><a href="{% url 'docs-examples-actor' actor.slug %}" class="{% if request.resolver_match.url_name == 'docs-examples-actor' and request.resolver_match.kwargs.actor_slug == actor.slug %}text-green-600 font-medium{% else %}text-sm text-gray-500 hover:text-green-600{% endif %} block py-1"><i class="fas {{ actor.icon }} mr-2"></i>{{ actor.name }}</a></li>
+                                    {% endfor %}
+                                    {% endif %}
+                                </ul>
+                            </li>
+                            <li><a href="{% url 'docs-reference' %}" class="{% if request.resolver_match.url_name == 'docs-reference' %}text-green-600 font-medium{% else %}text-gray-600 hover:text-green-600{% endif %} block py-1"><i class="fas fa-file-code mr-2"></i>Référence API</a></li>
+                            <li><a href="{% url 'docs-errors' %}" class="{% if request.resolver_match.url_name == 'docs-errors' %}text-green-600 font-medium{% else %}text-gray-600 hover:text-green-600{% endif %} block py-1"><i class="fas fa-exclamation-triangle mr-2"></i>Gestion des erreurs</a></li>
+                            <li><a href="{% url 'docs-setup' %}" class="{% if request.resolver_match.url_name == 'docs-setup' %}text-green-600 font-medium{% else %}text-gray-600 hover:text-green-600{% endif %} block py-1"><i class="fas fa-cog mr-2"></i>Installation</a></li>
+                            <li><a href="{% url 'docs-support' %}" class="{% if request.resolver_match.url_name == 'docs-support' %}text-green-600 font-medium{% else %}text-gray-600 hover:text-green-600{% endif %} block py-1"><i class="fas fa-life-ring mr-2"></i>Support</a></li>
+                        </ul>
+                        <div class="mt-4 pt-4 border-t border-gray-200">
+                            <h4 class="text-xs font-semibold text-gray-500 uppercase mb-2">Ressources</h4>
+                            <ul class="space-y-1">
+                                <li><a href="{{ swagger_url }}" target="_blank" class="text-sm text-gray-500 hover:text-green-600 block py-1"><i class="fas fa-external-link-alt mr-2"></i>Swagger UI</a></li>
+                                <li><a href="{{ redoc_url }}" target="_blank" class="text-sm text-gray-500 hover:text-green-600 block py-1"><i class="fas fa-external-link-alt mr-2"></i>ReDoc</a></li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <div class="lg:col-span-3">
+                {% block breadcrumbs %}
+                <nav class="text-sm text-gray-500 mb-6">
+                    <a href="{% url 'docs-home' %}" class="hover:text-gray-700">Accueil</a>
+                    <span class="mx-2">/</span>
+                    <span class="text-gray-900">{% block breadcrumb_current %}Documentation{% endblock %}</span>
+                </nav>
+                {% endblock %}
+
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-300 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center mb-4">
+                        <svg class="w-8 h-8 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
+                        </svg>
+                        <span class="ml-2 text-xl font-bold text-white">{{ api_info.title }}</span>
+                    </div>
+                    <p class="text-sm">Plateforme de gestion agricole pour le Gabon</p>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Documentation</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="{% url 'docs-home' %}" class="hover:text-green-400">Guide de démarrage</a></li>
+                        <li><a href="{{ swagger_url }}" target="_blank" class="hover:text-green-400">Référence API</a></li>
+                        <li><a href="{% url 'docs-examples' %}" class="hover:text-green-400">Exemples</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Ressources</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="{{ swagger_url }}" target="_blank" class="hover:text-green-400">Swagger UI</a></li>
+                        <li><a href="{{ redoc_url }}" target="_blank" class="hover:text-green-400">ReDoc</a></li>
+                        <li><a href="{{ schema_url }}" target="_blank" class="hover:text-green-400">Schéma OpenAPI</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4">API</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="{{ api_base_url }}" target="_blank" class="hover:text-green-400">Base URL</a></li>
+                        <li><span class="text-gray-500">Version {{ version }}</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-sm">
+                <p>&copy; 2025 {{ api_info.title }}. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+

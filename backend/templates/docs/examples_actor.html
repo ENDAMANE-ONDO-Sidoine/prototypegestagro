@@ -1,0 +1,115 @@
+{% extends "docs/base.html" %}
+{% load static %}
+
+{% block title %}{{ examples.title }} - {{ api_info.title }}{% endblock %}
+
+{% block breadcrumb_current %}
+<a href="{% url 'docs-examples' %}">Exemples</a>
+<span class="mx-2">/</span>
+<span>{{ actor.name }}</span>
+{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow-sm p-8">
+    <div class="mb-8">
+        <div class="flex items-center mb-4">
+            <div class="{% if actor.color == 'green' %}bg-green-100 text-green-600{% elif actor.color == 'blue' %}bg-blue-100 text-blue-600{% elif actor.color == 'purple' %}bg-purple-100 text-purple-600{% elif actor.color == 'yellow' %}bg-yellow-100 text-yellow-600{% else %}bg-gray-100 text-gray-600{% endif %} rounded-full p-5 mr-4">
+                <i class="fas {{ actor.icon }} text-5xl"></i>
+            </div>
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">{{ examples.title }}</h1>
+                <p class="text-lg text-gray-600 mt-2">{{ examples.description }}</p>
+            </div>
+        </div>
+    </div>
+
+    {% for example in examples.examples %}
+    <div class="mb-12 border-l-4 {% if actor.color == 'green' %}border-green-500{% elif actor.color == 'blue' %}border-blue-500{% elif actor.color == 'purple' %}border-purple-500{% elif actor.color == 'yellow' %}border-yellow-500{% else %}border-gray-500{% endif %} pl-6">
+        <h2 class="text-2xl font-semibold text-gray-900 mb-2">{{ example.title }}</h2>
+        <p class="text-gray-600 mb-6">{{ example.description }}</p>
+
+        <!-- Request -->
+        <div class="mb-6">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-lg font-semibold text-gray-800">Requête</h3>
+                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded text-sm font-medium">
+                    {{ example.request.method }}
+                </span>
+            </div>
+            <div class="bg-gray-900 rounded-lg p-4 mb-3">
+                <code class="text-green-400 text-sm">{{ example.request.url }}</code>
+            </div>
+            {% if example.request.headers %}
+            <div class="mb-3">
+                <h4 class="text-sm font-semibold text-gray-700 mb-2">Headers:</h4>
+                <pre class="bg-gray-50 border border-gray-200 rounded p-3 text-xs overflow-x-auto"><code>{% for key, value in example.request.headers.items %}{{ key }}: {{ value }}
+{% endfor %}</code></pre>
+            </div>
+            {% endif %}
+            {% if example.request.body %}
+            <div>
+                <h4 class="text-sm font-semibold text-gray-700 mb-2">Body:</h4>
+                <pre class="bg-gray-50 border border-gray-200 rounded p-3 text-xs overflow-x-auto"><code>{{ example.request.body|safe }}</code></pre>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Response -->
+        <div>
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-lg font-semibold text-gray-800">Réponse</h3>
+                <span class="px-3 py-1 {% if example.response.status == 200 or example.response.status == 201 %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %} rounded text-sm font-medium">
+                    {{ example.response.status }}
+                </span>
+            </div>
+            <pre class="bg-gray-50 border border-gray-200 rounded p-4 text-xs overflow-x-auto"><code>{{ example.response.body|safe }}</code></pre>
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="mt-8 pt-8 border-t border-gray-200">
+        <div class="flex items-center justify-between">
+            <div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Besoin d'aide ?</h3>
+                <p class="text-gray-600">
+                    Consultez la <a href="{{ swagger_url }}" target="_blank" 
+                    {% if actor.color == 'green' %}class="text-green-600 hover:underline"
+                    {% elif actor.color == 'blue' %}class="text-blue-600 hover:underline"
+                    {% elif actor.color == 'purple' %}class="text-purple-600 hover:underline"
+                    {% elif actor.color == 'yellow' %}class="text-yellow-600 hover:underline"
+                    {% else %}class="text-gray-600 hover:underline"{% endif %}>documentation complète de l'API</a> 
+                    ou testez ces exemples directement dans Swagger UI.
+                </p>
+            </div>
+            <a href="{{ swagger_url }}" target="_blank" 
+               {% if actor.color == 'green' %}class="px-6 py-3 bg-green-600 text-white rounded hover:bg-green-700 transition"
+               {% elif actor.color == 'blue' %}class="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+               {% elif actor.color == 'purple' %}class="px-6 py-3 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
+               {% elif actor.color == 'yellow' %}class="px-6 py-3 bg-yellow-600 text-white rounded hover:bg-yellow-700 transition"
+               {% else %}class="px-6 py-3 bg-gray-600 text-white rounded hover:bg-gray-700 transition"{% endif %}>
+                Tester dans Swagger →
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Formater les JSON dans les exemples
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('pre code').forEach(function(block) {
+            try {
+                const text = block.textContent.trim();
+                if (text.startsWith('{') || text.startsWith('[')) {
+                    const json = JSON.parse(text);
+                    block.textContent = JSON.stringify(json, null, 2);
+                }
+            } catch (e) {
+                // Ce n'est pas du JSON valide, on laisse tel quel
+            }
+        });
+    });
+</script>
+{% endblock %}
+

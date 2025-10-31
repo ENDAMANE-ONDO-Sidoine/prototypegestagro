@@ -7,11 +7,30 @@ from django.conf import settings
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from apps.core.media_views import MinIOMediaView, MinIOStaticView
+from apps.core.docs_views import (
+    docs_home, docs_concepts, docs_authentication, 
+    docs_examples, docs_examples_actor,
+    docs_quickstart, docs_reference, docs_errors, 
+    docs_setup, docs_support
+)
+from apps.core.actor_views import actor_endpoints_redirect
 
 urlpatterns = [
     # Admin (désactivable via settings.DJANGO_ADMIN_ENABLED)
     *([path("admin/", admin.site.urls)] if getattr(settings, "DJANGO_ADMIN_ENABLED", True) else []),
     
+    # Documentation développeur
+    path("docs/", docs_home, name="docs-home"),
+    path("", docs_home, name="docs-home-root"),  # Redirection root vers docs
+    path("docs/quickstart/", docs_quickstart, name="docs-quickstart"),
+    path("docs/concepts/", docs_concepts, name="docs-concepts"),
+    path("docs/authentication/", docs_authentication, name="docs-authentication"),
+    path("docs/examples/", docs_examples, name="docs-examples"),
+    path("docs/examples/<str:actor_slug>/", docs_examples_actor, name="docs-examples-actor"),
+    path("docs/reference/", docs_reference, name="docs-reference"),
+    path("docs/errors/", docs_errors, name="docs-errors"),
+    path("docs/setup/", docs_setup, name="docs-setup"),
+    path("docs/support/", docs_support, name="docs-support"),
     
     # API Documentation
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
@@ -26,6 +45,9 @@ urlpatterns = [
     path("api/v1/buyers/", include("apps.buyers.urls")),
     path("api/v1/transport/", include("apps.transport.urls")),
     path("api/v1/agronomy/", include("apps.agronomy.urls")),
+    
+    # Redirections pour les pages acteurs (docs)
+    path("docs/actor/<str:actor_slug>/", actor_endpoints_redirect, name="actor-endpoints-redirect"),
     
     # Health Check
     path("health/", include("health_check.urls")),

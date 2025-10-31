@@ -1,0 +1,214 @@
+{% extends "docs/base.html" %}
+
+{% block title %}Installation et Configuration - {{ api_info.title }}{% endblock %}
+
+{% block breadcrumb_current %}Installation{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow-sm p-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-4">Installation et Configuration</h1>
+        <p class="text-lg text-gray-600">
+            Guide complet pour configurer votre environnement de développement et intégrer l'API GestAgro dans votre application.
+        </p>
+    </div>
+
+    <!-- Configuration de base -->
+    <section class="mb-12">
+        <h2 class="text-2xl font-semibold text-gray-900 mb-4 flex items-center">
+            <i class="fas fa-cog text-blue-600 mr-2"></i>
+            Configuration de base
+        </h2>
+        <div class="bg-gray-50 rounded-lg p-6 space-y-6">
+            <div>
+                <h3 class="font-semibold text-gray-900 mb-2">Base URL</h3>
+                <div class="bg-gray-900 rounded p-3">
+                    <code class="text-green-400">Production: https://gestagro-api.onrender.com/api/v1/</code>
+                </div>
+                <div class="bg-gray-900 rounded p-3 mt-2">
+                    <code class="text-green-400">Développement: http://localhost:8000/api/v1/</code>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="font-semibold text-gray-900 mb-2">Headers requis</h3>
+                <div class="bg-gray-900 rounded p-3">
+                    <pre class="text-green-400 text-sm"><code>Content-Type: application/json
+Authorization: Bearer YOUR_ACCESS_TOKEN</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Variables d'environnement -->
+    <section class="mb-12">
+        <h2 class="text-2xl font-semibold text-gray-900 mb-4 flex items-center">
+            <i class="fas fa-key text-yellow-600 mr-2"></i>
+            Variables d'environnement
+        </h2>
+        <div class="bg-gray-50 rounded-lg p-6">
+            <p class="text-gray-600 mb-4">Configurez ces variables dans votre fichier <code class="bg-gray-100 px-2 py-1 rounded">.env</code> :</p>
+            <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
+                <pre class="text-green-400 text-sm"><code># API Configuration
+GESTAGRO_API_URL=https://gestagro-api.onrender.com/api/v1/
+GESTAGRO_API_KEY=your_api_key_here
+
+# Authentification
+GESTAGRO_CLIENT_ID=your_client_id
+GESTAGRO_CLIENT_SECRET=your_client_secret
+
+# Environnement
+GESTAGRO_ENV=production  # ou 'development'</code></pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- SDKs et bibliothèques -->
+    <section class="mb-12">
+        <h2 class="text-2xl font-semibold text-gray-900 mb-4 flex items-center">
+            <i class="fas fa-code text-purple-600 mr-2"></i>
+            SDKs et Bibliothèques
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="border border-gray-200 rounded-lg p-6">
+                <div class="flex items-center mb-4">
+                    <i class="fab fa-js text-yellow-500 text-2xl mr-3"></i>
+                    <h3 class="text-xl font-semibold text-gray-900">JavaScript / Node.js</h3>
+                </div>
+                <div class="bg-gray-900 rounded p-3 mb-4">
+                    <pre class="text-green-400 text-xs"><code>npm install axios</code></pre>
+                </div>
+                <div class="bg-gray-900 rounded p-3">
+                    <pre class="text-green-400 text-xs"><code>import axios from 'axios';
+
+const api = axios.create({
+  baseURL: '{{ api_base_url }}',
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
+// Ajouter le token aux requêtes
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('access_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});</code></pre>
+                </div>
+            </div>
+
+            <div class="border border-gray-200 rounded-lg p-6">
+                <div class="flex items-center mb-4">
+                    <i class="fab fa-python text-blue-500 text-2xl mr-3"></i>
+                    <h3 class="text-xl font-semibold text-gray-900">Python</h3>
+                </div>
+                <div class="bg-gray-900 rounded p-3 mb-4">
+                    <pre class="text-green-400 text-xs"><code>pip install requests</code></pre>
+                </div>
+                <div class="bg-gray-900 rounded p-3">
+                    <pre class="text-green-400 text-xs"><code>import requests
+
+class GestAgroAPI:
+    def __init__(self, base_url, token):
+        self.base_url = base_url
+        self.headers = {
+            'Authorization': f'Bearer {token}',
+            'Content-Type': 'application/json'
+        }
+    
+    def get(self, endpoint):
+        return requests.get(
+            f'{self.base_url}{endpoint}',
+            headers=self.headers
+        )</code></pre>
+                </div>
+            </div>
+
+            <div class="border border-gray-200 rounded-lg p-6">
+                <div class="flex items-center mb-4">
+                    <i class="fab fa-php text-indigo-500 text-2xl mr-3"></i>
+                    <h3 class="text-xl font-semibold text-gray-900">PHP</h3>
+                </div>
+                <div class="bg-gray-900 rounded p-3 mb-4">
+                    <pre class="text-green-400 text-xs"><code>composer require guzzlehttp/guzzle</code></pre>
+                </div>
+                <div class="bg-gray-900 rounded p-3">
+                    <pre class="text-green-400 text-xs"><code>$client = new \GuzzleHttp\Client([
+    'base_uri' => '{{ api_base_url }}',
+    'headers' => [
+        'Authorization' => 'Bearer ' . $token,
+        'Content-Type' => 'application/json'
+    ]
+]);</code></pre>
+                </div>
+            </div>
+
+            <div class="border border-gray-200 rounded-lg p-6">
+                <div class="flex items-center mb-4">
+                    <i class="fab fa-java text-orange-500 text-2xl mr-3"></i>
+                    <h3 class="text-xl font-semibold text-gray-900">Java</h3>
+                </div>
+                <div class="bg-gray-900 rounded p-3 mb-4">
+                    <pre class="text-green-400 text-xs"><code>&lt;dependency&gt;
+  &lt;groupId&gt;com.squareup.okhttp3&lt;/groupId&gt;
+  &lt;artifactId&gt;okhttp&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+                </div>
+                <div class="bg-gray-900 rounded p-3">
+                    <pre class="text-green-400 text-xs"><code>OkHttpClient client = new OkHttpClient();
+Request request = new Request.Builder()
+    .url("{{ api_base_url }}farmers/products/")
+    .addHeader("Authorization", "Bearer " + token)
+    .build();</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Configuration des requêtes -->
+    <section class="mb-12">
+        <h2 class="text-2xl font-semibold text-gray-900 mb-4 flex items-center">
+            <i class="fas fa-exchange-alt text-green-600 mr-2"></i>
+            Configuration des requêtes
+        </h2>
+        <div class="bg-gray-50 rounded-lg p-6 space-y-6">
+            <div>
+                <h3 class="font-semibold text-gray-900 mb-2">Timeout</h3>
+                <p class="text-gray-600 mb-2">Configurez un timeout approprié pour vos requêtes :</p>
+                <div class="bg-gray-900 rounded p-3">
+                    <pre class="text-green-400 text-xs"><code>Timeout recommandé: 30 secondes</code></pre>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="font-semibold text-gray-900 mb-2">Retry Logic</h3>
+                <p class="text-gray-600 mb-2">Implémentez une logique de retry pour les erreurs temporaires :</p>
+                <div class="bg-gray-900 rounded p-3">
+                    <pre class="text-green-400 text-xs"><code>Retry pour: 429, 500, 502, 503, 504
+Nombre max de tentatives: 3
+Délai entre tentatives: exponentiel (1s, 2s, 4s)</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Test de connexion -->
+    <section class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <i class="fas fa-check-circle text-blue-600 mr-2"></i>
+            Test de connexion
+        </h2>
+        <p class="text-gray-700 mb-4">Testez votre configuration avec cette requête simple :</p>
+        <div class="bg-gray-900 rounded p-4 overflow-x-auto mb-4">
+            <pre class="text-green-400 text-sm"><code>GET {{ api_base_url }}
+Authorization: Bearer YOUR_TOKEN</code></pre>
+        </div>
+        <p class="text-sm text-gray-700">
+            Si tout est configuré correctement, vous devriez recevoir une réponse avec les informations de l'API.
+        </p>
+    </section>
+</div>
+{% endblock %}
+

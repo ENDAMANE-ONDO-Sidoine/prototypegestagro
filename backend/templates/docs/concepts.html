@@ -1,0 +1,229 @@
+{% extends "docs/base.html" %}
+
+{% block title %}Concepts - {{ api_info.title }}{% endblock %}
+
+{% block breadcrumb_current %}Concepts{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow-sm p-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">Concepts de l'API GestAgro</h1>
+
+    <div class="prose max-w-none">
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">Architecture REST</h2>
+            <p class="text-gray-600 mb-4">
+                L'API GestAgro suit les principes REST (Representational State Transfer) pour offrir une interface 
+                cohérente et intuitive. Chaque ressource est accessible via une URL unique et peut être manipulée 
+                avec les méthodes HTTP standards : GET, POST, PUT, PATCH, DELETE.
+            </p>
+            <div class="bg-gray-50 border-l-4 border-green-500 p-4 my-4">
+                <p class="text-sm text-gray-700">
+                    <strong>Base URL:</strong> <code class="bg-white px-2 py-1 rounded">{{ api_base_url }}</code>
+                </p>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">Authentification JWT</h2>
+            <p class="text-gray-600 mb-4">
+                L'API utilise JSON Web Tokens (JWT) pour l'authentification. Chaque requête doit inclure un token 
+                d'accès dans l'en-tête <code class="bg-gray-100 px-2 py-1 rounded">Authorization: Bearer &lt;token&gt;</code>.
+            </p>
+            <ul class="list-disc list-inside text-gray-600 space-y-2 mb-4">
+                <li>Les tokens ont une durée de vie limitée pour des raisons de sécurité</li>
+                <li>Utilisez le refresh token pour obtenir un nouveau token d'accès</li>
+                <li>Les tokens peuvent être révoqués lors de la déconnexion</li>
+            </ul>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">Acteurs de la Plateforme</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-center mb-3">
+                        <div class="bg-green-100 text-green-600 rounded-full p-3 mr-3">
+                            <i class="fas fa-seedling text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900">Agriculteurs</h3>
+                    </div>
+                    <p class="text-gray-600 text-sm">
+                        Gèrent leurs produits agricoles, catégories, stocks et reçoivent des commandes. 
+                        Ils peuvent suivre leurs ventes et gérer leurs profils.
+                    </p>
+                </div>
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-center mb-3">
+                        <div class="bg-blue-100 text-blue-600 rounded-full p-3 mr-3">
+                            <i class="fas fa-cart-shopping text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900">Acheteurs</h3>
+                    </div>
+                    <p class="text-gray-600 text-sm">
+                        Parcourent le catalogue, gèrent leurs paniers, passent des commandes et créent 
+                        des listes de souhaits. Ils peuvent suivre leurs commandes et laisser des avis.
+                    </p>
+                </div>
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-center mb-3">
+                        <div class="bg-purple-100 text-purple-600 rounded-full p-3 mr-3">
+                            <i class="fas fa-truck text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900">Transporteurs</h3>
+                    </div>
+                    <p class="text-gray-600 text-sm">
+                        Gèrent leur flotte de véhicules, créent des expéditions, suivent les livraisons 
+                        et proposent des offres de transport aux autres acteurs.
+                    </p>
+                </div>
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-center mb-3">
+                        <div class="bg-yellow-100 text-yellow-600 rounded-full p-3 mr-3">
+                            <i class="fas fa-microscope text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900">Agronomes</h3>
+                    </div>
+                    <p class="text-gray-600 text-sm">
+                        Gèrent les champs, suivent les cultures, effectuent des diagnostics, donnent des 
+                        recommandations et alertent sur les conditions météorologiques.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">Organisations Multi-Tenants</h2>
+            <p class="text-gray-600 mb-4">
+                La plateforme supporte un modèle multi-tenants où chaque utilisateur peut appartenir à plusieurs 
+                organisations. Les ressources sont automatiquement filtrées selon l'organisation de l'utilisateur.
+            </p>
+            <ul class="list-disc list-inside text-gray-600 space-y-2">
+                <li>Un utilisateur peut avoir plusieurs membreships dans différentes organisations</li>
+                <li>Chaque membership a un rôle (owner, admin, member, viewer)</li>
+                <li>Les permissions sont gérées au niveau de l'organisation</li>
+            </ul>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">Codes de Statut HTTP</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Code</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr><td class="px-4 py-3 text-sm font-medium text-gray-900">200</td><td class="px-4 py-3 text-sm text-gray-600">Succès</td></tr>
+                        <tr><td class="px-4 py-3 text-sm font-medium text-gray-900">201</td><td class="px-4 py-3 text-sm text-gray-600">Créé avec succès</td></tr>
+                        <tr><td class="px-4 py-3 text-sm font-medium text-gray-900">400</td><td class="px-4 py-3 text-sm text-gray-600">Requête invalide</td></tr>
+                        <tr><td class="px-4 py-3 text-sm font-medium text-gray-900">401</td><td class="px-4 py-3 text-sm text-gray-600">Non authentifié</td></tr>
+                        <tr><td class="px-4 py-3 text-sm font-medium text-gray-900">403</td><td class="px-4 py-3 text-sm text-gray-600">Accès refusé</td></tr>
+                        <tr><td class="px-4 py-3 text-sm font-medium text-gray-900">404</td><td class="px-4 py-3 text-sm text-gray-600">Ressource non trouvée</td></tr>
+                        <tr><td class="px-4 py-3 text-sm font-medium text-gray-900">500</td><td class="px-4 py-3 text-sm text-gray-600">Erreur serveur</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">Pagination</h2>
+            <p class="text-gray-600 mb-4">
+                Les listes de ressources sont paginées pour optimiser les performances. Utilisez les paramètres 
+                <code class="bg-gray-100 px-2 py-1 rounded">page</code> et <code class="bg-gray-100 px-2 py-1 rounded">page_size</code> 
+                pour naviguer dans les résultats.
+            </p>
+            <pre class="bg-gray-900 text-green-400 p-4 rounded overflow-x-auto text-sm"><code>{
+  "count": 100,
+  "next": "{{ api_base_url }}products/?page=2",
+  "previous": null,
+  "results": [...]
+}</code></pre>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">Format des Réponses</h2>
+            <p class="text-gray-600 mb-4">
+                Toutes les réponses sont au format JSON avec un encodage UTF-8. Les dates sont au format ISO 8601.
+            </p>
+            <div class="bg-gray-50 border-l-4 border-blue-500 p-4">
+                <p class="text-sm text-gray-700 mb-2">
+                    <strong>Format de date:</strong> <code>2025-10-29T14:30:00Z</code>
+                </p>
+                <p class="text-sm text-gray-700 mb-2">
+                    <strong>Format monétaire:</strong> <code>"1500.00"</code> (string pour éviter les problèmes de précision)
+                </p>
+                <p class="text-sm text-gray-700 mb-2">
+                    <strong>Monnaie:</strong> XAF (Franc CFA) par défaut
+                </p>
+                <p class="text-sm text-gray-700">
+                    <strong>Encodage:</strong> UTF-8
+                </p>
+            </div>
+        </section>
+
+        <!-- Rate Limiting -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">Limitation de taux (Rate Limiting)</h2>
+            <p class="text-gray-600 mb-4">
+                L'API limite le nombre de requêtes pour protéger les ressources et assurer une expérience équitable pour tous les utilisateurs.
+            </p>
+            <div class="bg-gray-50 border-l-4 border-orange-500 p-6 rounded">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <h3 class="font-semibold text-gray-900 mb-1">Limite</h3>
+                        <p class="text-2xl font-bold text-orange-600">1000</p>
+                        <p class="text-sm text-gray-600">requêtes/heure</p>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-900 mb-1">Headers</h3>
+                        <p class="text-sm text-gray-600"><code>X-RateLimit-Limit</code></p>
+                        <p class="text-sm text-gray-600"><code>X-RateLimit-Remaining</code></p>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-900 mb-1">En cas de dépassement</h3>
+                        <p class="text-sm text-gray-600">Erreur <code class="bg-red-100 px-1 rounded">429</code> avec header <code>Retry-After</code></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filtrage et recherche -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">Filtrage et Recherche</h2>
+            <p class="text-gray-600 mb-4">
+                La plupart des endpoints de liste supportent le filtrage et la recherche via des paramètres de requête.
+            </p>
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="font-semibold text-gray-900 mb-3">Exemples de filtres</h3>
+                <div class="space-y-2">
+                    <div class="bg-gray-900 rounded p-3">
+                        <code class="text-green-400 text-sm">GET /api/v1/farmers/products/?status=active&category=legumes</code>
+                    </div>
+                    <div class="bg-gray-900 rounded p-3">
+                        <code class="text-green-400 text-sm">GET /api/v1/buyers/orders/?status=pending&ordering=-created_at</code>
+                    </div>
+                    <div class="bg-gray-900 rounded p-3">
+                        <code class="text-green-400 text-sm">GET /api/v1/search/products/?q=mais&page=1&page_size=20</code>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Webhooks (si applicable) -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">Webhooks</h2>
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded">
+                <p class="text-gray-700 mb-2">
+                    <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                    <strong>Note:</strong> Les webhooks sont disponibles pour les événements importants (nouvelles commandes, changements de statut, etc.).
+                </p>
+                <p class="text-sm text-gray-600">
+                    Configurez vos webhooks via l'interface d'administration ou l'API pour recevoir des notifications en temps réel.
+                </p>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+

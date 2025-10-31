@@ -1,0 +1,287 @@
+{% extends "docs/base.html" %}
+
+{% block title %}Authentification - {{ api_info.title }}{% endblock %}
+
+{% block breadcrumb_current %}Authentification{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow-sm p-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">Guide d'Authentification</h1>
+
+    <div class="prose max-w-none">
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">Vue d'ensemble</h2>
+            <p class="text-gray-600 mb-4">
+                L'API GestAgro utilise l'authentification JWT (JSON Web Tokens) pour sécuriser les endpoints. 
+                Vous devez obtenir un token d'accès avant de pouvoir utiliser la plupart des fonctionnalités de l'API.
+            </p>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">1. Inscription</h2>
+            <p class="text-gray-600 mb-4">
+                Créez un nouveau compte utilisateur. Vous recevrez automatiquement un token d'accès et un refresh token.
+            </p>
+            
+            <div class="bg-gray-900 rounded-lg p-4 mb-4">
+                <div class="flex items-center justify-between mb-2">
+                    <code class="text-green-400 text-sm">POST {{ api_base_url }}auth/register/</code>
+                    <span class="px-2 py-1 bg-blue-500 text-white text-xs rounded">POST</span>
+                </div>
+            </div>
+
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Body:</h3>
+            <pre class="bg-gray-50 border border-gray-200 rounded p-4 text-xs overflow-x-auto mb-4"><code>{
+  "email": "agriculteur@example.com",
+  "password": "MotDePasse123!",
+  "first_name": "Jean",
+  "last_name": "Dupont",
+  "user_role": "farmer",
+  "phone": "+241 06 12 34 56 78"
+}</code></pre>
+
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Réponse (201):</h3>
+            <pre class="bg-gray-50 border border-gray-200 rounded p-4 text-xs overflow-x-auto"><code>{
+  "message": "Utilisateur créé avec succès",
+  "refresh": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+  "access": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+  "user": {
+    "id": 1,
+    "email": "agriculteur@example.com",
+    "first_name": "Jean",
+    "last_name": "Dupont",
+    "user_role": "farmer"
+  }
+}</code></pre>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">2. Connexion</h2>
+            <p class="text-gray-600 mb-4">
+                Connectez-vous avec vos identifiants pour obtenir un nouveau token d'accès.
+            </p>
+            
+            <div class="bg-gray-900 rounded-lg p-4 mb-4">
+                <div class="flex items-center justify-between mb-2">
+                    <code class="text-green-400 text-sm">POST {{ api_base_url }}auth/login/</code>
+                    <span class="px-2 py-1 bg-blue-500 text-white text-xs rounded">POST</span>
+                </div>
+            </div>
+
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Body:</h3>
+            <pre class="bg-gray-50 border border-gray-200 rounded p-4 text-xs overflow-x-auto mb-4"><code>{
+  "email": "agriculteur@example.com",
+  "password": "MotDePasse123!"
+}</code></pre>
+
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Réponse (200):</h3>
+            <pre class="bg-gray-50 border border-gray-200 rounded p-4 text-xs overflow-x-auto"><code>{
+  "refresh": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+  "access": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+  "user": {
+    "id": 1,
+    "email": "agriculteur@example.com",
+    "first_name": "Jean",
+    "last_name": "Dupont"
+  }
+}</code></pre>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">3. Utiliser le Token</h2>
+            <p class="text-gray-600 mb-4">
+                Incluez le token d'accès dans l'en-tête <code class="bg-gray-100 px-2 py-1 rounded">Authorization</code> 
+                de toutes vos requêtes authentifiées.
+            </p>
+            
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <p class="text-sm text-blue-800">
+                    <strong>Format:</strong> <code>Authorization: Bearer &lt;access_token&gt;</code>
+                </p>
+            </div>
+
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Exemple avec cURL:</h3>
+            <pre class="bg-gray-900 text-green-400 p-4 rounded overflow-x-auto text-xs"><code>curl -X GET "{{ api_base_url }}farmers/products/" \
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc..." \
+  -H "Content-Type: application/json"</code></pre>
+
+            <h3 class="text-lg font-semibold text-gray-800 mb-2 mt-4">Exemple avec JavaScript (Fetch):</h3>
+            <pre class="bg-gray-900 text-green-400 p-4 rounded overflow-x-auto text-xs"><code>fetch('{{ api_base_url }}farmers/products/', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer ' + accessToken,
+    'Content-Type': 'application/json'
+  }
+})
+.then(response => response.json())
+.then(data => console.log(data));</code></pre>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">4. Rafraîchir le Token</h2>
+            <p class="text-gray-600 mb-4">
+                Les tokens d'accès ont une durée de vie limitée. Utilisez le refresh token pour obtenir un nouveau 
+                token d'accès sans avoir à vous reconnecter.
+            </p>
+            
+            <div class="bg-gray-900 rounded-lg p-4 mb-4">
+                <div class="flex items-center justify-between mb-2">
+                    <code class="text-green-400 text-sm">POST {{ api_base_url }}auth/refresh/</code>
+                    <span class="px-2 py-1 bg-blue-500 text-white text-xs rounded">POST</span>
+                </div>
+            </div>
+
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Body:</h3>
+            <pre class="bg-gray-50 border border-gray-200 rounded p-4 text-xs overflow-x-auto mb-4"><code>{
+  "refresh": "eyJ0eXAiOiJKV1QiLCJhbGc..."
+}</code></pre>
+
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Réponse (200):</h3>
+            <pre class="bg-gray-50 border border-gray-200 rounded p-4 text-xs overflow-x-auto"><code>{
+  "access": "eyJ0eXAiOiJKV1QiLCJhbGc..."
+}</code></pre>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">5. Vérifier le Token</h2>
+            <p class="text-gray-600 mb-4">
+                Vérifiez si un token est valide sans le rafraîchir.
+            </p>
+            
+            <div class="bg-gray-900 rounded-lg p-4 mb-4">
+                <div class="flex items-center justify-between mb-2">
+                    <code class="text-green-400 text-sm">POST {{ api_base_url }}auth/verify/</code>
+                    <span class="px-2 py-1 bg-blue-500 text-white text-xs rounded">POST</span>
+                </div>
+            </div>
+
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Body:</h3>
+            <pre class="bg-gray-50 border border-gray-200 rounded p-4 text-xs overflow-x-auto mb-4"><code>{
+  "token": "eyJ0eXAiOiJKV1QiLCJhbGc..."
+}</code></pre>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">6. Déconnexion</h2>
+            <p class="text-gray-600 mb-4">
+                Révoquez un refresh token pour déconnecter un utilisateur.
+            </p>
+            
+            <div class="bg-gray-900 rounded-lg p-4 mb-4">
+                <div class="flex items-center justify-between mb-2">
+                    <code class="text-green-400 text-sm">POST {{ api_base_url }}auth/logout/</code>
+                    <span class="px-2 py-1 bg-blue-500 text-white text-xs rounded">POST</span>
+                </div>
+            </div>
+
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Body:</h3>
+            <pre class="bg-gray-50 border border-gray-200 rounded p-4 text-xs overflow-x-auto mb-4"><code>{
+  "refresh": "eyJ0eXAiOiJKV1QiLCJhbGc..."
+}</code></pre>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">Rôles Utilisateur</h2>
+            <p class="text-gray-600 mb-4">
+                Chaque utilisateur a un rôle principal qui détermine ses permissions et accès aux fonctionnalités.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-seedling text-green-600 mr-2"></i>
+                        <h3 class="font-semibold text-gray-900">farmer</h3>
+                    </div>
+                    <p class="text-sm text-gray-600">Agriculteur - Gestion de produits et ventes</p>
+                </div>
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-cart-shopping text-blue-600 mr-2"></i>
+                        <h3 class="font-semibold text-gray-900">buyer</h3>
+                    </div>
+                    <p class="text-sm text-gray-600">Acheteur - Navigation catalogue et commandes</p>
+                </div>
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-truck text-purple-600 mr-2"></i>
+                        <h3 class="font-semibold text-gray-900">transporter</h3>
+                    </div>
+                    <p class="text-sm text-gray-600">Transporteur - Gestion de flotte et expéditions</p>
+                </div>
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-microscope text-yellow-600 mr-2"></i>
+                        <h3 class="font-semibold text-gray-900">agronomist</h3>
+                    </div>
+                    <p class="text-sm text-gray-600">Agronome - Gestion de champs et diagnostics</p>
+                </div>
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-user-shield text-red-600 mr-2"></i>
+                        <h3 class="font-semibold text-gray-900">admin</h3>
+                    </div>
+                    <p class="text-sm text-gray-600">Administrateur - Accès complet à la plateforme</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bonnes pratiques de sécurité -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">Bonnes pratiques de sécurité</h2>
+            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-6 rounded">
+                <h3 class="font-semibold text-gray-900 mb-3">Recommandations importantes</h3>
+                <ul class="space-y-2 text-gray-700">
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-yellow-600 mr-2 mt-1"></i>
+                        <span><strong>Ne jamais</strong> exposer vos tokens dans le code source ou les repositories publics</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-yellow-600 mr-2 mt-1"></i>
+                        <span>Stockez les tokens de manière sécurisée (variables d'environnement, secrets managers)</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-yellow-600 mr-2 mt-1"></i>
+                        <span>Implémentez un rafraîchissement automatique des tokens avant expiration</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-yellow-600 mr-2 mt-1"></i>
+                        <span>Utilisez HTTPS en production pour protéger les tokens en transit</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-yellow-600 mr-2 mt-1"></i>
+                        <span>Révoquez immédiatement les tokens compromis via l'endpoint de déconnexion</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Durée de vie des tokens -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">Durée de vie des tokens</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Durée</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Usage</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-6 py-4 text-sm font-medium text-gray-900">Access Token</td>
+                            <td class="px-6 py-4 text-sm text-gray-600">1 heure</td>
+                            <td class="px-6 py-4 text-sm text-gray-600">Toutes les requêtes authentifiées</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 text-sm font-medium text-gray-900">Refresh Token</td>
+                            <td class="px-6 py-4 text-sm text-gray-600">7 jours</td>
+                            <td class="px-6 py-4 text-sm text-gray-600">Rafraîchir l'access token</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
