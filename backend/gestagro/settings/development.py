@@ -9,6 +9,22 @@ DEBUG = True
 # Development specific settings
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
 
+# Activer l'admin en dev
+DJANGO_ADMIN_ENABLED = True
+
+# Origines de confiance pour le CSRF en local (admin sur 8000/8001)
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    'http://localhost:8001',
+    'http://127.0.0.1:8001',
+]
+
+# IMPORTANT: en dev, servir les fichiers statiques et médias depuis le disque
+# (évite les URLs MinIO/S3 qui cassent le style de Django Admin)
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+
 # Database pour développement local (PostgreSQL)
 # DATABASES est défini dans base.py avec les variables d'environnement
 
