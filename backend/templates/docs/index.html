@@ -1,4 +1,5 @@
 {% extends "docs/base.html" %}
+{% load static %}
 
 {% block title %}{{ api_info.title }} - Documentation{% endblock %}
 
@@ -268,6 +269,27 @@ GET {{ api_base_url }}farmers/products/</code></pre>
             <p class="text-xs text-gray-600">Tous les endpoints</p>
         </a>
     </div>
+</div>
+
+<!-- Intégrations & Technologies utilisées -->
+<div class="bg-white rounded-lg shadow-sm p-8 mb-8">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">Technologies et intégrations</h2>
+    <p class="text-gray-600 mb-6">GestAgro API s'intègre facilement à vos outils et s'appuie sur un socle technique moderne, fiable et scalable.</p>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div class="border border-gray-200 rounded-lg p-4 flex items-center justify-center bg-gray-50"><img src="{% static 'img/django-logo_svg.svg' %}" alt="Django" class="h-8 sm:h-10" /></div>
+        <div class="border border-gray-200 rounded-lg p-4 flex items-center justify-center bg-gray-50"><img src="{% static 'img/django-rest-framework.svg' %}" alt="DRF" class="h-8 sm:h-10" /></div>
+        <div class="border border-gray-200 rounded-lg p-4 flex items-center justify-center bg-gray-50"><img src="{% static 'img/postgresql-logo-svg.svg' %}" alt="PostgreSQL" class="h-8 sm:h-10" /></div>
+        <div class="border border-gray-200 rounded-lg p-4 flex items-center justify-center bg-gray-50"><img src="{% static 'img/redis-logo_svg.svg' %}" alt="Redis" class="h-8 sm:h-10" /></div>
+        <div class="border border-gray-200 rounded-lg p-4 flex items-center justify-center bg-gray-50"><img src="{% static 'img/celery-svg.svg' %}" alt="Celery" class="h-8 sm:h-10" /></div>
+        <div class="border border-gray-200 rounded-lg p-4 flex items-center justify-center bg-gray-50"><img src="{% static 'img/rabbitmq-logo-svg.svg' %}" alt="RabbitMQ" class="h-8 sm:h-10" /></div>
+        <div class="border border-gray-200 rounded-lg p-4 flex items-center justify-center bg-gray-50"><img src="{% static 'img/nginx-logo-svg.svg' %}" alt="Nginx" class="h-8 sm:h-10" /></div>
+        <div class="border border-gray-200 rounded-lg p-4 flex items-center justify-center bg-gray-50"><img src="{% static 'img/docker-svg.svg' %}" alt="Docker" class="h-8 sm:h-10" /></div>
+        <div class="border border-gray-200 rounded-lg p-4 flex items-center justify-center bg-gray-50"><img src="{% static 'img/kubernetes-logo.svg' %}" alt="Kubernetes" class="h-8 sm:h-10" /></div>
+        <div class="border border-gray-200 rounded-lg p-4 flex items-center justify-center bg-gray-50"><img src="{% static 'img/minio-svg.svg' %}" alt="MinIO/S3" class="h-8 sm:h-10" /></div>
+        <div class="border border-gray-200 rounded-lg p-4 flex items-center justify-center bg-gray-50"><img src="{% static 'img/elasticsearch-svg.svg' %}" alt="Elasticsearch" class="h-8 sm:h-10" /></div>
+        <div class="border border-gray-200 rounded-lg p-4 flex items-center justify-center bg-gray-50"><img src="{% static 'img/ci-cd-svg.svg' %}" alt="CI/CD" class="h-8 sm:h-10" /></div>
+    </div>
+    <p class="text-xs text-gray-500 mt-4">Cette liste dépend de l'environnement de déploiement (local, staging, production).</p>
 </div>
 
 <!-- Guides importants -->
