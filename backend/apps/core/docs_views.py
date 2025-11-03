@@ -3,6 +3,7 @@ Vues pour la documentation développeur de l'API GestAgro
 """
 import json
 from django.shortcuts import render, get_object_or_404
+from django.urls import reverse
 from django.http import HttpResponse
 from django.conf import settings
 
@@ -22,6 +23,25 @@ def favicon_view(request):
     Retourne une réponse vide pour éviter les erreurs 404
     """
     return HttpResponse(status=204)
+
+
+def api_home(request):
+    """
+    Page d'accueil publique de l'API (landing page)
+    """
+    base_url = request.build_absolute_uri('/api/v1/')
+    context = {
+        'api_info': {
+            'title': 'GestAgro API',
+            'tagline': "Connecter l'écosystème agricole du Gabon",
+            'description': "Une API REST moderne pour relier agriculteurs, acheteurs, transporteurs et agronomes avec des outils sécurisés et performants.",
+            'version': getattr(settings, 'SPECTACULAR_SETTINGS', {}).get('VERSION', '1.0.0'),
+        },
+        'api_base_url': base_url,
+        'swagger_url': request.build_absolute_uri('/api/docs/'),
+        'docs_url': request.build_absolute_uri(reverse('docs-home')),
+    }
+    return render(request, 'api_home.html', context)
 
 
 def get_actors_data(base_url, request):

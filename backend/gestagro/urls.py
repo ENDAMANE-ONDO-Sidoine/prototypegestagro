@@ -13,7 +13,8 @@ from apps.core.docs_views import (
     docs_quickstart, docs_reference, docs_errors, 
     docs_setup, docs_support, docs_best_practices,
     docs_webhooks, docs_rate_limiting, docs_security,
-    docs_changelog, docs_performance, docs_glossary
+    docs_changelog, docs_performance, docs_glossary,
+    api_home
 )
 from apps.core.actor_views import actor_endpoints_redirect
 from apps.core.docs_views import favicon_view
@@ -25,9 +26,11 @@ urlpatterns = [
     # Admin (désactivable via settings.DJANGO_ADMIN_ENABLED)
     *([path("admin/", admin.site.urls)] if getattr(settings, "DJANGO_ADMIN_ENABLED", True) else []),
     
+    # Accueil API (landing)
+    path("", api_home, name="api-home"),
+
     # Documentation développeur
     path("docs/", docs_home, name="docs-home"),
-    path("", docs_home, name="docs-home-root"),  # Redirection root vers docs
     path("docs/quickstart/", docs_quickstart, name="docs-quickstart"),
     path("docs/concepts/", docs_concepts, name="docs-concepts"),
     path("docs/authentication/", docs_authentication, name="docs-authentication"),
