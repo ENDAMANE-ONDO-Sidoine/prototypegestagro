@@ -50,9 +50,14 @@ else:
 # Configuration des fichiers statiques
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# S'assurer que STATICFILES_DIRS est défini pour collectstatic
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
 
-# Utiliser Whitenoise sans compression pour éviter les erreurs de manifest
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+# Utiliser le storage Django standard - WhiteNoise middleware servira les fichiers
+# Si besoin de compression, utiliser 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # Configuration des médias
 MEDIA_URL = '/media/'
