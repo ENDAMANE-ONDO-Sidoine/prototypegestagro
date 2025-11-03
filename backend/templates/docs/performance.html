@@ -1,0 +1,210 @@
+{% extends "docs/base.html" %}
+
+{% block title %}Performance - {{ api_info.title }}{% endblock %}
+
+{% block breadcrumb_current %}Performance{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow-sm p-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-4">Performance et optimisation</h1>
+        <p class="text-lg text-gray-600">
+            Guide pour optimiser les performances de vos intégrations avec l'API GestAgro.
+        </p>
+    </div>
+
+    <!-- Pagination -->
+    <section class="mb-12">
+        <div class="flex items-center mb-4">
+            <i class="fas fa-list-ol text-blue-600 text-2xl mr-3"></i>
+            <h2 class="text-2xl font-semibold text-gray-900">Pagination efficace</h2>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-6">
+            <p class="text-gray-600 mb-4">
+                Utilisez toujours la pagination pour les grandes listes. Ne chargez que les données nécessaires.
+            </p>
+            <div class="bg-gray-900 rounded-lg p-4 mb-4">
+                <pre class="text-green-400 text-sm overflow-x-auto"><code>// Requête paginée
+GET {{ api_base_url }}farmers/products/?page=1&page_size=20
+
+// Réponse
+{
+  "count": 250,
+  "next": "{{ api_base_url }}farmers/products/?page=2&page_size=20",
+  "previous": null,
+  "results": [...]
+}</code></pre>
+            </div>
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4">
+                <p class="text-blue-800"><strong>Astuce :</strong> Ajustez <code class="bg-blue-100 px-2 py-1 rounded">page_size</code> selon vos besoins (max 100 par défaut).</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Caching -->
+    <section class="mb-12">
+        <div class="flex items-center mb-4">
+            <i class="fas fa-database text-green-600 text-2xl mr-3"></i>
+            <h2 class="text-2xl font-semibold text-gray-900">Mise en cache</h2>
+        </div>
+        <div class="space-y-4">
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Stratégies de cache</h3>
+                <ul class="list-disc list-inside text-gray-600 space-y-2 mb-4">
+                    <li><strong>Données statiques :</strong> Catégories, configurations (TTL: 24h)</li>
+                    <li><strong>Données semi-statiques :</strong> Produits, utilisateurs (TTL: 1h)</li>
+                    <li><strong>Données dynamiques :</strong> Commandes, statistiques (TTL: 5-15min)</li>
+                    <li><strong>Ne jamais mettre en cache :</strong> Tokens, données sensibles</li>
+                </ul>
+            </div>
+
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Headers de cache</h3>
+                <p class="text-gray-600 mb-4">
+                    Respectez les headers <code class="bg-gray-100 px-2 py-1 rounded">Cache-Control</code> et <code class="bg-gray-100 px-2 py-1 rounded">ETag</code> dans les réponses de l'API.
+                </p>
+                <div class="bg-gray-900 rounded-lg p-4">
+                    <pre class="text-green-400 text-sm overflow-x-auto"><code>// Requête conditionnelle avec ETag
+GET /api/v1/farmers/products/
+If-None-Match: "abc123..."
+
+// Si non modifié, réponse 304 Not Modified (pas de données transférées)</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Requêtes parallèles -->
+    <section class="mb-12">
+        <div class="flex items-center mb-4">
+            <i class="fas fa-rocket text-purple-600 text-2xl mr-3"></i>
+            <h2 class="text-2xl font-semibold text-gray-900">Requêtes parallèles</h2>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-6">
+            <p class="text-gray-600 mb-4">
+                Lorsque vous devez récupérer plusieurs ressources indépendantes, effectuez les requêtes en parallèle plutôt qu'en série.
+            </p>
+            <div class="bg-gray-900 rounded-lg p-4 mb-4" data-code-copy>
+                <pre class="text-green-400 text-sm overflow-x-auto"><code>// Série (lent)
+const products = await fetch('/products');
+const orders = await fetch('/orders');
+const stats = await fetch('/stats');
+
+// Parallèle (rapide)
+const [products, orders, stats] = await Promise.all([
+  fetch('/products'),
+  fetch('/orders'),
+  fetch('/stats')
+]);</code></pre>
+            </div>
+            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4">
+                <p class="text-yellow-800"><strong>Attention :</strong> Respectez les limites de rate limiting même avec des requêtes parallèles.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filtres et recherche -->
+    <section class="mb-12">
+        <div class="flex items-center mb-4">
+            <i class="fas fa-filter text-indigo-600 text-2xl mr-3"></i>
+            <h2 class="text-2xl font-semibold text-gray-900">Filtrage efficace</h2>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-6">
+            <p class="text-gray-600 mb-4">
+                Utilisez les paramètres de filtrage pour réduire la taille des réponses et améliorer les performances.
+            </p>
+            <div class="space-y-3">
+                <div class="bg-white rounded-lg p-4 border border-gray-200">
+                    <h4 class="font-semibold text-gray-900 mb-2">Filtres par champ</h4>
+                    <code class="text-sm bg-gray-100 px-2 py-1 rounded">GET /products/?status=active&category=1</code>
+                </div>
+                <div class="bg-white rounded-lg p-4 border border-gray-200">
+                    <h4 class="font-semibold text-gray-900 mb-2">Recherche full-text</h4>
+                    <code class="text-sm bg-gray-100 px-2 py-1 rounded">GET /search/products/?q=tomate</code>
+                </div>
+                <div class="bg-white rounded-lg p-4 border border-gray-200">
+                    <h4 class="font-semibold text-gray-900 mb-2">Tri</h4>
+                    <code class="text-sm bg-gray-100 px-2 py-1 rounded">GET /products/?ordering=-created_at,price</code>
+                </div>
+                <div class="bg-white rounded-lg p-4 border border-gray-200">
+                    <h4 class="font-semibold text-gray-900 mb-2">Plage de dates</h4>
+                    <code class="text-sm bg-gray-100 px-2 py-1 rounded">GET /orders/?created_at__gte=2025-01-01</code>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Compression -->
+    <section class="mb-12">
+        <div class="flex items-center mb-4">
+            <i class="fas fa-compress text-orange-600 text-2xl mr-3"></i>
+            <h2 class="text-2xl font-semibold text-gray-900">Compression</h2>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-6">
+            <p class="text-gray-600 mb-4">
+                L'API supporte la compression gzip et brotli. Ajoutez les headers appropriés pour réduire la taille des réponses.
+            </p>
+            <div class="bg-gray-900 rounded-lg p-4">
+                <pre class="text-green-400 text-sm overflow-x-auto"><code>GET /api/v1/farmers/products/
+Accept-Encoding: gzip, br
+
+// La réponse sera compressée automatiquement</code></pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Optimisations spécifiques -->
+    <section class="mb-12">
+        <div class="flex items-center mb-4">
+            <i class="fas fa-lightbulb text-yellow-600 text-2xl mr-3"></i>
+            <h2 class="text-2xl font-semibold text-gray-900">Optimisations avancées</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Connection pooling</h3>
+                <p class="text-gray-600 text-sm">
+                    Réutilisez les connexions HTTP pour éviter le coût d'établissement de nouvelles connexions.
+                </p>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Timeouts appropriés</h3>
+                <p class="text-gray-600 text-sm">
+                    Configurez des timeouts adaptés (connect: 5s, read: 30s) pour éviter les blocages.
+                </p>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Batch requests</h3>
+                <p class="text-gray-600 text-sm">
+                    Utilisez les endpoints batch quand disponibles pour réduire le nombre de requêtes.
+                </p>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Lazy loading</h3>
+                <p class="text-gray-600 text-sm">
+                    Chargez les données seulement quand elles sont nécessaires (infinite scroll, etc.).
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Métriques -->
+    <section class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Métriques de performance</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white rounded-lg p-6">
+                <div class="text-3xl font-bold text-green-600 mb-2">&lt; 200ms</div>
+                <p class="text-gray-600">Temps de réponse moyen pour les requêtes simples</p>
+            </div>
+            <div class="bg-white rounded-lg p-6">
+                <div class="text-3xl font-bold text-blue-600 mb-2">&lt; 500ms</div>
+                <p class="text-gray-600">Temps de réponse pour les requêtes complexes</p>
+            </div>
+            <div class="bg-white rounded-lg p-6">
+                <div class="text-3xl font-bold text-purple-600 mb-2">99.9%</div>
+                <p class="text-gray-600">Uptime garanti en production</p>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+

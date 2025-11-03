@@ -209,6 +209,41 @@ Authorization: Bearer YOUR_TOKEN</code></pre>
             Si tout est configuré correctement, vous devriez recevoir une réponse avec les informations de l'API.
         </p>
     </section>
+
+    <!-- Ressources supplémentaires -->
+    <section class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-8 mt-12">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Ressources supplémentaires</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <a href="{% url 'docs-security' %}" class="bg-white rounded-lg p-6 hover:shadow-md transition">
+                <div class="flex items-center mb-3">
+                    <i class="fas fa-shield-alt text-red-500 text-2xl mr-3"></i>
+                    <h3 class="font-semibold text-gray-900">Sécurité</h3>
+                </div>
+                <p class="text-sm text-gray-600">Apprenez à protéger vos tokens et utiliser HTTPS correctement.</p>
+            </a>
+            <a href="{% url 'docs-best-practices' %}" class="bg-white rounded-lg p-6 hover:shadow-md transition">
+                <div class="flex items-center mb-3">
+                    <i class="fas fa-star text-yellow-500 text-2xl mr-3"></i>
+                    <h3 class="font-semibold text-gray-900">Bonnes pratiques</h3>
+                </div>
+                <p class="text-sm text-gray-600">Découvrez les meilleures pratiques pour utiliser l'API efficacement.</p>
+            </a>
+            <a href="{% url 'docs-performance' %}" class="bg-white rounded-lg p-6 hover:shadow-md transition">
+                <div class="flex items-center mb-3">
+                    <i class="fas fa-rocket text-purple-500 text-2xl mr-3"></i>
+                    <h3 class="font-semibold text-gray-900">Performance</h3>
+                </div>
+                <p class="text-sm text-gray-600">Optimisez vos requêtes avec le cache et la pagination.</p>
+            </a>
+            <a href="{% url 'docs-rate-limiting' %}" class="bg-white rounded-lg p-6 hover:shadow-md transition">
+                <div class="flex items-center mb-3">
+                    <i class="fas fa-tachometer-alt text-blue-500 text-2xl mr-3"></i>
+                    <h3 class="font-semibold text-gray-900">Rate Limiting</h3>
+                </div>
+                <p class="text-sm text-gray-600">Comprenez les limites et quotas de requêtes.</p>
+            </a>
+        </div>
+    </section>
 </div>
 {% endblock %}
 

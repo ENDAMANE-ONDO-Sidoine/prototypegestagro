@@ -1,0 +1,91 @@
+{% extends "docs/base.html" %}
+
+{% block title %}Glossaire - {{ api_info.title }}{% endblock %}
+
+{% block breadcrumb_current %}Glossaire{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow-sm p-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-4">Glossaire</h1>
+        <p class="text-lg text-gray-600">
+            Définitions des termes techniques et concepts utilisés dans la documentation de l'API GestAgro.
+        </p>
+    </div>
+
+    <!-- Recherche -->
+    <div class="mb-8">
+        <input type="search" 
+               id="glossary-search"
+               placeholder="Rechercher un terme..." 
+               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+    </div>
+
+    <!-- Liste des termes -->
+    <div id="glossary-list" class="space-y-6">
+        {% for item in glossary %}
+        <div class="glossary-item border-b border-gray-200 pb-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-2" data-term="{{ item.term|lower }}">
+                <span class="glossary-term">{{ item.term }}</span>
+            </h2>
+            <p class="text-gray-700 leading-relaxed">{{ item.definition }}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Aucun résultat -->
+    <div id="no-results" class="hidden text-center py-12">
+        <i class="fas fa-search text-gray-400 text-4xl mb-4"></i>
+        <p class="text-gray-600">Aucun terme trouvé correspondant à votre recherche.</p>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('glossary-search');
+    const glossaryItems = document.querySelectorAll('.glossary-item');
+    const noResults = document.getElementById('no-results');
+    
+    searchInput.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase().trim();
+        let visibleCount = 0;
+        
+        glossaryItems.forEach(item => {
+            const term = item.querySelector('.glossary-term').textContent.toLowerCase();
+            const definition = item.textContent.toLowerCase();
+            
+            if (term.includes(searchTerm) || definition.includes(searchTerm)) {
+                item.style.display = 'block';
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+        
+        // Afficher/masquer le message "aucun résultat"
+        if (visibleCount === 0 && searchTerm !== '') {
+            noResults.classList.remove('hidden');
+            document.getElementById('glossary-list').style.display = 'none';
+        } else {
+            noResults.classList.add('hidden');
+            document.getElementById('glossary-list').style.display = 'block';
+        }
+    });
+});
+</script>
+
+<style>
+.glossary-item {
+    transition: opacity 0.2s;
+}
+
+.glossary-item:last-child {
+    border-bottom: none;
+}
+
+#glossary-search:focus {
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+</style>
+{% endblock %}
+

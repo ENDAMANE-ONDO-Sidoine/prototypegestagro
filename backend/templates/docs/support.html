@@ -101,10 +101,13 @@
                     <i class="fas fa-question-circle text-blue-600 mr-2"></i>
                     Quelle est la limite de taux (rate limiting) ?
                 </h3>
-                <p class="text-gray-600">
+                <p class="text-gray-600 mb-2">
                     L'API limite à 1000 requêtes par heure par utilisateur. Si vous dépassez cette limite, 
                     vous recevrez une erreur 429 avec un header <code class="bg-gray-100 px-2 py-1 rounded">Retry-After</code> 
                     indiquant quand vous pourrez refaire des requêtes.
+                </p>
+                <p class="text-sm text-gray-600">
+                    <a href="{% url 'docs-rate-limiting' %}" class="text-blue-600 hover:underline">Consultez la documentation complète sur le rate limiting →</a>
                 </p>
             </div>
 
@@ -113,10 +116,14 @@
                     <i class="fas fa-question-circle text-blue-600 mr-2"></i>
                     Comment gérer les erreurs 500 ?
                 </h3>
-                <p class="text-gray-600">
+                <p class="text-gray-600 mb-2">
                     Les erreurs 500 sont des erreurs serveur temporaires. Implémentez une logique de retry avec un délai exponentiel. 
                     Si le problème persiste, contactez le support avec l'<code class="bg-gray-100 px-2 py-1 rounded">error_id</code> 
                     fourni dans la réponse.
+                </p>
+                <p class="text-sm text-gray-600">
+                    <a href="{% url 'docs-errors' %}" class="text-blue-600 hover:underline">Voir la gestion des erreurs →</a> | 
+                    <a href="{% url 'docs-best-practices' %}" class="text-blue-600 hover:underline">Bonnes pratiques de retry →</a>
                 </p>
             </div>
 
@@ -125,10 +132,14 @@
                     <i class="fas fa-question-circle text-blue-600 mr-2"></i>
                     Puis-je utiliser l'API en production ?
                 </h3>
-                <p class="text-gray-600">
+                <p class="text-gray-600 mb-2">
                     Oui, l'API est disponible en production à l'adresse 
                     <code class="bg-gray-100 px-2 py-1 rounded">https://gestagro-api.onrender.com/api/v1/</code>. 
                     Assurez-vous d'utiliser HTTPS en production et de stocker vos tokens de manière sécurisée.
+                </p>
+                <p class="text-sm text-gray-600">
+                    <a href="{% url 'docs-security' %}" class="text-blue-600 hover:underline">Guide de sécurité complet →</a> | 
+                    <a href="{% url 'docs-best-practices' %}" class="text-blue-600 hover:underline">Bonnes pratiques →</a>
                 </p>
             </div>
         </div>

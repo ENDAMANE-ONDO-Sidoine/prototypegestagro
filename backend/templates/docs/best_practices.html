@@ -1,0 +1,303 @@
+{% extends "docs/base.html" %}
+
+{% block title %}Bonnes pratiques - {{ api_info.title }}{% endblock %}
+
+{% block breadcrumb_current %}Bonnes pratiques{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow-sm p-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-4">Bonnes pratiques</h1>
+        <p class="text-lg text-gray-600">
+            Guide des meilleures pratiques pour utiliser l'API GestAgro efficacement et de manière sécurisée.
+        </p>
+    </div>
+
+    <!-- Gestion des erreurs -->
+    <section class="mb-12">
+        <div class="flex items-center mb-4">
+            <i class="fas fa-exclamation-triangle text-yellow-600 text-2xl mr-3"></i>
+            <h2 class="text-2xl font-semibold text-gray-900">Gestion des erreurs</h2>
+        </div>
+        <div class="space-y-4">
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Implémenter une logique de retry</h3>
+                <p class="text-gray-600 mb-4">
+                    Les erreurs temporaires (429, 500, 503) nécessitent une logique de retry avec backoff exponentiel.
+                </p>
+                <div class="bg-gray-900 rounded-lg p-4 mb-4">
+                    <pre class="text-green-400 text-sm overflow-x-auto"><code>// JavaScript/Node.js
+async function apiRequest(url, options, retries = 3) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(url, options);
+      if (response.ok) return response;
+      
+      // Retry seulement pour erreurs temporaires
+      if (response.status === 429 || response.status >= 500) {
+        const delay = Math.pow(2, i) * 1000; // Backoff exponentiel
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+      throw new Error(`HTTP ${response.status}`);
+    } catch (error) {
+      if (i === retries - 1) throw error;
+    }
+  }
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Vérifier les headers de réponse</h3>
+                <p class="text-gray-600 mb-2">
+                    Les headers contiennent des informations importantes :
+                </p>
+                <ul class="list-disc list-inside text-gray-600 space-y-1 mb-4">
+                    <li><code class="bg-gray-100 px-2 py-1 rounded">X-RateLimit-Remaining</code> : Requêtes restantes</li>
+                    <li><code class="bg-gray-100 px-2 py-1 rounded">Retry-After</code> : Secondes à attendre après erreur 429</li>
+                    <li><code class="bg-gray-100 px-2 py-1 rounded">X-Request-ID</code> : ID unique pour le support</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gestion des tokens -->
+    <section class="mb-12">
+        <div class="flex items-center mb-4">
+            <i class="fas fa-key text-blue-600 text-2xl mr-3"></i>
+            <h2 class="text-2xl font-semibold text-gray-900">Gestion des tokens</h2>
+        </div>
+        <div class="space-y-4">
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Refresh automatique</h3>
+                <p class="text-gray-600 mb-4">
+                    Implémentez un mécanisme de refresh automatique avant l'expiration du token.
+                </p>
+                <div class="bg-gray-900 rounded-lg p-4">
+                    <pre class="text-green-400 text-sm overflow-x-auto"><code>// Python
+import time
+from datetime import datetime, timedelta
+
+class TokenManager:
+    def __init__(self):
+        self.access_token = None
+        self.refresh_token = None
+        self.expires_at = None
+    
+    def is_token_expired(self):
+        if not self.expires_at:
+            return True
+        return datetime.now() >= self.expires_at - timedelta(minutes=5)  # Refresh 5min avant
+    
+    async def get_valid_token(self):
+        if self.is_token_expired():
+            await self.refresh_access_token()
+        return self.access_token</code></pre>
+                </div>
+            </div>
+
+            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3"><i class="fas fa-exclamation-triangle text-yellow-600 mr-2"></i>Stockage sécurisé</h3>
+                <ul class="list-disc list-inside text-gray-700 space-y-2">
+                    <li><strong>Ne jamais</strong> stocker les tokens en clair dans le code source</li>
+                    <li>Utiliser des variables d'environnement ou un gestionnaire de secrets</li>
+                    <li>En production web, utiliser des cookies httpOnly ou le localStorage de manière sécurisée</li>
+                    <li>Ne jamais exposer les tokens dans les logs ou les URLs</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Optimisation des requêtes -->
+    <section class="mb-12">
+        <div class="flex items-center mb-4">
+            <i class="fas fa-tachometer-alt text-green-600 text-2xl mr-3"></i>
+            <h2 class="text-2xl font-semibold text-gray-900">Optimisation des requêtes</h2>
+        </div>
+        <div class="space-y-4">
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Utiliser la pagination</h3>
+                <p class="text-gray-600 mb-4">
+                    Ne chargez que les données nécessaires en utilisant les paramètres de pagination.
+                </p>
+                <div class="bg-gray-900 rounded-lg p-4">
+                    <pre class="text-green-400 text-sm overflow-x-auto"><code>// Requête avec pagination
+GET {{ api_base_url }}farmers/products/?page=1&page_size=20
+
+// Réponse
+{
+  "count": 150,
+  "next": "{{ api_base_url }}farmers/products/?page=2",
+  "previous": null,
+  "results": [...]
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Utiliser les filtres et la recherche</h3>
+                <p class="text-gray-600 mb-4">
+                    Réduisez la taille des réponses en utilisant les paramètres de filtrage disponibles.
+                </p>
+                <div class="bg-gray-900 rounded-lg p-4">
+                    <pre class="text-green-400 text-sm overflow-x-auto"><code>// Filtrer par statut
+GET {{ api_base_url }}farmers/products/?status=active
+
+// Recherche
+GET {{ api_base_url }}search/products/?q=tomate&category=legumes
+
+// Tri
+GET {{ api_base_url }}farmers/products/?ordering=-created_at</code></pre>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Éviter les requêtes N+1</h3>
+                <p class="text-gray-600 mb-4">
+                    Utilisez les endpoints dédiés plutôt que de faire plusieurs requêtes séquentielles.
+                </p>
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="text-red-800 font-semibold mb-2"><i class="fas fa-times-circle mr-2"></i>À éviter :</p>
+                    <code class="text-sm">for product in products: get_product_details(product.id)</code>
+                </div>
+                <div class="bg-green-50 border-l-4 border-green-500 p-4">
+                    <p class="text-green-800 font-semibold mb-2"><i class="fas fa-check-circle mr-2"></i>Recommandé :</p>
+                    <code class="text-sm">GET /farmers/products/ (retourne tous les détails)</code>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sécurité -->
+    <section class="mb-12">
+        <div class="flex items-center mb-4">
+            <i class="fas fa-shield-alt text-red-600 text-2xl mr-3"></i>
+            <h2 class="text-2xl font-semibold text-gray-900">Sécurité</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">HTTPS uniquement</h3>
+                <p class="text-gray-600">
+                    Utilisez <strong>toujours</strong> HTTPS en production. L'API refuse les connexions non sécurisées.
+                </p>
+            </div>
+
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Validation des données</h3>
+                <p class="text-gray-600">
+                    Validez toujours les données avant de les envoyer à l'API pour éviter les erreurs 400.
+                </p>
+            </div>
+
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Permissions minimales</h3>
+                <p class="text-gray-600">
+                    Utilisez des tokens avec les permissions minimales nécessaires pour votre cas d'usage.
+                </p>
+            </div>
+
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Gestion des secrets</h3>
+                <p class="text-gray-600">
+                    Ne commitez jamais vos tokens ou clés API dans votre gestionnaire de version.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Performance -->
+    <section class="mb-12">
+        <div class="flex items-center mb-4">
+            <i class="fas fa-rocket text-purple-600 text-2xl mr-3"></i>
+            <h2 class="text-2xl font-semibold text-gray-900">Performance</h2>
+        </div>
+        <div class="space-y-4">
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Mise en cache</h3>
+                <p class="text-gray-600 mb-4">
+                    Mettez en cache les données qui changent rarement (catégories, configurations, etc.).
+                </p>
+                <ul class="list-disc list-inside text-gray-600 space-y-1">
+                    <li>Respectez les headers <code class="bg-gray-100 px-2 py-1 rounded">Cache-Control</code></li>
+                    <li>Utilisez <code class="bg-gray-100 px-2 py-1 rounded">ETag</code> pour la validation conditionnelle</li>
+                    <li>Ne mettez pas en cache les données sensibles ou personnelles</li>
+                </ul>
+            </div>
+
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Requêtes parallèles</h3>
+                <p class="text-gray-600 mb-4">
+                    Lorsque possible, effectuez plusieurs requêtes en parallèle plutôt qu'en série.
+                </p>
+                <div class="bg-gray-900 rounded-lg p-4">
+                    <pre class="text-green-400 text-sm overflow-x-auto"><code>// JavaScript - Requêtes parallèles
+const [products, orders, stats] = await Promise.all([
+  fetch('{{ api_base_url }}farmers/products/'),
+  fetch('{{ api_base_url }}buyers/orders/'),
+  fetch('{{ api_base_url }}farmers/dashboard/stats/')
+]);</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Checklist -->
+    <section class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Checklist de vérification</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white rounded-lg p-4">
+                <h3 class="font-semibold text-gray-900 mb-3">Avant le déploiement :</h3>
+                <ul class="space-y-2 text-sm text-gray-600">
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                        <span>Tokens stockés de manière sécurisée</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                        <span>HTTPS activé en production</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                        <span>Gestion des erreurs implémentée</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                        <span>Refresh automatique des tokens</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                        <span>Rate limiting respecté</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="bg-white rounded-lg p-4">
+                <h3 class="font-semibold text-gray-900 mb-3">Optimisation :</h3>
+                <ul class="space-y-2 text-sm text-gray-600">
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                        <span>Pagination utilisée pour les grandes listes</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                        <span>Filtres et recherche utilisés</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                        <span>Cache mis en place pour données statiques</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                        <span>Requêtes parallèles quand possible</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                        <span>Logs configurés pour le débogage</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+

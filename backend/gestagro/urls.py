@@ -11,11 +11,17 @@ from apps.core.docs_views import (
     docs_home, docs_concepts, docs_authentication, 
     docs_examples, docs_examples_actor,
     docs_quickstart, docs_reference, docs_errors, 
-    docs_setup, docs_support
+    docs_setup, docs_support, docs_best_practices,
+    docs_webhooks, docs_rate_limiting, docs_security,
+    docs_changelog, docs_performance, docs_glossary
 )
 from apps.core.actor_views import actor_endpoints_redirect
+from apps.core.docs_views import favicon_view
 
 urlpatterns = [
+    # Favicon (gère les requêtes favicon.ico pour éviter les erreurs 404)
+    path("favicon.ico", favicon_view, name="favicon"),
+    
     # Admin (désactivable via settings.DJANGO_ADMIN_ENABLED)
     *([path("admin/", admin.site.urls)] if getattr(settings, "DJANGO_ADMIN_ENABLED", True) else []),
     
@@ -31,6 +37,13 @@ urlpatterns = [
     path("docs/errors/", docs_errors, name="docs-errors"),
     path("docs/setup/", docs_setup, name="docs-setup"),
     path("docs/support/", docs_support, name="docs-support"),
+    path("docs/best-practices/", docs_best_practices, name="docs-best-practices"),
+    path("docs/webhooks/", docs_webhooks, name="docs-webhooks"),
+    path("docs/rate-limiting/", docs_rate_limiting, name="docs-rate-limiting"),
+    path("docs/security/", docs_security, name="docs-security"),
+    path("docs/changelog/", docs_changelog, name="docs-changelog"),
+    path("docs/performance/", docs_performance, name="docs-performance"),
+    path("docs/glossary/", docs_glossary, name="docs-glossary"),
     
     # API Documentation
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),

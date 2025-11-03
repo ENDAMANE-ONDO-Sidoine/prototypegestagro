@@ -185,6 +185,11 @@
                         <p class="text-sm text-gray-600">Erreur <code class="bg-red-100 px-1 rounded">429</code> avec header <code>Retry-After</code></p>
                     </div>
                 </div>
+                <div class="mt-4 pt-4 border-t border-orange-300">
+                    <a href="{% url 'docs-rate-limiting' %}" class="text-orange-600 hover:text-orange-700 font-medium">
+                        Consultez la documentation complète sur le rate limiting →
+                    </a>
+                </div>
             </div>
         </section>
 
@@ -218,9 +223,14 @@
                     <i class="fas fa-info-circle text-blue-600 mr-2"></i>
                     <strong>Note:</strong> Les webhooks sont disponibles pour les événements importants (nouvelles commandes, changements de statut, etc.).
                 </p>
-                <p class="text-sm text-gray-600">
+                <p class="text-sm text-gray-600 mb-4">
                     Configurez vos webhooks via l'interface d'administration ou l'API pour recevoir des notifications en temps réel.
                 </p>
+                <div class="mt-4 pt-4 border-t border-blue-300">
+                    <a href="{% url 'docs-webhooks' %}" class="text-blue-600 hover:text-blue-700 font-medium">
+                        Consultez la documentation complète sur les webhooks →
+                    </a>
+                </div>
             </div>
         </section>
     </div>

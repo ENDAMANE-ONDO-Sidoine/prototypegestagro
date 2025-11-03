@@ -3,6 +3,7 @@ Vues pour la documentation développeur de l'API GestAgro
 """
 import json
 from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse
 from django.conf import settings
 
 
@@ -13,6 +14,14 @@ def format_json(data):
     if isinstance(data, str):
         return data
     return json.dumps(data, indent=2, ensure_ascii=False)
+
+
+def favicon_view(request):
+    """
+    Vue pour gérer les requêtes favicon.ico
+    Retourne une réponse vide pour éviter les erreurs 404
+    """
+    return HttpResponse(status=204)
 
 
 def get_actors_data(base_url, request):
@@ -949,4 +958,198 @@ def docs_support(request):
         'version': api_info['version'],
     }
     return render(request, 'docs/support.html', context)
+
+
+def docs_best_practices(request):
+    """
+    Page des bonnes pratiques
+    """
+    base_url = request.build_absolute_uri('/api/v1/')
+    api_info = {
+        'title': 'GestAgro API',
+        'version': getattr(settings, 'SPECTACULAR_SETTINGS', {}).get('VERSION', '1.0.0'),
+    }
+    actors = get_actors_data(base_url, request)
+    
+    context = {
+        'api_info': api_info,
+        'api_base_url': base_url,
+        'actors': actors,
+        'swagger_url': request.build_absolute_uri('/api/docs/'),
+        'redoc_url': request.build_absolute_uri('/api/redoc/'),
+        'schema_url': request.build_absolute_uri('/api/schema/'),
+        'version': api_info['version'],
+    }
+    return render(request, 'docs/best_practices.html', context)
+
+
+def docs_webhooks(request):
+    """
+    Page de documentation des webhooks
+    """
+    base_url = request.build_absolute_uri('/api/v1/')
+    api_info = {
+        'title': 'GestAgro API',
+        'version': getattr(settings, 'SPECTACULAR_SETTINGS', {}).get('VERSION', '1.0.0'),
+    }
+    actors = get_actors_data(base_url, request)
+    
+    context = {
+        'api_info': api_info,
+        'api_base_url': base_url,
+        'actors': actors,
+        'swagger_url': request.build_absolute_uri('/api/docs/'),
+        'redoc_url': request.build_absolute_uri('/api/redoc/'),
+        'schema_url': request.build_absolute_uri('/api/schema/'),
+        'version': api_info['version'],
+    }
+    return render(request, 'docs/webhooks.html', context)
+
+
+def docs_rate_limiting(request):
+    """
+    Page de documentation du rate limiting
+    """
+    base_url = request.build_absolute_uri('/api/v1/')
+    api_info = {
+        'title': 'GestAgro API',
+        'version': getattr(settings, 'SPECTACULAR_SETTINGS', {}).get('VERSION', '1.0.0'),
+    }
+    actors = get_actors_data(base_url, request)
+    
+    context = {
+        'api_info': api_info,
+        'api_base_url': base_url,
+        'actors': actors,
+        'swagger_url': request.build_absolute_uri('/api/docs/'),
+        'redoc_url': request.build_absolute_uri('/api/redoc/'),
+        'schema_url': request.build_absolute_uri('/api/schema/'),
+        'version': api_info['version'],
+    }
+    return render(request, 'docs/rate_limiting.html', context)
+
+
+def docs_security(request):
+    """
+    Page de documentation de la sécurité
+    """
+    base_url = request.build_absolute_uri('/api/v1/')
+    api_info = {
+        'title': 'GestAgro API',
+        'version': getattr(settings, 'SPECTACULAR_SETTINGS', {}).get('VERSION', '1.0.0'),
+    }
+    actors = get_actors_data(base_url, request)
+    
+    context = {
+        'api_info': api_info,
+        'api_base_url': base_url,
+        'actors': actors,
+        'swagger_url': request.build_absolute_uri('/api/docs/'),
+        'redoc_url': request.build_absolute_uri('/api/redoc/'),
+        'schema_url': request.build_absolute_uri('/api/schema/'),
+        'version': api_info['version'],
+    }
+    return render(request, 'docs/security.html', context)
+
+
+def docs_changelog(request):
+    """
+    Page du changelog
+    """
+    base_url = request.build_absolute_uri('/api/v1/')
+    api_info = {
+        'title': 'GestAgro API',
+        'version': getattr(settings, 'SPECTACULAR_SETTINGS', {}).get('VERSION', '1.0.0'),
+    }
+    actors = get_actors_data(base_url, request)
+    
+    # Changelog dynamique (peut être chargé depuis un fichier JSON ou la base de données)
+    changelog = [
+        {
+            'version': '1.0.0',
+            'date': '2025-01-15',
+            'type': 'release',
+            'changes': [
+                {'type': 'added', 'description': 'API REST complète pour tous les acteurs'},
+                {'type': 'added', 'description': 'Authentification JWT avec refresh tokens'},
+                {'type': 'added', 'description': 'Documentation développeur interactive'},
+                {'type': 'added', 'description': 'Support multi-organisations'},
+            ]
+        },
+    ]
+    
+    context = {
+        'api_info': api_info,
+        'api_base_url': base_url,
+        'actors': actors,
+        'changelog': changelog,
+        'swagger_url': request.build_absolute_uri('/api/docs/'),
+        'redoc_url': request.build_absolute_uri('/api/redoc/'),
+        'schema_url': request.build_absolute_uri('/api/schema/'),
+        'version': api_info['version'],
+    }
+    return render(request, 'docs/changelog.html', context)
+
+
+def docs_performance(request):
+    """
+    Page de documentation sur les performances
+    """
+    base_url = request.build_absolute_uri('/api/v1/')
+    api_info = {
+        'title': 'GestAgro API',
+        'version': getattr(settings, 'SPECTACULAR_SETTINGS', {}).get('VERSION', '1.0.0'),
+    }
+    actors = get_actors_data(base_url, request)
+    
+    context = {
+        'api_info': api_info,
+        'api_base_url': base_url,
+        'actors': actors,
+        'swagger_url': request.build_absolute_uri('/api/docs/'),
+        'redoc_url': request.build_absolute_uri('/api/redoc/'),
+        'schema_url': request.build_absolute_uri('/api/schema/'),
+        'version': api_info['version'],
+    }
+    return render(request, 'docs/performance.html', context)
+
+
+def docs_glossary(request):
+    """
+    Page du glossaire
+    """
+    base_url = request.build_absolute_uri('/api/v1/')
+    api_info = {
+        'title': 'GestAgro API',
+        'version': getattr(settings, 'SPECTACULAR_SETTINGS', {}).get('VERSION', '1.0.0'),
+    }
+    actors = get_actors_data(base_url, request)
+    
+    # Glossaire dynamique
+    glossary = [
+        {'term': 'API', 'definition': 'Application Programming Interface - Interface de programmation permettant à des applications de communiquer entre elles.'},
+        {'term': 'JWT', 'definition': 'JSON Web Token - Standard ouvert pour transmettre des informations sécurisées sous forme d\'objet JSON.'},
+        {'term': 'REST', 'definition': 'Representational State Transfer - Style d\'architecture pour créer des services web.'},
+        {'term': 'Endpoint', 'definition': 'Point d\'accès à une fonctionnalité spécifique de l\'API via une URL unique.'},
+        {'term': 'Token', 'definition': 'Jeton d\'authentification utilisé pour accéder aux ressources protégées de l\'API.'},
+        {'term': 'Refresh Token', 'definition': 'Token utilisé pour obtenir un nouveau token d\'accès sans ré-authentification.'},
+        {'term': 'Rate Limiting', 'definition': 'Limitation du nombre de requêtes qu\'un utilisateur peut effectuer dans un délai donné.'},
+        {'term': 'Webhook', 'definition': 'Mécanisme permettant à l\'API de notifier automatiquement une URL externe lors d\'événements.'},
+        {'term': 'Pagination', 'definition': 'Technique pour diviser de grandes listes de résultats en pages plus petites.'},
+        {'term': 'Multi-tenancy', 'definition': 'Architecture permettant à plusieurs organisations d\'utiliser la même instance d\'application.'},
+        {'term': 'CRUD', 'definition': 'Create, Read, Update, Delete - Opérations de base sur les données.'},
+        {'term': 'HTTPS', 'definition': 'HyperText Transfer Protocol Secure - Protocole HTTP sécurisé avec chiffrement SSL/TLS.'},
+    ]
+    
+    context = {
+        'api_info': api_info,
+        'api_base_url': base_url,
+        'actors': actors,
+        'glossary': glossary,
+        'swagger_url': request.build_absolute_uri('/api/docs/'),
+        'redoc_url': request.build_absolute_uri('/api/redoc/'),
+        'schema_url': request.build_absolute_uri('/api/schema/'),
+        'version': api_info['version'],
+    }
+    return render(request, 'docs/glossary.html', context)
 

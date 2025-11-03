@@ -1,0 +1,291 @@
+{% extends "docs/base.html" %}
+
+{% block title %}Sécurité - {{ api_info.title }}{% endblock %}
+
+{% block breadcrumb_current %}Sécurité{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow-sm p-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-4">Sécurité</h1>
+        <p class="text-lg text-gray-600">
+            Guide complet sur les mesures de sécurité et les bonnes pratiques pour utiliser l'API GestAgro de manière sécurisée.
+        </p>
+    </div>
+
+    <!-- HTTPS -->
+    <section class="mb-12">
+        <div class="flex items-center mb-4">
+            <i class="fas fa-lock text-green-600 text-2xl mr-3"></i>
+            <h2 class="text-2xl font-semibold text-gray-900">HTTPS obligatoire</h2>
+        </div>
+        <div class="bg-green-50 border-l-4 border-green-500 p-6">
+            <p class="text-gray-700 mb-4">
+                <strong>Toutes les communications avec l'API doivent utiliser HTTPS.</strong> 
+                Les requêtes HTTP non sécurisées sont automatiquement rejetées en production.
+            </p>
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                <p class="text-red-800 font-semibold mb-2"><i class="fas fa-times-circle mr-2"></i>Ne jamais utiliser :</p>
+                <code class="text-sm">http://gestagro-api.onrender.com</code>
+            </div>
+            <div class="bg-green-50 border-l-4 border-green-500 p-4">
+                <p class="text-green-800 font-semibold mb-2"><i class="fas fa-check-circle mr-2"></i>Toujours utiliser :</p>
+                <code class="text-sm">https://gestagro-api.onrender.com</code>
+            </div>
+        </div>
+    </section>
+
+    <!-- Authentification -->
+    <section class="mb-12">
+        <div class="flex items-center mb-4">
+            <i class="fas fa-key text-blue-600 text-2xl mr-3"></i>
+            <h2 class="text-2xl font-semibold text-gray-900">Protection des tokens</h2>
+        </div>
+        <div class="space-y-4">
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Stockage sécurisé</h3>
+                <ul class="list-disc list-inside text-gray-600 space-y-2">
+                    <li><strong>Ne jamais</strong> commiter les tokens dans votre code source ou Git</li>
+                    <li>Utilisez des variables d'environnement ou un gestionnaire de secrets (AWS Secrets Manager, Azure Key Vault, etc.)</li>
+                    <li>En applications web, utilisez des cookies httpOnly ou le sessionStorage (pas localStorage pour les tokens sensibles)</li>
+                    <li>En applications mobiles, utilisez le Keychain (iOS) ou Keystore (Android)</li>
+                </ul>
+            </div>
+
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Durée de vie des tokens</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-blue-50 p-4 rounded">
+                        <h4 class="font-semibold text-gray-900 mb-2">Access Token</h4>
+                        <p class="text-sm text-gray-600">Durée : <strong>1 heure</strong></p>
+                        <p class="text-sm text-gray-600">Usage : Requêtes API authentifiées</p>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded">
+                        <h4 class="font-semibold text-gray-900 mb-2">Refresh Token</h4>
+                        <p class="text-sm text-gray-600">Durée : <strong>7 jours</strong></p>
+                        <p class="text-sm text-gray-600">Usage : Obtenir un nouveau access token</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3"><i class="fas fa-exclamation-triangle text-yellow-600 mr-2"></i>Bonnes pratiques</h3>
+                <ul class="list-disc list-inside text-gray-700 space-y-2">
+                    <li>Ne jamais exposer les tokens dans les URLs (query parameters)</li>
+                    <li>Ne jamais logger les tokens complets (masquez les 4 derniers caractères)</li>
+                    <li>Implémentez un mécanisme de refresh automatique avant expiration</li>
+                    <li>Révoquez les tokens compromis immédiatement via <code class="bg-yellow-100 px-2 py-1 rounded">POST /auth/logout/</code></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Validation des données -->
+    <section class="mb-12">
+        <div class="flex items-center mb-4">
+            <i class="fas fa-check-circle text-purple-600 text-2xl mr-3"></i>
+            <h2 class="text-2xl font-semibold text-gray-900">Validation des données</h2>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-6">
+            <p class="text-gray-600 mb-4">
+                Validez toujours les données côté client avant de les envoyer à l'API pour améliorer la sécurité et l'expérience utilisateur.
+            </p>
+            <div class="bg-gray-900 rounded-lg p-4">
+                <pre class="text-green-400 text-sm overflow-x-auto"><code>// Validation avant envoi
+function validateProduct(data) {
+  const errors = [];
+  
+  if (!data.name || data.name.length < 3) {
+    errors.push('Le nom doit contenir au moins 3 caractères');
+  }
+  
+  if (!data.price || data.price <= 0) {
+    errors.push('Le prix doit être supérieur à 0');
+  }
+  
+  if (!data.currency || !['XAF', 'EUR', 'USD'].includes(data.currency)) {
+    errors.push('Devise invalide');
+  }
+  
+  return errors;
+}</code></pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Prévention des attaques -->
+    <section class="mb-12">
+        <div class="flex items-center mb-4">
+            <i class="fas fa-shield-alt text-red-600 text-2xl mr-3"></i>
+            <h2 class="text-2xl font-semibold text-gray-900">Prévention des attaques courantes</h2>
+        </div>
+        <div class="space-y-4">
+            <div class="border border-gray-200 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Injection SQL</h3>
+                <p class="text-gray-600 mb-2">
+                    L'API utilise des requêtes paramétrées et ORM Django pour prévenir les injections SQL. 
+                    Vous n'avez pas besoin de prendre de mesures supplémentaires côté client.
+                </p>
+            </div>
+
+            <div class="border border-gray-200 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">XSS (Cross-Site Scripting)</h3>
+                <p class="text-gray-600 mb-2">
+                    Échappez toujours les données utilisateur avant de les afficher dans votre interface. 
+                    Utilisez des bibliothèques appropriées selon votre framework.
+                </p>
+            </div>
+
+            <div class="border border-gray-200 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">CSRF (Cross-Site Request Forgery)</h3>
+                <p class="text-gray-600 mb-2">
+                    Les tokens JWT dans les headers Authorization protègent contre les attaques CSRF. 
+                    L'API utilise également des tokens CSRF pour les requêtes de session.
+                </p>
+            </div>
+
+            <div class="border border-gray-200 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Brute Force</h3>
+                <p class="text-gray-600 mb-2">
+                    L'API limite le nombre de tentatives de connexion par IP et par compte. 
+                    Après plusieurs échecs, un délai d'attente est imposé.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Permissions et autorisations -->
+    <section class="mb-12">
+        <div class="flex items-center mb-4">
+            <i class="fas fa-user-shield text-indigo-600 text-2xl mr-3"></i>
+            <h2 class="text-2xl font-semibold text-gray-900">Principe du moindre privilège</h2>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-6">
+            <p class="text-gray-600 mb-4">
+                Utilisez des tokens avec les permissions minimales nécessaires pour votre cas d'usage.
+            </p>
+            <ul class="list-disc list-inside text-gray-600 space-y-2">
+                <li>Ne demandez pas d'accès administrateur si vous n'en avez pas besoin</li>
+                <li>Utilisez des comptes d'application dédiés plutôt que des comptes personnels</li>
+                <li>Révoquez les tokens inutilisés régulièrement</li>
+                <li>Auditez régulièrement les permissions accordées</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Webhooks sécurité -->
+    <section class="mb-12">
+        <div class="flex items-center mb-4">
+            <i class="fas fa-webhook text-orange-600 text-2xl mr-3"></i>
+            <h2 class="text-2xl font-semibold text-gray-900">Sécurité des webhooks</h2>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-3">Vérification de signature</h3>
+            <p class="text-gray-600 mb-4">
+                Vérifiez toujours la signature HMAC-SHA256 des webhooks pour vous assurer qu'ils proviennent bien de GestAgro.
+            </p>
+            <div class="bg-gray-900 rounded-lg p-4">
+                <pre class="text-green-400 text-sm overflow-x-auto"><code>// Vérification de signature webhook
+import hmac
+import hashlib
+
+def verify_webhook(payload, signature, secret):
+    expected = hmac.new(
+        secret.encode(),
+        payload.encode(),
+        hashlib.sha256
+    ).hexdigest()
+    return hmac.compare_digest(f"sha256={expected}", signature)</code></pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Checklist sécurité -->
+    <section class="bg-gradient-to-r from-red-50 to-orange-50 rounded-lg p-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Checklist de sécurité</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-lg p-6">
+                <h3 class="font-semibold text-gray-900 mb-4">Communication</h3>
+                <ul class="space-y-2 text-sm text-gray-600">
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                        <span>HTTPS utilisé en production</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                        <span>Certificats SSL valides</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                        <span>Pas de données sensibles dans les URLs</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="bg-white rounded-lg p-6">
+                <h3 class="font-semibold text-gray-900 mb-4">Authentification</h3>
+                <ul class="space-y-2 text-sm text-gray-600">
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                        <span>Tokens stockés de manière sécurisée</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                        <span>Refresh automatique implémenté</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                        <span>Tokens révoqués lors de la déconnexion</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="bg-white rounded-lg p-6">
+                <h3 class="font-semibold text-gray-900 mb-4">Validation</h3>
+                <ul class="space-y-2 text-sm text-gray-600">
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                        <span>Validation des données côté client</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                        <span>Échappement des données utilisateur</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                        <span>Validation des fichiers uploadés</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="bg-white rounded-lg p-6">
+                <h3 class="font-semibold text-gray-900 mb-4">Monitoring</h3>
+                <ul class="space-y-2 text-sm text-gray-600">
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                        <span>Logs de sécurité activés</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                        <span>Alertes en cas d'activité suspecte</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                        <span>Audit régulier des accès</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Signaler une vulnérabilité -->
+    <section class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">Signaler une vulnérabilité de sécurité</h3>
+        <p class="text-gray-700 mb-4">
+            Si vous découvrez une vulnérabilité de sécurité, veuillez la signaler de manière responsable à 
+            <a href="mailto:security@gestagro.com" class="text-blue-600 hover:underline font-medium">security@gestagro.com</a>.
+        </p>
+        <p class="text-gray-600 text-sm">
+            Ne partagez pas publiquement les détails de la vulnérabilité avant qu'elle ne soit corrigée.
+        </p>
+    </section>
+</div>
+{% endblock %}
+

@@ -1,0 +1,132 @@
+{% extends "docs/base.html" %}
+
+{% block title %}Changelog - {{ api_info.title }}{% endblock %}
+
+{% block breadcrumb_current %}Changelog{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow-sm p-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-4">Changelog</h1>
+        <p class="text-lg text-gray-600">
+            Historique des versions et changements majeurs de l'API GestAgro.
+        </p>
+    </div>
+
+    {% for version in changelog %}
+    <section class="mb-12 border-l-4 {% if version.type == 'release' %}border-green-500{% elif version.type == 'major' %}border-blue-500{% elif version.type == 'minor' %}border-yellow-500{% else %}border-gray-500{% endif %} pl-6">
+        <div class="bg-gray-50 rounded-lg p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900">Version {{ version.version }}</h2>
+                    <p class="text-gray-600 text-sm">{{ version.date }}</p>
+                </div>
+                {% if version.type == 'release' %}
+                <span class="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium">Release</span>
+                {% elif version.type == 'major' %}
+                <span class="px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">Majeure</span>
+                {% elif version.type == 'minor' %}
+                <span class="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">Mineure</span>
+                {% else %}
+                <span class="px-4 py-2 bg-gray-100 text-gray-800 rounded-full text-sm font-medium">Patch</span>
+                {% endif %}
+            </div>
+
+            <div class="space-y-3">
+                {% for change in version.changes %}
+                <div class="flex items-start">
+                    {% if change.type == 'added' %}
+                    <span class="text-green-600 mr-3 mt-1">
+                        <i class="fas fa-plus-circle"></i>
+                    </span>
+                    <div>
+                        <span class="font-semibold text-green-800">Ajouté :</span>
+                        <span class="text-gray-700">{{ change.description }}</span>
+                    </div>
+                    {% elif change.type == 'changed' %}
+                    <span class="text-blue-600 mr-3 mt-1">
+                        <i class="fas fa-edit"></i>
+                    </span>
+                    <div>
+                        <span class="font-semibold text-blue-800">Modifié :</span>
+                        <span class="text-gray-700">{{ change.description }}</span>
+                    </div>
+                    {% elif change.type == 'deprecated' %}
+                    <span class="text-yellow-600 mr-3 mt-1">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </span>
+                    <div>
+                        <span class="font-semibold text-yellow-800">Déprécié :</span>
+                        <span class="text-gray-700">{{ change.description }}</span>
+                    </div>
+                    {% elif change.type == 'removed' %}
+                    <span class="text-red-600 mr-3 mt-1">
+                        <i class="fas fa-minus-circle"></i>
+                    </span>
+                    <div>
+                        <span class="font-semibold text-red-800">Supprimé :</span>
+                        <span class="text-gray-700">{{ change.description }}</span>
+                    </div>
+                    {% elif change.type == 'fixed' %}
+                    <span class="text-purple-600 mr-3 mt-1">
+                        <i class="fas fa-bug"></i>
+                    </span>
+                    <div>
+                        <span class="font-semibold text-purple-800">Corrigé :</span>
+                        <span class="text-gray-700">{{ change.description }}</span>
+                    </div>
+                    {% elif change.type == 'security' %}
+                    <span class="text-orange-600 mr-3 mt-1">
+                        <i class="fas fa-shield-alt"></i>
+                    </span>
+                    <div>
+                        <span class="font-semibold text-orange-800">Sécurité :</span>
+                        <span class="text-gray-700">{{ change.description }}</span>
+                    </div>
+                    {% else %}
+                    <span class="text-gray-600 mr-3 mt-1">
+                        <i class="fas fa-circle"></i>
+                    </span>
+                    <div>
+                        <span class="text-gray-700">{{ change.description }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endfor %}
+
+    <!-- Breaking Changes -->
+    <section class="mt-12 bg-red-50 border border-red-200 rounded-lg p-8">
+        <h2 class="text-2xl font-bold text-red-900 mb-4">
+            <i class="fas fa-exclamation-triangle mr-2"></i>
+            Changements majeurs (Breaking Changes)
+        </h2>
+        <p class="text-red-800 mb-4">
+            Les changements majeurs peuvent nécessiter des modifications dans votre code. 
+            Consultez cette section lors des mises à jour importantes.
+        </p>
+        <div class="bg-white rounded-lg p-4">
+            <p class="text-gray-600">
+                Aucun changement majeur pour le moment. Cette section sera mise à jour lors des prochaines versions majeures.
+            </p>
+        </div>
+    </section>
+
+    <!-- Migration Guide -->
+    <section class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">Guide de migration</h2>
+        <p class="text-gray-700 mb-4">
+            Pour migrer d'une version à l'autre, consultez notre <a href="{% url 'docs-quickstart' %}" class="text-blue-600 hover:underline">guide de démarrage</a> 
+            et les <a href="{% url 'docs-best-practices' %}" class="text-blue-600 hover:underline">bonnes pratiques</a>.
+        </p>
+        <p class="text-gray-600 text-sm">
+            En cas de problème lors de la migration, contactez le support à 
+            <a href="mailto:support@gestagro.com" class="text-blue-600 hover:underline">support@gestagro.com</a>.
+        </p>
+    </section>
+</div>
+{% endblock %}
+

@@ -270,6 +270,69 @@ GET {{ api_base_url }}farmers/products/</code></pre>
     </div>
 </div>
 
+<!-- Guides importants -->
+<div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-8 mb-8">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">Guides essentiels</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <a href="{% url 'docs-best-practices' %}" class="bg-white rounded-lg p-6 hover:shadow-md transition">
+            <div class="flex items-center mb-3">
+                <i class="fas fa-star text-yellow-500 text-2xl mr-3"></i>
+                <h3 class="font-semibold text-gray-900">Bonnes pratiques</h3>
+            </div>
+            <p class="text-sm text-gray-600">Conseils pour utiliser l'API efficacement</p>
+        </a>
+        <a href="{% url 'docs-security' %}" class="bg-white rounded-lg p-6 hover:shadow-md transition">
+            <div class="flex items-center mb-3">
+                <i class="fas fa-shield-alt text-red-500 text-2xl mr-3"></i>
+                <h3 class="font-semibold text-gray-900">Sécurité</h3>
+            </div>
+            <p class="text-sm text-gray-600">Protection des tokens et HTTPS</p>
+        </a>
+        <a href="{% url 'docs-rate-limiting' %}" class="bg-white rounded-lg p-6 hover:shadow-md transition">
+            <div class="flex items-center mb-3">
+                <i class="fas fa-tachometer-alt text-blue-500 text-2xl mr-3"></i>
+                <h3 class="font-semibold text-gray-900">Rate Limiting</h3>
+            </div>
+            <p class="text-sm text-gray-600">Limites et quotas de requêtes</p>
+        </a>
+        <a href="{% url 'docs-performance' %}" class="bg-white rounded-lg p-6 hover:shadow-md transition">
+            <div class="flex items-center mb-3">
+                <i class="fas fa-rocket text-purple-500 text-2xl mr-3"></i>
+                <h3 class="font-semibold text-gray-900">Performance</h3>
+            </div>
+            <p class="text-sm text-gray-600">Optimisation et cache</p>
+        </a>
+        <a href="{% url 'docs-webhooks' %}" class="bg-white rounded-lg p-6 hover:shadow-md transition">
+            <div class="flex items-center mb-3">
+                <i class="fas fa-webhook text-orange-500 text-2xl mr-3"></i>
+                <h3 class="font-semibold text-gray-900">Webhooks</h3>
+            </div>
+            <p class="text-sm text-gray-600">Notifications en temps réel</p>
+        </a>
+        <a href="{% url 'docs-changelog' %}" class="bg-white rounded-lg p-6 hover:shadow-md transition">
+            <div class="flex items-center mb-3">
+                <i class="fas fa-history text-indigo-500 text-2xl mr-3"></i>
+                <h3 class="font-semibold text-gray-900">Changelog</h3>
+            </div>
+            <p class="text-sm text-gray-600">Historique des versions</p>
+        </a>
+        <a href="{% url 'docs-glossary' %}" class="bg-white rounded-lg p-6 hover:shadow-md transition">
+            <div class="flex items-center mb-3">
+                <i class="fas fa-book-open text-green-500 text-2xl mr-3"></i>
+                <h3 class="font-semibold text-gray-900">Glossaire</h3>
+            </div>
+            <p class="text-sm text-gray-600">Définitions des termes</p>
+        </a>
+        <a href="{% url 'docs-errors' %}" class="bg-white rounded-lg p-6 hover:shadow-md transition">
+            <div class="flex items-center mb-3">
+                <i class="fas fa-exclamation-triangle text-yellow-500 text-2xl mr-3"></i>
+                <h3 class="font-semibold text-gray-900">Gestion d'erreurs</h3>
+            </div>
+            <p class="text-sm text-gray-600">Codes d'erreur et solutions</p>
+        </a>
+    </div>
+</div>
+
 <!-- Fonctionnalités clés -->
 <div class="bg-white rounded-lg shadow-sm p-8">
     <h2 class="text-2xl font-bold text-gray-900 mb-6">Fonctionnalités clés</h2>

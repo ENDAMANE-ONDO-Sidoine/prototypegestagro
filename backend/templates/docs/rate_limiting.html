@@ -1,0 +1,239 @@
+{% extends "docs/base.html" %}
+
+{% block title %}Rate Limiting - {{ api_info.title }}{% endblock %}
+
+{% block breadcrumb_current %}Rate Limiting{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow-sm p-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-4">Limitation de taux (Rate Limiting)</h1>
+        <p class="text-lg text-gray-600">
+            L'API GestAgro utilise des limitations de taux pour garantir des performances optimales 
+            et une utilisation équitable de nos ressources pour tous les utilisateurs.
+        </p>
+    </div>
+
+    <!-- Vue d'ensemble -->
+    <section class="mb-12">
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-3">Quotas par défaut</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white rounded-lg p-4">
+                    <div class="text-3xl font-bold text-blue-600 mb-2">1000</div>
+                    <p class="text-gray-600">Requêtes par heure</p>
+                    <p class="text-xs text-gray-500 mt-1">Par utilisateur authentifié</p>
+                </div>
+                <div class="bg-white rounded-lg p-4">
+                    <div class="text-3xl font-bold text-green-600 mb-2">100</div>
+                    <p class="text-gray-600">Requêtes par minute</p>
+                    <p class="text-xs text-gray-500 mt-1">Burst limit</p>
+                </div>
+                <div class="bg-white rounded-lg p-4">
+                    <div class="text-3xl font-bold text-purple-600 mb-2">10</div>
+                    <p class="text-gray-600">Requêtes par seconde</p>
+                    <p class="text-xs text-gray-500 mt-1">Pic maximum</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Headers de réponse -->
+    <section class="mb-12">
+        <div class="flex items-center mb-4">
+            <i class="fas fa-heading text-green-600 text-2xl mr-3"></i>
+            <h2 class="text-2xl font-semibold text-gray-900">Headers de réponse</h2>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-6">
+            <p class="text-gray-600 mb-4">
+                Chaque réponse de l'API inclut des headers contenant des informations sur vos limites :
+            </p>
+            <div class="space-y-3">
+                <div class="border-l-4 border-green-500 pl-4">
+                    <code class="text-gray-900 font-mono">X-RateLimit-Limit</code>
+                    <p class="text-sm text-gray-600 mt-1">Nombre maximum de requêtes autorisées dans la période</p>
+                </div>
+                <div class="border-l-4 border-blue-500 pl-4">
+                    <code class="text-gray-900 font-mono">X-RateLimit-Remaining</code>
+                    <p class="text-sm text-gray-600 mt-1">Nombre de requêtes restantes dans la période actuelle</p>
+                </div>
+                <div class="border-l-4 border-yellow-500 pl-4">
+                    <code class="text-gray-900 font-mono">X-RateLimit-Reset</code>
+                    <p class="text-sm text-gray-600 mt-1">Timestamp Unix (en secondes) du prochain reset du compteur</p>
+                </div>
+                <div class="border-l-4 border-red-500 pl-4">
+                    <code class="text-gray-900 font-mono">Retry-After</code>
+                    <p class="text-sm text-gray-600 mt-1">Nombre de secondes à attendre après une erreur 429</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gestion des limites -->
+    <section class="mb-12">
+        <div class="flex items-center mb-4">
+            <i class="fas fa-exclamation-circle text-yellow-600 text-2xl mr-3"></i>
+            <h2 class="text-2xl font-semibold text-gray-900">Dépassement des limites</h2>
+        </div>
+        <div class="bg-red-50 border-l-4 border-red-500 p-6 mb-4">
+            <h3 class="text-lg font-semibold text-gray-900 mb-3">Erreur 429 Too Many Requests</h3>
+            <p class="text-gray-700 mb-4">
+                Lorsque vous dépassez votre limite, l'API retourne une erreur <code class="bg-red-100 px-2 py-1 rounded">429</code> 
+                avec les headers suivants :
+            </p>
+            <div class="bg-gray-900 rounded-lg p-4">
+                <pre class="text-green-400 text-sm overflow-x-auto"><code>HTTP/1.1 429 Too Many Requests
+X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 0
+X-RateLimit-Reset: 1705320000
+Retry-After: 3600
+
+{
+  "error": "rate_limit_exceeded",
+  "message": "Vous avez dépassé votre limite de requêtes. Réessayez dans 3600 secondes.",
+  "retry_after": 3600
+}</code></pre>
+            </div>
+        </div>
+
+        <div class="bg-gray-50 rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-3">Bonnes pratiques</h3>
+            <ul class="list-disc list-inside text-gray-600 space-y-2">
+                <li>Surveillez le header <code class="bg-gray-100 px-2 py-1 rounded">X-RateLimit-Remaining</code> pour éviter de dépasser la limite</li>
+                <li>Implémentez une logique de retry avec backoff exponentiel lors d'une erreur 429</li>
+                <li>Utilisez le header <code class="bg-gray-100 px-2 py-1 rounded">Retry-After</code> pour déterminer le délai d'attente</li>
+                <li>Mettez en cache les réponses lorsque c'est possible pour réduire le nombre de requêtes</li>
+                <li>Utilisez la pagination pour récupérer les données par lots plutôt qu'en une seule requête</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Exemples de code -->
+    <section class="mb-12">
+        <div class="flex items-center mb-4">
+            <i class="fas fa-code text-purple-600 text-2xl mr-3"></i>
+            <h2 class="text-2xl font-semibold text-gray-900">Gestion du rate limiting dans votre code</h2>
+        </div>
+        <div class="space-y-4">
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">JavaScript/Node.js</h3>
+                <div class="bg-gray-900 rounded-lg p-4">
+                    <pre class="text-green-400 text-sm overflow-x-auto"><code>async function makeRequest(url, options) {
+  const response = await fetch(url, options);
+  
+  // Vérifier les limites
+  const remaining = parseInt(response.headers.get('X-RateLimit-Remaining') || '0');
+  const resetTime = parseInt(response.headers.get('X-RateLimit-Reset') || '0');
+  
+  if (remaining < 10) {
+    console.warn(`Attention: Il reste ${remaining} requêtes. Reset à ${new Date(resetTime * 1000)}`);
+  }
+  
+  // Gérer l'erreur 429
+  if (response.status === 429) {
+    const retryAfter = parseInt(response.headers.get('Retry-After') || '60');
+    console.log(`Rate limit atteint. Attente de ${retryAfter} secondes...`);
+    await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
+    return makeRequest(url, options); // Retry
+  }
+  
+  return response;
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Python</h3>
+                <div class="bg-gray-900 rounded-lg p-4">
+                    <pre class="text-green-400 text-sm overflow-x-auto"><code>import time
+import requests
+
+def make_request(url, headers):
+    response = requests.get(url, headers=headers)
+    
+    # Vérifier les limites
+    remaining = int(response.headers.get('X-RateLimit-Remaining', 0))
+    reset_time = int(response.headers.get('X-RateLimit-Reset', 0))
+    
+    if remaining < 10:
+        print(f"Attention: Il reste {remaining} requêtes. Reset à {reset_time}")
+    
+    # Gérer l'erreur 429
+    if response.status_code == 429:
+        retry_after = int(response.headers.get('Retry-After', 60))
+        print(f"Rate limit atteint. Attente de {retry_after} secondes...")
+        time.sleep(retry_after)
+        return make_request(url, headers)  # Retry
+    
+    return response</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quotas par endpoint -->
+    <section class="mb-12">
+        <div class="flex items-center mb-4">
+            <i class="fas fa-list text-indigo-600 text-2xl mr-3"></i>
+            <h2 class="text-2xl font-semibold text-gray-900">Limites spécifiques par endpoint</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Endpoint</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Limite/heure</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Limite/minute</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Notes</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <tr>
+                        <td class="px-4 py-3 text-sm font-mono text-gray-900">POST /auth/login</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">20</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">5</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">Sécurité anti-bruteforce</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 text-sm font-mono text-gray-900">POST /auth/register</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">10</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">2</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">Prévention spam</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 text-sm font-mono text-gray-900">GET /search/*</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">500</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">30</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">Requêtes intensives</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 text-sm font-mono text-gray-900">POST /* (Upload)</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">200</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">10</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">Ressources serveur</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 text-sm font-mono text-gray-900">Tous les autres</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">1000</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">100</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">Limite par défaut</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Augmenter les limites -->
+    <section class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">Besoin de limites plus élevées ?</h2>
+        <p class="text-gray-700 mb-4">
+            Si vous avez besoin de quotas plus élevés pour votre application, contactez notre équipe de support 
+            à <a href="mailto:support@gestagro.com" class="text-blue-600 hover:underline">support@gestagro.com</a>.
+        </p>
+        <p class="text-gray-600 text-sm">
+            Les plans entreprise incluent des limites personnalisées et un support prioritaire.
+        </p>
+    </section>
+</div>
+{% endblock %}
+
