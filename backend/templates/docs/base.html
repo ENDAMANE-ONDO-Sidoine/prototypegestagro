@@ -11,6 +11,49 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
         pre { white-space: pre-wrap; word-wrap: break-word; }
+
+        /* Theme overrides (dark mode) - maps common utility colors to dark equivalents */
+        .dark body { background-color: #0f172a; }
+        .dark .bg-white { background-color: #1f2937 !important; }
+        .dark .bg-gray-50 { background-color: #111827 !important; }
+        .dark .bg-gray-100 { background-color: #0b1220 !important; }
+        .dark .text-gray-900 { color: #f3f4f6 !important; }
+        .dark .text-gray-800 { color: #e5e7eb !important; }
+        .dark .text-gray-700 { color: #d1d5db !important; }
+        .dark .text-gray-600 { color: #cbd5e1 !important; }
+        .dark .text-gray-500 { color: #94a3b8 !important; }
+        .dark .border-gray-200 { border-color: #374151 !important; }
+        .dark .border-gray-300 { border-color: #4b5563 !important; }
+        .dark .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0,0,0,0.6) !important; }
+        .dark .bg-gray-900 { background-color: #0b1220 !important; }
+        .dark code, .dark pre code { color: #a7f3d0 !important; }
+        .dark .text-blue-800, .dark .text-blue-700, .dark .text-blue-600 { color: #93c5fd !important; }
+        .dark .text-green-800, .dark .text-green-700, .dark .text-green-600 { color: #86efac !important; }
+        .dark .text-red-800, .dark .text-red-700, .dark .text-red-600 { color: #fca5a5 !important; }
+        .dark .text-yellow-800, .dark .text-yellow-700, .dark .text-yellow-600 { color: #fde68a !important; }
+        .dark .bg-blue-100 { background-color: rgba(37,99,235,0.15) !important; }
+        .dark .bg-green-100 { background-color: rgba(16,185,129,0.15) !important; }
+        .dark .bg-red-100 { background-color: rgba(239,68,68,0.15) !important; }
+        .dark .bg-yellow-100 { background-color: rgba(234,179,8,0.15) !important; }
+        .dark .bg-blue-50 { background-color: rgba(59,130,246,0.10) !important; }
+        .dark .bg-green-50 { background-color: rgba(16,185,129,0.10) !important; }
+        .dark .bg-purple-50 { background-color: rgba(168,85,247,0.10) !important; }
+        .dark .bg-yellow-50 { background-color: rgba(234,179,8,0.10) !important; }
+        .dark .text-blue-900 { color: #bfdbfe !important; }
+        .dark .text-green-900 { color: #bbf7d0 !important; }
+
+        /* Inline code and chips on dark */
+        .dark .bg-gray-100 code, .dark code.bg-gray-100, .dark code.bg-yellow-100 { color: #e5e7eb !important; }
+        .dark .bg-gray-100 { border-color: #334155 !important; }
+
+        /* Gradient backgrounds */
+        .dark .from-green-50 { --tw-gradient-from: rgba(16,185,129,0.10) !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(16,185,129,0)); }
+        .dark .to-blue-50 { --tw-gradient-to: rgba(59,130,246,0.10) !important; }
+
+        /* Ensure text inside cards remains readable */
+        .dark .rounded-lg, .dark .p-6, .dark .p-8 { color: #e5e7eb; }
+        .dark .bg-white .text-gray-600 { color: #cbd5e1 !important; }
+        .dark .ring-override:focus { outline: none; box-shadow: 0 0 0 2px #10b981; }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -48,6 +91,10 @@
                     <select class="text-sm border border-gray-300 rounded px-3 py-1 text-gray-700">
                         <option>Version {{ version }}</option>
                     </select>
+                    <button id="theme-toggle" type="button" class="flex items-center text-gray-600 hover:text-gray-900 border border-gray-300 rounded px-3 py-1 ring-override">
+                        <i id="theme-icon" class="fas fa-moon mr-2"></i>
+                        <span id="theme-label">Thème sombre</span>
+                    </button>
                     <a href="{{ swagger_url }}" target="_blank" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
                         Essayer l'API
                     </a>
@@ -282,6 +329,53 @@
                 document.querySelectorAll('[data-code-copy]')
                     .forEach(enhanceCopy);
             });
+        })();
+
+        // Thème clair/sombre : persistance et bascule
+        (function() {
+            const STORAGE_KEY = 'docs-theme';
+            const html = document.documentElement;
+            const btn = document.getElementById('theme-toggle');
+            const icon = document.getElementById('theme-icon');
+            const label = document.getElementById('theme-label');
+
+            function applyTheme(theme) {
+                const isDark = theme === 'dark';
+                html.classList.toggle('dark', isDark);
+                if (icon && label) {
+                    if (isDark) {
+                        icon.className = 'fas fa-sun mr-2';
+                        label.textContent = 'Thème clair';
+                    } else {
+                        icon.className = 'fas fa-moon mr-2';
+                        label.textContent = 'Thème sombre';
+                    }
+                }
+            }
+
+            function getPreferredTheme() {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved === 'light' || saved === 'dark') return saved;
+                return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+
+            const initial = getPreferredTheme();
+            applyTheme(initial);
+
+            if (btn) {
+                btn.addEventListener('click', function() {
+                    const next = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+                    localStorage.setItem(STORAGE_KEY, next);
+                    applyTheme(next);
+                });
+            }
+
+            // Synchronise si préférence système change (si pas de choix utilisateur)
+            if (!localStorage.getItem(STORAGE_KEY) && window.matchMedia) {
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                    applyTheme(e.matches ? 'dark' : 'light');
+                });
+            }
         })();
     </script>
 </body>
