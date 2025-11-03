@@ -36,8 +36,8 @@
                     {{ example.request.method }}
                 </span>
             </div>
-            <div class="bg-gray-900 rounded-lg p-4 mb-3" data-code-copy>
-                <code class="text-green-400 text-sm">{{ example.request.url }}</code>
+            <div class="bg-gray-900 rounded-lg p-4 mb-3 overflow-x-auto" data-code-copy>
+                <code class="text-green-400 text-sm break-all">{{ example.request.url }}</code>
             </div>
             {% if example.request.headers %}
             <div class="mb-3">
@@ -62,13 +62,13 @@
                     {{ example.response.status }}
                 </span>
             </div>
-            <pre class="bg-gray-50 border border-gray-200 rounded p-4 text-xs overflow-x-auto" data-code-copy><code>{{ example.response.body|safe }}</code></pre>
+            <pre class="bg-gray-50 border border-gray-200 rounded p-4 text-xs overflow-x-auto" data-code-copy><code class="break-all">{{ example.response.body|safe }}</code></pre>
         </div>
     </div>
     {% endfor %}
 
     <div class="mt-8 pt-8 border-t border-gray-200">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
                 <h3 class="text-lg font-semibold text-gray-900 mb-2">Besoin d'aide ?</h3>
                 <p class="text-gray-600">
@@ -82,11 +82,11 @@
                 </p>
             </div>
             <a href="{{ swagger_url }}" target="_blank" 
-               {% if actor.color == 'green' %}class="px-6 py-3 bg-green-600 text-white rounded hover:bg-green-700 transition"
-               {% elif actor.color == 'blue' %}class="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-               {% elif actor.color == 'purple' %}class="px-6 py-3 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
-               {% elif actor.color == 'yellow' %}class="px-6 py-3 bg-yellow-600 text-white rounded hover:bg-yellow-700 transition"
-               {% else %}class="px-6 py-3 bg-gray-600 text-white rounded hover:bg-gray-700 transition"{% endif %}>
+               {% if actor.color == 'green' %}class="w-full sm:w-auto text-center px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base bg-green-600 text-white rounded hover:bg-green-700 transition"
+               {% elif actor.color == 'blue' %}class="w-full sm:w-auto text-center px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+               {% elif actor.color == 'purple' %}class="w-full sm:w-auto text-center px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base bg-purple-600 text-white rounded hover:bg-purple-700 transition"
+               {% elif actor.color == 'yellow' %}class="w-full sm:w-auto text-center px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base bg-yellow-600 text-white rounded hover:bg-yellow-700 transition"
+               {% else %}class="w-full sm:w-auto text-center px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base bg-gray-600 text-white rounded hover:bg-gray-700 transition"{% endif %}>
                 Tester dans Swagger →
             </a>
         </div>

@@ -62,14 +62,14 @@
     <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-3 sm:space-x-4">
                     <a href="{% url 'api-home' %}" class="flex items-center">
                         <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
                         </svg>
                         <span class="ml-2 text-xl font-bold text-gray-900">{{ api_info.title }}</span>
                     </a>
-                    <div class="hidden md:flex space-x-6">
+                    <div class="hidden md:flex space-x-4 lg:space-x-6">
                         <a href="{% url 'docs-home' %}" class="{% if request.resolver_match|safe_url_name == 'docs-home' %}text-green-600 font-medium border-b-2 border-green-600 pb-4{% else %}text-gray-600 hover:text-gray-900{% endif %} px-2">
                             Accueil
                         </a>
@@ -87,15 +87,18 @@
                         </a>
                     </div>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <select class="text-sm border border-gray-300 rounded px-3 py-1 text-gray-700">
+                <div class="flex items-center space-x-2 sm:space-x-4">
+                    <select class="hidden sm:block text-sm border border-gray-300 rounded px-3 py-1 text-gray-700">
                         <option>Version {{ version }}</option>
                     </select>
-                    <button id="theme-toggle" type="button" class="flex items-center text-gray-600 hover:text-gray-900 border border-gray-300 rounded px-3 py-1 ring-override">
+                    <button id="theme-toggle" type="button" class="flex items-center text-gray-600 hover:text-gray-900 border border-gray-300 rounded px-2 py-1 sm:px-3 ring-override">
                         <i id="theme-icon" class="fas fa-moon mr-2"></i>
-                        <span id="theme-label">Thème sombre</span>
+                        <span id="theme-label" class="hidden sm:inline">Thème sombre</span>
                     </button>
-                    <a href="{{ swagger_url }}" target="_blank" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                    <button id="mobile-menu-open" class="md:hidden inline-flex items-center justify-center p-2 rounded text-gray-600 hover:text-gray-900 border border-gray-300" aria-label="Ouvrir le menu">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <a href="{{ swagger_url }}" target="_blank" class="hidden sm:inline-flex bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
                         Essayer l'API
                     </a>
                 </div>
@@ -103,11 +106,46 @@
         </nav>
     </header>
 
+    <div id="mobile-drawer" class="fixed inset-0 z-50 hidden md:hidden" aria-hidden="true">
+        <div id="mobile-backdrop" class="absolute inset-0 bg-black bg-opacity-40"></div>
+        <aside class="absolute right-0 top-0 h-full w-72 sm:w-80 max-w-[92%] bg-white shadow-xl p-4 overflow-y-auto">
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-lg font-semibold text-gray-900">Menu</span>
+                <button id="mobile-menu-close" class="p-2 rounded text-gray-600 hover:text-gray-900 border border-gray-300" aria-label="Fermer">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <nav>
+                <ul class="space-y-3">
+                    <li><a href="{% url 'docs-home' %}" class="block py-1 text-gray-700 hover:text-green-600"><i class="fas fa-home mr-2"></i>Accueil</a></li>
+                    <li><a href="{% url 'docs-quickstart' %}" class="block py-1 text-gray-700 hover:text-green-600"><i class="fas fa-rocket mr-2"></i>Démarrage rapide</a></li>
+                    <li><a href="{% url 'docs-concepts' %}" class="block py-1 text-gray-700 hover:text-green-600"><i class="fas fa-book mr-2"></i>Concepts</a></li>
+                    <li><a href="{% url 'docs-examples' %}" class="block py-1 text-gray-700 hover:text-green-600"><i class="fas fa-code mr-2"></i>Exemples</a></li>
+                    <li><a href="{% url 'docs-reference' %}" class="block py-1 text-gray-700 hover:text-green-600"><i class="fas fa-file-code mr-2"></i>Référence API</a></li>
+                    <li><a href="{% url 'docs-best-practices' %}" class="block py-1 text-gray-700 hover:text-green-600"><i class="fas fa-star mr-2"></i>Bonnes pratiques</a></li>
+                    <li><a href="{% url 'docs-errors' %}" class="block py-1 text-gray-700 hover:text-green-600"><i class="fas fa-exclamation-triangle mr-2"></i>Gestion des erreurs</a></li>
+                    <li><a href="{% url 'docs-rate-limiting' %}" class="block py-1 text-gray-700 hover:text-green-600"><i class="fas fa-tachometer-alt mr-2"></i>Rate Limiting</a></li>
+                    <li><a href="{% url 'docs-security' %}" class="block py-1 text-gray-700 hover:text-green-600"><i class="fas fa-shield-alt mr-2"></i>Sécurité</a></li>
+                    <li><a href="{% url 'docs-performance' %}" class="block py-1 text-gray-700 hover:text-green-600"><i class="fas fa-rocket mr-2"></i>Performance</a></li>
+                    <li><a href="{% url 'docs-webhooks' %}" class="block py-1 text-gray-700 hover:text-green-600"><i class="fas fa-share-nodes mr-2"></i>Webhooks</a></li>
+                    <li><a href="{% url 'docs-setup' %}" class="block py-1 text-gray-700 hover:text-green-600"><i class="fas fa-cog mr-2"></i>Installation</a></li>
+                    <li><a href="{% url 'docs-changelog' %}" class="block py-1 text-gray-700 hover:text-green-600"><i class="fas fa-history mr-2"></i>Changelog</a></li>
+                    <li><a href="{% url 'docs-glossary' %}" class="block py-1 text-gray-700 hover:text-green-600"><i class="fas fa-book-open mr-2"></i>Glossaire</a></li>
+                    <li><a href="{% url 'docs-support' %}" class="block py-1 text-gray-700 hover:text-green-600"><i class="fas fa-life-ring mr-2"></i>Support</a></li>
+                </ul>
+                <div class="mt-6 pt-6 border-t border-gray-200">
+                    <a href="{{ swagger_url }}" target="_blank" class="block py-1 text-gray-500 hover:text-green-600"><i class="fas fa-external-link-alt mr-2"></i>Swagger UI</a>
+                    <a href="{{ redoc_url }}" target="_blank" class="block py-1 text-gray-500 hover:text-green-600"><i class="fas fa-external-link-alt mr-2"></i>ReDoc</a></li>
+                </div>
+            </nav>
+        </aside>
+    </div>
+
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+    <main class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 lg:py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
             <!-- Sidebar Navigation -->
-            <aside class="lg:col-span-1">
+            <aside class="lg:col-span-1 hidden lg:block">
                 <div class="sticky top-20">
                     <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
                         <input id="docs-search" type="search" placeholder="Rechercher dans la doc..." 
@@ -329,6 +367,20 @@
                 document.querySelectorAll('[data-code-copy]')
                     .forEach(enhanceCopy);
             });
+        })();
+
+        // Mobile drawer toggle
+        (function(){
+            const openBtn = document.getElementById('mobile-menu-open');
+            const drawer = document.getElementById('mobile-drawer');
+            const closeBtn = document.getElementById('mobile-menu-close');
+            const backdrop = document.getElementById('mobile-backdrop');
+            function open(){ if(drawer) drawer.classList.remove('hidden'); }
+            function close(){ if(drawer) drawer.classList.add('hidden'); }
+            if(openBtn) openBtn.addEventListener('click', open);
+            if(closeBtn) closeBtn.addEventListener('click', close);
+            if(backdrop) backdrop.addEventListener('click', close);
+            document.addEventListener('keydown', function(e){ if(e.key==='Escape') close(); });
         })();
 
         // Thème clair/sombre : persistance et bascule

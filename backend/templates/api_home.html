@@ -41,10 +41,10 @@
                         <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">{{ api_info.title }}<span class="block text-green-600">{{ api_info.tagline }}</span></h1>
                         <p class="text-lg text-gray-600 mb-6">{{ api_info.description }}</p>
                         <div class="flex flex-wrap items-center gap-3">
-                            <a href="{{ docs_url }}" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                            <a href="{{ docs_url }}" class="px-4 py-2 text-sm sm:px-6 sm:py-3 sm:text-base bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
                                 Commencer avec la documentation
                             </a>
-                            <a href="{{ swagger_url }}" target="_blank" class="px-6 py-3 bg-white text-gray-800 rounded-lg border border-gray-200 hover:bg-gray-50 transition">
+                            <a href="{{ swagger_url }}" target="_blank" class="px-4 py-2 text-sm sm:px-6 sm:py-3 sm:text-base bg-white text-gray-800 rounded-lg border border-gray-200 hover:bg-gray-50 transition">
                                 <i class="fas fa-code mr-2"></i>Essayer l'API
                             </a>
                             <span class="ml-2 text-sm text-gray-600">v{{ api_info.version }}</span>
@@ -87,39 +87,55 @@
         </section>
 
         <!-- Sections -->
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <h2 class="text-2xl font-bold text-gray-900 mb-6">Pour qui ?</h2>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div class="bg-white rounded-lg border border-gray-200 p-6">
-                    <i class="fas fa-seedling text-green-600 text-2xl"></i>
-                    <h3 class="mt-3 font-semibold text-gray-900">Agriculteurs</h3>
-                    <p class="text-sm text-gray-600">Catalogue, stocks, ventes et statistiques</p>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 sm:gap-6">
+                <div class="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+                    <div class="flex items-start space-x-3">
+                        <i class="fas fa-seedling text-green-600 text-xl sm:text-2xl"></i>
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Agriculteurs</h3>
+                            <p class="text-xs sm:text-sm text-gray-600">Catalogue, stocks, ventes et statistiques</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="bg-white rounded-lg border border-gray-200 p-6">
-                    <i class="fas fa-cart-shopping text-blue-600 text-2xl"></i>
-                    <h3 class="mt-3 font-semibold text-gray-900">Acheteurs</h3>
-                    <p class="text-sm text-gray-600">Recherche, paniers, commandes, paiements</p>
+                <div class="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+                    <div class="flex items-start space-x-3">
+                        <i class="fas fa-cart-shopping text-blue-600 text-xl sm:text-2xl"></i>
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Acheteurs</h3>
+                            <p class="text-xs sm:text-sm text-gray-600">Recherche, paniers, commandes, paiements</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="bg-white rounded-lg border border-gray-200 p-6">
-                    <i class="fas fa-truck text-purple-600 text-2xl"></i>
-                    <h3 class="mt-3 font-semibold text-gray-900">Transporteurs</h3>
-                    <p class="text-sm text-gray-600">Flotte, expéditions, tracking et offres</p>
+                <div class="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+                    <div class="flex items-start space-x-3">
+                        <i class="fas fa-truck text-purple-600 text-xl sm:text-2xl"></i>
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Transporteurs</h3>
+                            <p class="text-xs sm:text-sm text-gray-600">Flotte, expéditions, tracking et offres</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="bg-white rounded-lg border border-gray-200 p-6">
-                    <i class="fas fa-microscope text-yellow-600 text-2xl"></i>
-                    <h3 class="mt-3 font-semibold text-gray-900">Agronomes</h3>
-                    <p class="text-sm text-gray-600">Champs, cultures, diagnostics et météo</p>
+                <div class="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+                    <div class="flex items-start space-x-3">
+                        <i class="fas fa-microscope text-yellow-600 text-xl sm:text-2xl"></i>
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Agronomes</h3>
+                            <p class="text-xs sm:text-sm text-gray-600">Champs, cultures, diagnostics et météo</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="mt-12 bg-white border border-gray-200 rounded-lg p-6 flex items-center justify-between">
+            <div class="mt-8 sm:mt-12 bg-white border border-gray-200 rounded-lg p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-900">Prêt à intégrer GestAgro API ?</h3>
-                    <p class="text-gray-600">Accédez aux guides et exemples prêts à l’emploi.</p>
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-900">Prêt à intégrer GestAgro API ?</h3>
+                    <p class="text-sm text-gray-600">Accédez aux guides et exemples prêts à l’emploi.</p>
                 </div>
-                <div class="flex gap-3">
-                    <a href="{{ docs_url }}" class="px-5 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">Aller à la documentation</a>
-                    <a href="{{ swagger_url }}" target="_blank" class="px-5 py-2 bg-gray-900 text-white rounded hover:bg-gray-800 transition"><i class="fas fa-code mr-2"></i>Swagger UI</a>
+                <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+                    <a href="{{ docs_url }}" class="w-full sm:w-auto text-center px-4 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition">Aller à la documentation</a>
+                    <a href="{{ swagger_url }}" target="_blank" class="w-full sm:w-auto text-center px-4 py-2 text-sm bg-gray-900 text-white rounded hover:bg-gray-800 transition"><i class="fas fa-code mr-2"></i>Swagger UI</a>
                 </div>
             </div>
         </section>
