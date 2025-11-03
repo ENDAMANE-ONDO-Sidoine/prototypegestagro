@@ -76,10 +76,14 @@ urlpatterns = [
       if (getattr(settings, "MINIO_ENABLED", False) or getattr(settings, "MINIO_STORAGE_ENDPOINT", None)) else []),
 ]
 
-# Serve media files in development
+# Serve media and static files in development
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    # Serve collected staticfiles (if any)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    # Also serve assets from STATICFILES_DIRS (e.g., backend/static)
+    for _static_dir in getattr(settings, "STATICFILES_DIRS", []):
+        urlpatterns += static(settings.STATIC_URL, document_root=_static_dir)
 else:
-    # Serve static files in production
+    # Serve static files in production (collected to STATIC_ROOT or storage backend)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
