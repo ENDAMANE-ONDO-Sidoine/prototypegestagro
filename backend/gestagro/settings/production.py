@@ -51,8 +51,12 @@ else:
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # S'assurer que STATICFILES_DIRS est défini pour collectstatic
+# Créer le répertoire s'il n'existe pas (pour éviter le warning)
+static_dir = BASE_DIR / 'static'
+if not static_dir.exists():
+    static_dir.mkdir(parents=True, exist_ok=True)
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',
+    static_dir,
 ]
 
 # Utiliser le storage Django standard - WhiteNoise middleware servira les fichiers
