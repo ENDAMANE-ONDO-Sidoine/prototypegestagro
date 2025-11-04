@@ -59,9 +59,12 @@ STATICFILES_DIRS = [
     static_dir,
 ]
 
-# Utiliser le storage Django standard - WhiteNoise middleware servira les fichiers
-# Si besoin de compression, utiliser 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-# STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+# Utiliser WhiteNoise storage pour servir les fichiers statiques (sans compression pour éviter les problèmes de manifest)
+STATICFILES_STORAGE = 'whitenoise.storage.WhiteNoiseStaticFilesStorage'
+
+# Configuration WhiteNoise
+WHITENOISE_USE_FINDERS = True
+WHITENOISE_AUTOREFRESH = True
 
 # Configuration des médias
 MEDIA_URL = '/media/'
