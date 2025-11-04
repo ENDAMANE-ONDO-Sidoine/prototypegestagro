@@ -63,6 +63,10 @@ STATICFILES_DIRS = [
     static_dir,
 ]
 
+# Désactiver MinIO pour les fichiers statiques en production (utiliser WhiteNoise)
+MINIO_ENABLED = False
+MINIO_STORAGE_ENDPOINT = None
+
 # Override STATICFILES_STORAGE de base.py pour utiliser le storage Django standard
 # WhiteNoise middleware sert automatiquement les fichiers depuis STATIC_ROOT
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
