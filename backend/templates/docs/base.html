@@ -11,10 +11,66 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
         pre { white-space: pre-wrap; word-wrap: break-word; }
+        
+        /* Smooth transitions for theme changes */
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+        /* Exclude elements that should not transition */
+        svg, img, canvas, video, iframe {
+            transition: none;
+        }
+        /* Smooth transition for body specifically */
+        html, body {
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
 
         /* Theme overrides (dark mode) - maps common utility colors to dark equivalents */
         .dark body { background-color: #0f172a; }
         .dark .bg-white { background-color: #1f2937 !important; }
+        .dark header { background-color: #1f2937 !important; border-color: #374151 !important; }
+        .dark header select, .dark header button { background-color: #374151 !important; border-color: #4b5563 !important; }
+        /* Appliquer le fond gris uniquement aux liens de navigation, pas au logo */
+        .dark header nav > div > a:not([href*="/"]):not([href*="api-home"]),
+        .dark header nav a[href*="docs-"],
+        .dark header nav a[href*="swagger"],
+        .dark header nav a[href*="redoc"],
+        .dark header nav a[href*="schema"] { background-color: #374151 !important; border-color: #4b5563 !important; }
+        /* Exclure explicitement le logo du fond gris en mode sombre */
+        .dark header a.logo-link,
+        .dark header a[href*="api-home"],
+        .dark header a[href="/"],
+        .dark header > nav > div > div > a:first-child { 
+            background-color: transparent !important; 
+            border: none !important; 
+            padding: 0 !important; 
+            box-shadow: none !important;
+        }
+        .dark header select, .dark header button { color: #e5e7eb !important; }
+        .dark header .bg-green-600 { background-color: #10b981 !important; }
+        .dark header .bg-green-600:hover { background-color: #059669 !important; }
+        .dark header .text-gray-900 { color: #f3f4f6 !important; }
+        .dark header .text-gray-800 { color: #f3f4f6 !important; }
+        .dark header .text-green-600 { color: #10b981 !important; }
+        /* Logo text styling - Force visibility in light mode */
+        header a[href*="api-home"] span { color: #111827 !important; }
+        header a[href*="api-home"] span.text-gray-900 { color: #111827 !important; }
+        header a[href*="api-home"] span.text-gray-800 { color: #111827 !important; }
+        /* Override any light colors on logo text */
+        header a:not(.dark) span { color: #111827 !important; }
+        .dark header a span { color: #f3f4f6 !important; }
+        /* Navigation links styling - Light mode */
+        header nav a.bg-gray-200 { background-color: #e5e7eb !important; }
+        header nav a.text-gray-800 { color: #1f2937 !important; }
+        header nav a.bg-gray-200:hover { background-color: #d1d5db !important; }
+        /* Navigation links styling - Dark mode */
+        .dark header nav a.bg-gray-200 { background-color: #374151 !important; }
+        .dark header nav a.text-gray-800 { color: #d1d5db !important; }
+        .dark header nav a.bg-gray-200:hover { background-color: #4b5563 !important; }
+        /* Override dark: classes for navigation links */
+        .dark header nav a.dark\:bg-gray-700 { background-color: #374151 !important; }
+        .dark header nav a.dark\:text-gray-300 { color: #d1d5db !important; }
+        .dark header nav a.dark\:hover\:bg-gray-600:hover { background-color: #4b5563 !important; }
         .dark .bg-gray-50 { background-color: #111827 !important; }
         .dark .bg-gray-100 { background-color: #0b1220 !important; }
         .dark .text-gray-900 { color: #f3f4f6 !important; }
@@ -22,6 +78,21 @@
         .dark .text-gray-700 { color: #d1d5db !important; }
         .dark .text-gray-600 { color: #cbd5e1 !important; }
         .dark .text-gray-500 { color: #94a3b8 !important; }
+        
+        /* Search input styling - Dark mode */
+        .dark #docs-search, .dark #glossary-search { 
+            color: #f3f4f6 !important; 
+            background-color: #374151 !important; 
+            border-color: #4b5563 !important; 
+        }
+        .dark #docs-search::placeholder, .dark #glossary-search::placeholder { 
+            color: #9ca3af !important; 
+        }
+        .dark #docs-search:focus, .dark #glossary-search:focus {
+            background-color: #374151 !important;
+            border-color: #10b981 !important;
+            color: #f3f4f6 !important;
+        }
         .dark .border-gray-200 { border-color: #374151 !important; }
         .dark .border-gray-300 { border-color: #4b5563 !important; }
         .dark .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0,0,0,0.6) !important; }
@@ -54,51 +125,78 @@
         .dark .rounded-lg, .dark .p-6, .dark .p-8 { color: #e5e7eb; }
         .dark .bg-white .text-gray-600 { color: #cbd5e1 !important; }
         .dark .ring-override:focus { outline: none; box-shadow: 0 0 0 2px #10b981; }
+        
+        /* Version dropdown styling */
+        #version-dropdown {
+            min-width: fit-content;
+        }
+        .dark #version-dropdown {
+            background-color: #374151 !important;
+            border-color: #4b5563 !important;
+        }
+        .dark #version-dropdown button {
+            color: #e5e7eb !important;
+        }
+        .dark #version-dropdown button:hover {
+            background-color: #4b5563 !important;
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body class="bg-gray-50">
     <!-- Header -->
     <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center space-x-3 sm:space-x-4">
-                    <a href="{% url 'api-home' %}" class="flex items-center">
-                        <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+        <nav class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-14 sm:h-16 gap-2">
+                <div class="flex items-center space-x-2 sm:space-x-3 md:space-x-4 flex-shrink-0">
+                    <a href="{% url 'api-home' %}" class="flex items-center logo-link">
+                        <svg class="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-green-600 dark:text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
                         </svg>
-                        <span class="ml-2 text-xl font-bold text-gray-900">{{ api_info.title }}</span>
+                        <span class="ml-1 sm:ml-2 text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100 whitespace-nowrap">{{ api_info.title }}</span>
                     </a>
-                    <div class="hidden md:flex space-x-4 lg:space-x-6">
-                        <a href="{% url 'docs-home' %}" class="{% if request.resolver_match|safe_url_name == 'docs-home' %}text-green-600 font-medium border-b-2 border-green-600 pb-4{% else %}text-gray-600 hover:text-gray-900{% endif %} px-2">
+                    <div class="hidden lg:flex items-center space-x-2">
+                        <a href="{% url 'docs-home' %}" class="{% if request.resolver_match|safe_url_name == 'docs-home' %}bg-green-600 text-white{% else %}bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600{% endif %} px-4 py-2 rounded-md font-medium transition-colors duration-200 flex items-center justify-center min-h-[38px]">
                             Accueil
                         </a>
-                        <a href="{% url 'docs-quickstart' %}" class="{% if request.resolver_match|safe_url_name == 'docs-quickstart' %}text-green-600 font-medium border-b-2 border-green-600 pb-4{% else %}text-gray-600 hover:text-gray-900{% endif %} px-2">
+                        <a href="{% url 'docs-quickstart' %}" class="{% if request.resolver_match|safe_url_name == 'docs-quickstart' %}bg-green-600 text-white{% else %}bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600{% endif %} px-4 py-2 rounded-md font-medium transition-colors duration-200 flex items-center justify-center min-h-[38px]">
                             Démarrage
                         </a>
-                        <a href="{% url 'docs-examples' %}" class="{% if 'docs-examples' in request.resolver_match|safe_url_name %}text-green-600 font-medium border-b-2 border-green-600 pb-4{% else %}text-gray-600 hover:text-gray-900{% endif %} px-2">
+                        <a href="{% url 'docs-examples' %}" class="{% if 'docs-examples' in request.resolver_match|safe_url_name %}bg-green-600 text-white{% else %}bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600{% endif %} px-4 py-2 rounded-md font-medium transition-colors duration-200 flex items-center justify-center min-h-[38px]">
                             Exemples
                         </a>
-                        <a href="{% url 'docs-reference' %}" class="{% if request.resolver_match|safe_url_name == 'docs-reference' %}text-green-600 font-medium border-b-2 border-green-600 pb-4{% else %}text-gray-600 hover:text-gray-900{% endif %} px-2">
+                        <a href="{% url 'docs-reference' %}" class="{% if request.resolver_match|safe_url_name == 'docs-reference' %}bg-green-600 text-white{% else %}bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600{% endif %} px-4 py-2 rounded-md font-medium transition-colors duration-200 flex items-center justify-center min-h-[38px]">
                             Référence
                         </a>
-                        <a href="{{ swagger_url }}" target="_blank" class="text-gray-600 hover:text-gray-900 px-2">
+                        <a href="{{ swagger_url }}" target="_blank" class="bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 px-4 py-2 rounded-md font-medium transition-colors duration-200 flex items-center justify-center min-h-[38px]">
                             Swagger
                         </a>
                     </div>
                 </div>
-                <div class="flex items-center space-x-2 sm:space-x-4">
-                    <select class="hidden sm:block text-sm border border-gray-300 rounded px-3 py-1 text-gray-700">
-                        <option>Version {{ version }}</option>
-                    </select>
-                    <button id="theme-toggle" type="button" class="flex items-center text-gray-600 hover:text-gray-900 border border-gray-300 rounded px-2 py-1 sm:px-3 ring-override">
-                        <i id="theme-icon" class="fas fa-moon mr-2"></i>
-                        <span id="theme-label" class="hidden sm:inline">Thème sombre</span>
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <div class="relative hidden md:block">
+                        <button id="version-dropdown-btn" type="button" class="flex items-center justify-center text-sm border border-gray-300 rounded px-2 md:px-3 py-2 h-[38px] text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 max-w-[140px]">
+                            <span>Version {{ version }}</span>
+                            <svg class="ml-1.5 h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div id="version-dropdown" class="hidden absolute right-0 mt-1 w-40 bg-white border border-gray-300 rounded-md shadow-lg z-50">
+                            <div class="py-1">
+                                <button type="button" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    Version {{ version }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="theme-toggle" type="button" class="flex items-center justify-center text-gray-600 hover:text-gray-900 border border-gray-300 rounded px-2 md:px-3 py-2 h-[38px] ring-override bg-white">
+                        <i id="theme-icon" class="fas fa-moon mr-1 md:mr-2"></i>
+                        <span id="theme-label" class="hidden md:inline text-sm">Thème sombre</span>
                     </button>
-                    <button id="mobile-menu-open" class="md:hidden inline-flex items-center justify-center p-2 rounded text-gray-600 hover:text-gray-900 border border-gray-300" aria-label="Ouvrir le menu">
+                    <button id="mobile-menu-open" class="lg:hidden inline-flex items-center justify-center w-[38px] h-[38px] rounded text-gray-600 hover:text-gray-900 border border-gray-300 bg-white" aria-label="Ouvrir le menu">
                         <i class="fas fa-bars"></i>
                     </button>
-                    <a href="{{ swagger_url }}" target="_blank" class="hidden sm:inline-flex bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                    <a href="{{ swagger_url }}" target="_blank" class="hidden lg:inline-flex items-center justify-center bg-green-600 text-white px-4 py-2 h-[38px] rounded hover:bg-green-700 transition text-sm whitespace-nowrap">
                         Essayer l'API
                     </a>
                 </div>
@@ -106,9 +204,9 @@
         </nav>
     </header>
 
-    <div id="mobile-drawer" class="fixed inset-0 z-50 hidden md:hidden" aria-hidden="true">
+    <div id="mobile-drawer" class="fixed inset-0 z-50 hidden lg:hidden" aria-hidden="true">
         <div id="mobile-backdrop" class="absolute inset-0 bg-black bg-opacity-40"></div>
-        <aside class="absolute right-0 top-0 h-full w-72 sm:w-80 max-w-[92%] bg-white shadow-xl p-4 overflow-y-auto">
+        <aside class="absolute right-0 top-0 h-full w-72 sm:w-80 md:w-96 max-w-[92%] bg-white shadow-xl p-4 overflow-y-auto">
             <div class="flex items-center justify-between mb-4">
                 <span class="text-lg font-semibold text-gray-900">Menu</span>
                 <button id="mobile-menu-close" class="p-2 rounded text-gray-600 hover:text-gray-900 border border-gray-300" aria-label="Fermer">
@@ -428,6 +526,41 @@
                     applyTheme(e.matches ? 'dark' : 'light');
                 });
             }
+        })();
+
+        // Version dropdown toggle
+        (function() {
+            const btn = document.getElementById('version-dropdown-btn');
+            const dropdown = document.getElementById('version-dropdown');
+            
+            if (!btn || !dropdown) return;
+            
+            function toggleDropdown() {
+                dropdown.classList.toggle('hidden');
+            }
+            
+            function closeDropdown() {
+                dropdown.classList.add('hidden');
+            }
+            
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                toggleDropdown();
+            });
+            
+            // Fermer en cliquant en dehors
+            document.addEventListener('click', function(e) {
+                if (!btn.contains(e.target) && !dropdown.contains(e.target)) {
+                    closeDropdown();
+                }
+            });
+            
+            // Fermer avec Escape
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeDropdown();
+                }
+            });
         })();
     </script>
 </body>

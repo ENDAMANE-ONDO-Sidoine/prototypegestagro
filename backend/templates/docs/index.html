@@ -7,9 +7,9 @@
 
 {% block content %}
 <!-- Introduction -->
-<div class="bg-white rounded-lg shadow-sm p-8 mb-8">
-    <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ api_info.title }} - Documentation</h1>
-    <p class="text-lg text-gray-600 mb-6">
+<div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 md:p-8 mb-6 sm:mb-8">
+    <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">{{ api_info.title }} - Documentation</h1>
+    <p class="text-base sm:text-lg text-gray-600 mb-4 sm:mb-6">
         {{ api_info.description }}
     </p>
     <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
@@ -21,7 +21,7 @@
 </div>
 
 <!-- Getting Started Cards -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8" id="getting-started">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8" id="getting-started">
     {% for item in getting_started %}
     <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition">
         <div class="flex items-center mb-4">
@@ -90,7 +90,7 @@
 </div>
 
 <!-- Quick Links -->
-<div class="bg-white rounded-lg shadow-sm p-8 mb-8">
+<div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 md:p-8 mb-6 sm:mb-8">
     <h2 class="text-2xl font-bold text-gray-900 mb-6">Liens rapides</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {% for link in quick_links %}
@@ -109,7 +109,7 @@
 </div>
 
 <!-- API Overview - Acteurs -->
-<div class="bg-white rounded-lg shadow-sm p-8 mb-8" id="actors">
+<div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 md:p-8 mb-6 sm:mb-8" id="actors">
     <h2 class="text-2xl font-bold text-gray-900 mb-6">Vue d'ensemble de l'API - Acteurs</h2>
     <div class="space-y-6">
         {% for actor in actors %}
@@ -124,34 +124,34 @@
                         <p class="text-gray-600">{{ actor.description }}</p>
                     </div>
                 </div>
-                <div class="flex flex-wrap gap-2 sm:justify-end">
+                <div class="flex flex-wrap gap-2 sm:justify-end mt-2 sm:mt-0">
                     {% if actor.color == 'green' %}
-                    <a href="{{ actor.swagger_url }}" target="_blank" class="text-green-600 hover:text-green-700 font-medium text-sm border border-green-600 px-3 py-1 rounded hover:bg-green-50">
+                    <a href="{{ actor.swagger_url }}" target="_blank" class="text-green-600 hover:text-green-700 font-medium text-xs sm:text-sm border border-green-600 px-2 sm:px-3 py-1.5 sm:py-1 rounded hover:bg-green-50 whitespace-nowrap">
                         Swagger →
                     </a>
                     {% elif actor.color == 'blue' %}
-                    <a href="{{ actor.swagger_url }}" target="_blank" class="text-blue-600 hover:text-blue-700 font-medium text-sm border border-blue-600 px-3 py-1 rounded hover:bg-blue-50">
+                    <a href="{{ actor.swagger_url }}" target="_blank" class="text-blue-600 hover:text-blue-700 font-medium text-xs sm:text-sm border border-blue-600 px-2 sm:px-3 py-1.5 sm:py-1 rounded hover:bg-blue-50 whitespace-nowrap">
                         Swagger →
                     </a>
                     {% elif actor.color == 'purple' %}
-                    <a href="{{ actor.swagger_url }}" target="_blank" class="text-purple-600 hover:text-purple-700 font-medium text-sm border border-purple-600 px-3 py-1 rounded hover:bg-purple-50">
+                    <a href="{{ actor.swagger_url }}" target="_blank" class="text-purple-600 hover:text-purple-700 font-medium text-xs sm:text-sm border border-purple-600 px-2 sm:px-3 py-1.5 sm:py-1 rounded hover:bg-purple-50 whitespace-nowrap">
                         Swagger →
                     </a>
                     {% elif actor.color == 'yellow' %}
-                    <a href="{{ actor.swagger_url }}" target="_blank" class="text-yellow-600 hover:text-yellow-700 font-medium text-sm border border-yellow-600 px-3 py-1 rounded hover:bg-yellow-50">
+                    <a href="{{ actor.swagger_url }}" target="_blank" class="text-yellow-600 hover:text-yellow-700 font-medium text-xs sm:text-sm border border-yellow-600 px-2 sm:px-3 py-1.5 sm:py-1 rounded hover:bg-yellow-50 whitespace-nowrap">
                         Swagger →
                     </a>
                     {% else %}
-                    <a href="{{ swagger_url }}" target="_blank" class="text-gray-600 hover:text-gray-700 font-medium text-sm border border-gray-600 px-3 py-1 rounded hover:bg-gray-50">
+                    <a href="{{ swagger_url }}" target="_blank" class="text-gray-600 hover:text-gray-700 font-medium text-xs sm:text-sm border border-gray-600 px-2 sm:px-3 py-1.5 sm:py-1 rounded hover:bg-gray-50 whitespace-nowrap">
                         Swagger →
                     </a>
                     {% endif %}
                     <a href="{% url 'docs-examples-actor' actor.slug %}" 
-                       {% if actor.color == 'green' %}class="text-green-600 hover:text-green-700 font-medium text-sm border border-green-600 px-3 py-1 rounded hover:bg-green-50"
-                       {% elif actor.color == 'blue' %}class="text-blue-600 hover:text-blue-700 font-medium text-sm border border-blue-600 px-3 py-1 rounded hover:bg-blue-50"
-                       {% elif actor.color == 'purple' %}class="text-purple-600 hover:text-purple-700 font-medium text-sm border border-purple-600 px-3 py-1 rounded hover:bg-purple-50"
-                       {% elif actor.color == 'yellow' %}class="text-yellow-600 hover:text-yellow-700 font-medium text-sm border border-yellow-600 px-3 py-1 rounded hover:bg-yellow-50"
-                       {% else %}class="text-gray-600 hover:text-gray-700 font-medium text-sm border border-gray-600 px-3 py-1 rounded hover:bg-gray-50"{% endif %}>
+                       {% if actor.color == 'green' %}class="text-green-600 hover:text-green-700 font-medium text-xs sm:text-sm border border-green-600 px-2 sm:px-3 py-1.5 sm:py-1 rounded hover:bg-green-50 whitespace-nowrap"
+                       {% elif actor.color == 'blue' %}class="text-blue-600 hover:text-blue-700 font-medium text-xs sm:text-sm border border-blue-600 px-2 sm:px-3 py-1.5 sm:py-1 rounded hover:bg-blue-50 whitespace-nowrap"
+                       {% elif actor.color == 'purple' %}class="text-purple-600 hover:text-purple-700 font-medium text-xs sm:text-sm border border-purple-600 px-2 sm:px-3 py-1.5 sm:py-1 rounded hover:bg-purple-50 whitespace-nowrap"
+                       {% elif actor.color == 'yellow' %}class="text-yellow-600 hover:text-yellow-700 font-medium text-xs sm:text-sm border border-yellow-600 px-2 sm:px-3 py-1.5 sm:py-1 rounded hover:bg-yellow-50 whitespace-nowrap"
+                       {% else %}class="text-gray-600 hover:text-gray-700 font-medium text-xs sm:text-sm border border-gray-600 px-2 sm:px-3 py-1.5 sm:py-1 rounded hover:bg-gray-50 whitespace-nowrap"{% endif %}>
                         Exemples →
                     </a>
                 </div>
@@ -185,7 +185,7 @@
 
 <!-- Statistics -->
 {% if stats %}
-<div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-8 mb-8">
+<div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-4 sm:p-6 md:p-8 mb-6 sm:mb-8">
     <h2 class="text-2xl font-bold text-gray-900 mb-6">Statistiques de la plateforme</h2>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         {% if stats.total_users %}
@@ -217,7 +217,7 @@
 {% endif %}
 
 <!-- Quick Start -->
-<div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-8 mb-8">
+<div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-4 sm:p-6 md:p-8 mb-6 sm:mb-8">
     <h2 class="text-2xl font-bold text-gray-900 mb-4">Démarrage rapide</h2>
     <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto mb-4">
         <pre class="text-green-400 text-sm"><code># 1. Authentification
@@ -233,19 +233,19 @@ Authorization: Bearer &lt;votre_access_token&gt;
 # 3. Exemple: Lister les produits
 GET {{ api_base_url }}farmers/products/</code></pre>
     </div>
-    <div class="flex items-center justify-between">
-        <p class="text-gray-700">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <p class="text-gray-700 text-sm sm:text-base">
             Consultez la <a href="{% url 'docs-quickstart' %}" class="text-green-600 hover:underline font-medium">page de démarrage rapide</a> 
             pour un guide complet étape par étape.
         </p>
-        <a href="{% url 'docs-quickstart' %}" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition">
+        <a href="{% url 'docs-quickstart' %}" class="bg-green-600 text-white px-4 sm:px-6 py-2 rounded hover:bg-green-700 transition text-sm sm:text-base whitespace-nowrap text-center">
             Commencer →
         </a>
     </div>
 </div>
 
 <!-- Ressources et Outils -->
-<div class="bg-white rounded-lg shadow-sm p-8 mb-8">
+<div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 md:p-8 mb-6 sm:mb-8">
     <h2 class="text-2xl font-bold text-gray-900 mb-6">Ressources et Outils</h2>
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <a href="{{ swagger_url }}" target="_blank" class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition text-center">
@@ -272,7 +272,7 @@ GET {{ api_base_url }}farmers/products/</code></pre>
 </div>
 
 <!-- Intégrations & Technologies utilisées -->
-<div class="bg-white rounded-lg shadow-sm p-8 mb-8">
+<div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 md:p-8 mb-6 sm:mb-8">
     <h2 class="text-2xl font-bold text-gray-900 mb-6">Technologies et intégrations</h2>
     <p class="text-gray-600 mb-6">GestAgro API s'intègre facilement à vos outils et s'appuie sur un socle technique moderne, fiable et scalable.</p>
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -293,7 +293,7 @@ GET {{ api_base_url }}farmers/products/</code></pre>
 </div>
 
 <!-- Guides importants -->
-<div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-8 mb-8">
+<div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-4 sm:p-6 md:p-8 mb-6 sm:mb-8">
     <h2 class="text-2xl font-bold text-gray-900 mb-6">Guides essentiels</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <a href="{% url 'docs-best-practices' %}" class="bg-white rounded-lg p-6 hover:shadow-md transition">
