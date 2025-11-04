@@ -183,7 +183,9 @@ db.sqlite3-journal
 
 # Django static files
 staticfiles/
-static/
+# Note: static/img/ est nécessaire pour les images SVG dans la documentation
+# static/
+!static/img/
 
 # Django media files
 media/
