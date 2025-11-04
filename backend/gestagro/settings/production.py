@@ -50,8 +50,12 @@ else:
 # Configuration des fichiers statiques
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# Créer le répertoire staticfiles s'il n'existe pas (pour éviter le warning)
+staticfiles_dir = BASE_DIR / 'staticfiles'
+if not staticfiles_dir.exists():
+    staticfiles_dir.mkdir(parents=True, exist_ok=True)
 # S'assurer que STATICFILES_DIRS est défini pour collectstatic
-# Créer le répertoire s'il n'existe pas (pour éviter le warning)
+# Créer le répertoire static s'il n'existe pas (pour éviter le warning)
 static_dir = BASE_DIR / 'static'
 if not static_dir.exists():
     static_dir.mkdir(parents=True, exist_ok=True)
