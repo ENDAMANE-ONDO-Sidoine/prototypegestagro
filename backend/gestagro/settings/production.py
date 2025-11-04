@@ -63,8 +63,9 @@ STATICFILES_DIRS = [
     static_dir,
 ]
 
+# Override STATICFILES_STORAGE de base.py pour utiliser le storage Django standard
 # WhiteNoise middleware sert automatiquement les fichiers depuis STATIC_ROOT
-# Pas besoin de définir STATICFILES_STORAGE - le middleware WhiteNoise gère tout
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 # Configuration WhiteNoise (optionnel, valeurs par défaut)
 WHITENOISE_USE_FINDERS = False  # Désactivé en production (les fichiers sont déjà collectés)
 WHITENOISE_AUTOREFRESH = False  # Désactivé en production
