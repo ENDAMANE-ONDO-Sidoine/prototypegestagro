@@ -29,6 +29,7 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
     'django_filters',
     'drf_spectacular',
@@ -116,6 +117,15 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Password hashers (Argon2 en priorité)
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+    'django.contrib.auth.hashers.ScryptPasswordHasher',
+]
+
 # Internationalization
 LANGUAGE_CODE = 'fr-fr'
 TIME_ZONE = 'UTC'
@@ -182,6 +192,19 @@ REST_FRAMEWORK = {
         'rest_framework.filters.OrderingFilter',
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    # Throttling
+    'DEFAULT_THROTTLE_CLASSES': [
+        'apps.core.throttles.SignupThrottle',
+        'apps.core.throttles.LoginThrottle',
+        'apps.core.throttles.PasswordResetThrottle',
+        'apps.core.throttles.EmailVerificationThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'signup': config('THROTTLE_SIGNUP_RATE', default='5/hour'),
+        'login': config('THROTTLE_LOGIN_RATE', default='10/hour'),
+        'password_reset': config('THROTTLE_PASSWORD_RESET_RATE', default='3/hour'),
+        'email_verification': config('THROTTLE_EMAIL_VERIFICATION_RATE', default='3/hour'),
+    },
 }
 
 # JWT Configuration

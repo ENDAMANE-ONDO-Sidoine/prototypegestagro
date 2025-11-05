@@ -21,6 +21,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from apps.core.services.email_service import EmailService
+from rest_framework.permissions import AllowAny
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -282,3 +283,54 @@ class PasswordResetConfirmView(APIView):
         user.set_password(new_password)
         user.save()
         return Response({'message': 'Mot de passe réinitialisé avec succès.'})
+
+
+class EmailVerificationRequestView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email')
+        if not email:
+            return Response({'error': 'Email requis.'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({'message': 'Si un compte existe, un email de vérification a été envoyé.'})
+
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+        verify_url = f"{request.scheme}://{request.get_host()}/verify-email?uid={uid}&token={token}"
+        context = {
+            'user': user,
+            'verify_url': verify_url,
+        }
+        EmailService.send_template_email(
+            to_email=user.email,
+            subject='Vérifiez votre adresse email',
+            template_name='emails/auth/email_verification.html',
+            text_template_name='emails/auth/email_verification.txt',
+            context=context,
+        )
+        return Response({'message': 'Si un compte existe, un email de vérification a été envoyé.'})
+
+
+class EmailVerificationConfirmView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        uid = request.data.get('uid')
+        token = request.data.get('token')
+        if not uid or not token:
+            return Response({'error': 'uid et token requis.'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            uid_int = int(urlsafe_base64_decode(uid).decode())
+            user = User.objects.get(pk=uid_int)
+        except Exception:
+            return Response({'error': 'Lien invalide.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not default_token_generator.check_token(user, token):
+            return Response({'error': 'Token invalide ou expiré.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.is_verified = True
+        user.save(update_fields=['is_verified'])
+        return Response({'message': 'Email vérifié avec succès.'})

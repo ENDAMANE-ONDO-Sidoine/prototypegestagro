@@ -1,0 +1,12 @@
+Bonjour {{ user.first_name|default:user.username }},
+
+Merci de confirmer votre adresse email pour sécuriser votre compte GestAgro.
+
+Cliquez sur le lien ci-dessous (ou copiez-collez-le dans votre navigateur) :
+{{ verify_url }}
+
+Ce lien expirera automatiquement.
+
+--
+GestAgro
+
