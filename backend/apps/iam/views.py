@@ -14,8 +14,13 @@ from .models import User, Membership, Role, Permission
 from apps.organizations.models import Organization
 from .serializers import (
     UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer,
-    OrganizationSerializer, MembershipSerializer, RoleSerializer, PermissionSerializer
+    OrganizationSerializer, MembershipSerializer, RoleSerializer, PermissionSerializer,
+    PasswordResetRequestSerializer, PasswordResetConfirmSerializer
 )
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes
+from apps.core.services.email_service import EmailService
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -221,3 +226,59 @@ def join_organization(request):
         return Response({
             'error': 'Organisation non trouvée'
         }, status=status.HTTP_404_NOT_FOUND)
+
+
+class PasswordResetRequestView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = PasswordResetRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data['email']
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            # Réponse générique pour ne pas révéler l'existence de l'email
+            return Response({'message': 'Si un compte existe, un email a été envoyé.'})
+
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+        reset_url = f"{request.scheme}://{request.get_host()}/reset-password?uid={uid}&token={token}"
+
+        context = {
+            'user': user,
+            'reset_url': reset_url,
+        }
+        # Envoi via service (console backend par défaut en dev)
+        EmailService.send_template_email(
+            to_email=user.email,
+            subject='Réinitialisation de votre mot de passe',
+            template_name='emails/auth/password_reset_email.html',
+            text_template_name='emails/auth/password_reset_email.txt',
+            context=context,
+        )
+        return Response({'message': 'Si un compte existe, un email a été envoyé.'})
+
+
+class PasswordResetConfirmView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = PasswordResetConfirmSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        uid = serializer.validated_data['uid']
+        token = serializer.validated_data['token']
+        new_password = serializer.validated_data['new_password']
+
+        try:
+            uid_int = int(urlsafe_base64_decode(uid).decode())
+            user = User.objects.get(pk=uid_int)
+        except Exception:
+            return Response({'error': 'Lien invalide.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not default_token_generator.check_token(user, token):
+            return Response({'error': 'Token invalide ou expiré.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(new_password)
+        user.save()
+        return Response({'message': 'Mot de passe réinitialisé avec succès.'})

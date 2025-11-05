@@ -7,7 +7,7 @@ from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 from .views import (
     CustomTokenObtainPairView, UserRegistrationView, UserProfileView,
     UserLogoutView, MembershipListView, MembershipDetailView, RoleListView, PermissionListView,
-    user_organizations, join_organization
+    user_organizations, join_organization, PasswordResetRequestView, PasswordResetConfirmView
 )
 
 router = DefaultRouter()
@@ -19,6 +19,9 @@ urlpatterns = [
     path('refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('logout/', UserLogoutView.as_view(), name='user_logout'),
+    # Password reset
+    path('password/reset/', PasswordResetRequestView.as_view(), name='password_reset_request'),
+    path('password/reset/confirm/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     
     # User Profile
     path('profile/', UserProfileView.as_view(), name='user_profile'),

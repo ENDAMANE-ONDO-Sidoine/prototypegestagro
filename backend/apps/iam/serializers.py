@@ -216,3 +216,13 @@ class PermissionSerializer(serializers.ModelSerializer):
         model = Permission
         fields = ['id', 'code', 'description', 'created_at']
         read_only_fields = ['id', 'created_at']
+
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    uid = serializers.CharField()
+    token = serializers.CharField()
+    new_password = serializers.CharField(write_only=True, validators=[validate_password])
