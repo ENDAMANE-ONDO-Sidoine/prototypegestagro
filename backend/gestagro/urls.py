@@ -5,7 +5,11 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from apps.core.docs_views import (
+    NoThrottleSpectacularAPIView,
+    NoThrottleSpectacularRedocView,
+    NoThrottleSpectacularSwaggerView
+)
 from apps.core.media_views import MinIOMediaView, MinIOStaticView
 from apps.core.docs_views import (
     docs_home, docs_concepts, docs_authentication, 
@@ -48,10 +52,10 @@ urlpatterns = [
     path("docs/performance/", docs_performance, name="docs-performance"),
     path("docs/glossary/", docs_glossary, name="docs-glossary"),
     
-    # API Documentation
-    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
-    path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
-    path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
+    # API Documentation (sans throttling)
+    path("api/schema/", NoThrottleSpectacularAPIView.as_view(), name="schema"),
+    path("api/docs/", NoThrottleSpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+    path("api/redoc/", NoThrottleSpectacularRedocView.as_view(url_name="schema"), name="redoc"),
     
     # API v1
     path("api/v1/", include("apps.core.urls")),
@@ -62,6 +66,7 @@ urlpatterns = [
     path("api/v1/transport/", include("apps.transport.urls")),
     path("api/v1/agronomy/", include("apps.agronomy.urls")),
     path("api/v1/payments/", include("apps.payments.urls")),
+    path("api/v1/", include("apps.notifications.urls")),
     
     # Redirections pour les pages acteurs (docs)
     path("docs/actor/<str:actor_slug>/", actor_endpoints_redirect, name="actor-endpoints-redirect"),

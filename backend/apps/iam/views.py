@@ -17,6 +17,9 @@ from .serializers import (
     OrganizationSerializer, MembershipSerializer, RoleSerializer, PermissionSerializer,
     PasswordResetRequestSerializer, PasswordResetConfirmSerializer
 )
+from apps.core.throttles import (
+    SignupThrottle, LoginThrottle, PasswordResetThrottle, EmailVerificationThrottle
+)
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
@@ -28,6 +31,8 @@ class CustomTokenObtainPairView(TokenObtainPairView):
     """
     Vue personnalisée pour l'obtention des tokens JWT
     """
+    throttle_classes = [LoginThrottle]
+    
     def post(self, request, *args, **kwargs):
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -47,6 +52,7 @@ class UserRegistrationView(APIView):
     Vue pour l'inscription d'un utilisateur
     """
     permission_classes = [permissions.AllowAny]
+    throttle_classes = [SignupThrottle]
 
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
@@ -231,6 +237,7 @@ def join_organization(request):
 
 class PasswordResetRequestView(APIView):
     permission_classes = [permissions.AllowAny]
+    throttle_classes = [PasswordResetThrottle]
 
     def post(self, request):
         serializer = PasswordResetRequestSerializer(data=request.data)
@@ -287,6 +294,7 @@ class PasswordResetConfirmView(APIView):
 
 class EmailVerificationRequestView(APIView):
     permission_classes = [AllowAny]
+    throttle_classes = [EmailVerificationThrottle]
 
     def post(self, request):
         email = request.data.get('email')

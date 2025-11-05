@@ -50,6 +50,7 @@ LOCAL_APPS = [
     'apps.transport',
     'apps.agronomy',
     'apps.payments',
+    'apps.notifications',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -192,13 +193,8 @@ REST_FRAMEWORK = {
         'rest_framework.filters.OrderingFilter',
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    # Throttling
-    'DEFAULT_THROTTLE_CLASSES': [
-        'apps.core.throttles.SignupThrottle',
-        'apps.core.throttles.LoginThrottle',
-        'apps.core.throttles.PasswordResetThrottle',
-        'apps.core.throttles.EmailVerificationThrottle',
-    ],
+    # Throttling - Les throttles spécifiques sont appliqués uniquement aux vues concernées
+    # Pas de DEFAULT_THROTTLE_CLASSES pour éviter d'appliquer le throttling à tous les endpoints
     'DEFAULT_THROTTLE_RATES': {
         'signup': config('THROTTLE_SIGNUP_RATE', default='5/hour'),
         'login': config('THROTTLE_LOGIN_RATE', default='10/hour'),

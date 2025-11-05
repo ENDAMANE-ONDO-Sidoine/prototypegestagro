@@ -6,6 +6,7 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.http import HttpResponse
 from django.conf import settings
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 
 def format_json(data):
@@ -1172,4 +1173,23 @@ def docs_glossary(request):
         'version': api_info['version'],
     }
     return render(request, 'docs/glossary.html', context)
+
+
+# Vues personnalisées pour la documentation API qui désactivent le throttling
+class NoThrottleSpectacularAPIView(SpectacularAPIView):
+    """Vue pour le schéma OpenAPI sans throttling"""
+    throttle_classes = []
+    throttle_scope = None
+
+
+class NoThrottleSpectacularRedocView(SpectacularRedocView):
+    """Vue pour Redoc sans throttling"""
+    throttle_classes = []
+    throttle_scope = None
+
+
+class NoThrottleSpectacularSwaggerView(SpectacularSwaggerView):
+    """Vue pour Swagger UI sans throttling"""
+    throttle_classes = []
+    throttle_scope = None
 
