@@ -45,10 +45,10 @@ class ShipmentTrackingInline(admin.TabularInline):
 @admin.register(Shipment)
 class ShipmentAdmin(admin.ModelAdmin):
     list_display = [
-        'tracking_number', 'order', 'status', 'priority', 'vehicle', 'driver',
+        'tracking_number', 'order', 'status', 'payment_status', 'priority', 'vehicle', 'driver',
         'scheduled_pickup_date', 'scheduled_delivery_date', 'transport_cost', 'created_at'
     ]
-    list_filter = ['status', 'priority', 'created_at']
+    list_filter = ['status', 'payment_status', 'priority', 'created_at']
     search_fields = ['tracking_number', 'order__order_number']
     ordering = ['-created_at']
     inlines = [ShipmentTrackingInline]

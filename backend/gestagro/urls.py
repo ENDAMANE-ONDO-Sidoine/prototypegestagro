@@ -61,6 +61,7 @@ urlpatterns = [
     path("api/v1/buyers/", include("apps.buyers.urls")),
     path("api/v1/transport/", include("apps.transport.urls")),
     path("api/v1/agronomy/", include("apps.agronomy.urls")),
+    path("api/v1/payments/", include("apps.payments.urls")),
     
     # Redirections pour les pages acteurs (docs)
     path("docs/actor/<str:actor_slug>/", actor_endpoints_redirect, name="actor-endpoints-redirect"),

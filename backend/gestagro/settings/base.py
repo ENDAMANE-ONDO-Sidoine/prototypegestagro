@@ -48,6 +48,7 @@ LOCAL_APPS = [
     'apps.buyers',
     'apps.transport',
     'apps.agronomy',
+    'apps.payments',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -354,3 +355,14 @@ DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@gestagro.ga')
 # MINIO_SECRET_KEY = config('MINIO_SECRET_KEY', default='minioadmin')
 # MINIO_BUCKET_NAME = config('MINIO_BUCKET_NAME', default='gestagro-storage')
 # MINIO_USE_SSL = config('MINIO_USE_SSL', default=False, cast=bool)
+
+# Payment Providers Configuration
+# Airtel Money
+AIRTEL_MONEY_API_KEY = config('AIRTEL_MONEY_API_KEY', default='')
+AIRTEL_MONEY_API_SECRET = config('AIRTEL_MONEY_API_SECRET', default='')
+AIRTEL_MONEY_SANDBOX = config('AIRTEL_MONEY_SANDBOX', default=True, cast=bool)
+
+# Moov Money
+MOOV_MONEY_API_KEY = config('MOOV_MONEY_API_KEY', default='')
+MOOV_MONEY_API_SECRET = config('MOOV_MONEY_API_SECRET', default='')
+MOOV_MONEY_SANDBOX = config('MOOV_MONEY_SANDBOX', default=True, cast=bool)

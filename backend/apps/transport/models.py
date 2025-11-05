@@ -276,6 +276,13 @@ class Shipment(models.Model):
         ('delayed', _('Delayed')),
     ]
 
+    PAYMENT_STATUS_CHOICES = [
+        ('pending', _('Pending')),
+        ('paid', _('Paid')),
+        ('failed', _('Failed')),
+        ('refunded', _('Refunded')),
+    ]
+
     PRIORITY_CHOICES = [
         ('low', _('Low')),
         ('normal', _('Normal')),
@@ -292,6 +299,7 @@ class Shipment(models.Model):
     # Informations de l'expédition
     tracking_number = models.CharField(_('tracking number'), max_length=100, unique=True)
     status = models.CharField(_('status'), max_length=20, choices=STATUS_CHOICES, default='pending')
+    payment_status = models.CharField(_('payment status'), max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending')
     priority = models.CharField(_('priority'), max_length=10, choices=PRIORITY_CHOICES, default='normal')
     
     # Dates importantes

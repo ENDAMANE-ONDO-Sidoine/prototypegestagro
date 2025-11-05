@@ -136,7 +136,7 @@ class ShipmentListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shipment
         fields = [
-            'id', 'tracking_number', 'order_number', 'status', 'priority',
+            'id', 'tracking_number', 'order_number', 'status', 'payment_status', 'priority',
             'route_name', 'vehicle_plate', 'driver_name', 'scheduled_pickup_date',
             'scheduled_delivery_date', 'actual_pickup_date', 'actual_delivery_date',
             'transport_cost', 'currency', 'is_delayed', 'progress_percentage',
@@ -160,7 +160,7 @@ class ShipmentDetailSerializer(serializers.ModelSerializer):
         model = Shipment
         fields = [
             'id', 'tracking_number', 'order', 'route', 'vehicle', 'driver',
-            'status', 'priority', 'scheduled_pickup_date', 'scheduled_delivery_date',
+            'status', 'payment_status', 'priority', 'scheduled_pickup_date', 'scheduled_delivery_date',
             'actual_pickup_date', 'actual_delivery_date', 'total_weight', 'total_volume',
             'transport_cost', 'currency', 'special_instructions', 'requires_signature',
             'requires_photo_proof', 'current_location', 'delivery_proof', 'notes',
