@@ -181,6 +181,46 @@
         </section>
 
         <section class="mb-12">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">7. Mot de passe oublié</h2>
+            <p class="text-gray-600 mb-4">
+                Démarrez un flux de réinitialisation de mot de passe en deux étapes: demande par email puis confirmation avec le token reçu.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Étape 1 — Demande de réinitialisation</h3>
+                    <div class="bg-gray-900 rounded-lg p-4 mb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <code class="text-green-400 text-sm break-all">POST {{ api_base_url }}auth/password/reset/</code>
+                            <span class="px-2 py-1 bg-blue-500 text-white text-xs rounded">POST</span>
+                        </div>
+                    </div>
+                    <h4 class="text-sm font-semibold text-gray-800 mb-2">Body:</h4>
+                    <pre class="bg-gray-50 border border-gray-200 rounded p-4 text-xs overflow-x-auto mb-4"><code>{
+  "email": "utilisateur@example.com"
+}</code></pre>
+                    <p class="text-xs text-gray-600">Si un compte existe, un email est envoyé avec un lien sécurisé (uid + token).</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Étape 2 — Confirmation</h3>
+                    <div class="bg-gray-900 rounded-lg p-4 mb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <code class="text-green-400 text-sm break-all">POST {{ api_base_url }}auth/password/reset/confirm/</code>
+                            <span class="px-2 py-1 bg-blue-500 text-white text-xs rounded">POST</span>
+                        </div>
+                    </div>
+                    <h4 class="text-sm font-semibold text-gray-800 mb-2">Body:</h4>
+                    <pre class="bg-gray-50 border border-gray-200 rounded p-4 text-xs overflow-x-auto mb-4"><code>{
+  "uid": "base64-user-id",
+  "token": "token-de-securite",
+  "new_password": "MotDePasseFort123!"
+}</code></pre>
+                    <p class="text-xs text-gray-600">Le mot de passe est mis à jour après vérification du token.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-12">
             <h2 class="text-2xl font-semibold text-gray-900 mb-4">Rôles Utilisateur</h2>
             <p class="text-gray-600 mb-4">
                 Chaque utilisateur a un rôle principal qui détermine ses permissions et accès aux fonctionnalités.
