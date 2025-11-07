@@ -234,10 +234,17 @@ SIMPLE_JWT = {
 }
 
 # CORS Configuration
-CORS_ALLOWED_ORIGINS = [
+_default_cors_origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://192.168.1.173:3000",
 ]
+
+CORS_ALLOWED_ORIGINS = config(
+    'CORS_ALLOWED_ORIGINS',
+    default=','.join(_default_cors_origins),
+    cast=lambda v: [origin.strip() for origin in v.split(',') if origin.strip()],
+)
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -366,7 +373,15 @@ EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+
+# Adresse expéditeur pour les emails transactionnels (reset password, vérification, notifications, etc.)
+# Cette adresse apparaîtra dans le champ "De:" des emails envoyés aux clients
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@gestagro.ga')
+
+# Adresses de support client (où les clients peuvent écrire pour obtenir de l'aide)
+# Ces adresses seront affichées dans les emails et sur le site web
+SUPPORT_EMAIL = config('SUPPORT_EMAIL', default='support@gestagro.ga')
+CONTACT_EMAIL = config('CONTACT_EMAIL', default='contact@gestagro.ga')
 
 # MinIO S3 Configuration (désactivé pour l'instant)
 # MINIO_ENDPOINT = config('MINIO_ENDPOINT', default='localhost:9000')

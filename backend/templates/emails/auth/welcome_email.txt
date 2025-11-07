@@ -1,0 +1,53 @@
+🌾 GESTAGRO - Plateforme Agricole du Gabon
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+BIENVENUE SUR GESTAGRO ! 👋
+
+Bonjour {{ user.first_name|default:user.username }},
+
+Nous sommes ravis de vous accueillir sur GestAgro, la plateforme qui connecte les acteurs du secteur agricole gabonais. Votre compte a été créé avec succès et vous pouvez dès maintenant commencer à utiliser nos services.
+
+🎯 POUR COMMENCER :
+
+• Complétez votre profil pour une meilleure expérience
+• Explorez les fonctionnalités adaptées à votre rôle
+• Connectez-vous avec d'autres acteurs du secteur agricole
+• Gérez vos commandes, stocks et productions en un seul endroit
+
+Votre rôle : {{ user_role|default:"Membre" }}
+Votre email : {{ user.email }}
+
+Accédez à votre tableau de bord :
+https://gestagro.ga/dashboard
+
+{% if verify_url %}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔐 IMPORTANT : VÉRIFICATION DE VOTRE EMAIL
+
+Pour sécuriser votre compte, veuillez vérifier votre adresse email en cliquant sur le lien ci-dessous :
+
+{{ verify_url }}
+
+⚠️ NOTE DE SÉCURITÉ :
+Ce lien de vérification expirera dans 24 heures. Si vous n'avez pas créé de compte, vous pouvez ignorer cet email.
+{% endif %}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Si vous avez des questions ou besoin d'assistance, n'hésitez pas à nous contacter. Notre équipe est là pour vous aider à tirer le meilleur parti de GestAgro.
+
+Bienvenue dans la communauté GestAgro ! 🌾
+
+— L'équipe GestAgro
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Besoin d'aide ? Contactez notre équipe : support@gestagro.ga
+
+GestAgro • Libreville, Gabon
+© {% now "Y" %} GestAgro. Tous droits réservés.
+
+Cet email vous a été envoyé automatiquement. Merci de ne pas y répondre directement.
+

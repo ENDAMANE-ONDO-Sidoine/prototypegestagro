@@ -32,7 +32,9 @@ STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 # CACHES est défini dans base.py avec les variables d'environnement
 
 # Email backend pour développement
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Par défaut, utilise console (affiche les emails dans le terminal)
+# Pour tester avec Gmail SMTP, définir EMAIL_BACKEND=smtp dans .env
+EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
 
 # CORS pour développement
 CORS_ALLOW_ALL_ORIGINS = True

@@ -1,47 +1,55 @@
-<!doctype html>
-<html lang="fr">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="x-ua-compatible" content="ie=edge" />
-    <title>Vérification email • GestAgro</title>
-  </head>
-  <body style="margin:0; padding:0; width:100% !important; background-color:#0b1f14;">
-    <div style="display:none; max-height:0; overflow:hidden; opacity:0; mso-hide:all;">Confirmez votre adresse email GestAgro.</div>
-    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#0b1f14;">
-      <tr>
-        <td align="center" style="padding:24px;">
-          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="640" style="width:100%; max-width:640px; background-color:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 8px 28px rgba(0,0,0,0.12);">
-            <tr>
-              <td style="background-color:#0f2d1d; padding:24px 28px; font-family:Arial,Helvetica,sans-serif; font-weight:700; font-size:18px; color:#ffffff;">GESTAGRO
-                <div style="font-weight:500; color:#a7f3d0; font-size:11px; margin-top:2px; letter-spacing:.6px;">Plateforme Agricole</div>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:28px;">
-                <h1 style="margin:0 0 8px 0; font-family:Arial,Helvetica,sans-serif; font-weight:700; font-size:22px; line-height:1.35; color:#0f172a;">Confirmez votre adresse email</h1>
-                <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:14px; line-height:1.7; color:#334155;">Bonjour <strong>{{ user.first_name|default:user.username }}</strong>,<br/>Merci de confirmer votre adresse email pour sécuriser votre compte GestAgro.</p>
-                <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:22px 0 8px 0;">
-                  <tr><td>
-                    <a href="{{ verify_url }}" target="_blank" style="display:inline-block; background:#16a34a; color:#ffffff; text-decoration:none; padding:12px 22px; border-radius:8px; font-family:Arial,Helvetica,sans-serif; font-weight:700; font-size:14px;">Vérifier mon email</a>
-                  </td></tr>
-                </table>
-                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:16px;">
-                  <tr><td style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:16px;">
-                    <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:13px; line-height:1.6; color:#0f172a;">Si le bouton ne fonctionne pas, copiez-collez ce lien dans votre navigateur :</p>
-                    <p style="margin:8px 0 0 0; font-family:Consolas,Monaco,monospace; font-size:12px; color:#0f766e; word-break:break-all;">{{ verify_url }}</p>
-                  </td></tr>
-                </table>
-                <p style="margin:22px 0 0 0; font-family:Arial,Helvetica,sans-serif; font-size:12px; color:#64748b;">Ce lien expirera automatiquement pour des raisons de sécurité.</p>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:20px 28px; background:#ffffff; border-top:1px solid #e5e7eb; font-family:Arial,Helvetica,sans-serif; font-size:12px; color:#6b7280;">&copy; {{ now|date:"Y" }} GestAgro. Tous droits réservés.</td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  </body>
-  </html>
+{% extends "emails/base_email.html" %}
 
+{% block email_title %}Vérification de votre email • GestAgro{% endblock %}
+
+{% block preheader %}Confirmez votre adresse email pour sécuriser votre compte GestAgro.{% endblock %}
+
+{% block email_content %}
+<h1 class="email-title">Vérifiez votre adresse email ✉️</h1>
+
+<p class="email-text">
+    Bonjour <strong>{{ user.first_name|default:user.username }}</strong>,
+</p>
+
+<p class="email-text">
+    Merci de vous être inscrit sur <strong>GestAgro</strong> ! Pour sécuriser votre compte et activer toutes les fonctionnalités, veuillez confirmer votre adresse email en cliquant sur le bouton ci-dessous.
+</p>
+
+<!-- CTA Button -->
+<div class="button-container">
+    <a href="{{ verify_url }}" class="button">Vérifier mon email</a>
+</div>
+
+<!-- Info Box with fallback link -->
+<div class="info-box">
+    <p class="info-box-text">
+        <strong>Le bouton ne fonctionne pas ?</strong><br>
+        Copiez et collez ce lien dans votre navigateur :
+    </p>
+    <p class="info-box-link">{{ verify_url }}</p>
+</div>
+
+<!-- Security Notice -->
+<div class="security-notice">
+    <p class="security-notice-text">
+        <strong>⏰ Important :</strong> Ce lien de vérification expirera dans 24 heures pour des raisons de sécurité. Si vous n'avez pas créé de compte GestAgro, vous pouvez ignorer cet email en toute sécurité.
+    </p>
+</div>
+
+<!-- Benefits Box -->
+<div class="info-box" style="background-color: #ecfdf5; border-left-color: #16a34a;">
+    <p class="info-box-text" style="color: #0f172a; margin-bottom: 12px;">
+        <strong>✅ Une fois votre email vérifié, vous pourrez :</strong>
+    </p>
+    <ul style="margin: 0; padding-left: 20px; color: #475569; font-size: 14px; line-height: 1.8;">
+        <li>Accéder à toutes les fonctionnalités de votre tableau de bord</li>
+        <li>Recevoir des notifications importantes par email</li>
+        <li>Réinitialiser votre mot de passe si nécessaire</li>
+        <li>Participer pleinement à la communauté GestAgro</li>
+    </ul>
+</div>
+
+<p class="email-text" style="margin-top: 24px;">
+    Si vous avez des questions, notre équipe de support est disponible pour vous aider.
+</p>
+{% endblock %}

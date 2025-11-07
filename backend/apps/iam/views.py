@@ -60,6 +60,41 @@ class UserRegistrationView(APIView):
             user = serializer.save()
             refresh = RefreshToken.for_user(user)
             
+            # Générer l'URL de vérification pour l'email de bienvenue
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            verify_token = default_token_generator.make_token(user)
+            verify_url = f"{request.scheme}://{request.get_host()}/verify-email?uid={uid}&token={verify_token}"
+            
+            # Récupérer le rôle de l'utilisateur depuis les données
+            user_role = request.data.get('user_role', 'Membre')
+            role_display = {
+                'farmer': 'Agriculteur',
+                'buyer': 'Acheteur',
+                'transporter': 'Transporteur',
+                'agronomist': 'Agronome',
+                'admin': 'Administrateur',
+            }.get(user_role, 'Membre')
+            
+            # Envoyer l'email de bienvenue
+            try:
+                EmailService.send_template_email(
+                    to_email=user.email,
+                    subject='Bienvenue sur GestAgro !',
+                    template_name='emails/auth/welcome_email.html',
+                    text_template_name='emails/auth/welcome_email.txt',
+                    context={
+                        'user': user,
+                        'user_role': role_display,
+                        'verify_url': verify_url,
+                    },
+                )
+            except Exception as e:
+                # Ne pas faire échouer l'inscription si l'email échoue
+                # On log l'erreur mais on continue
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"Erreur lors de l'envoi de l'email de bienvenue: {e}")
+            
             return Response({
                 'message': 'Utilisateur créé avec succès',
                 'refresh': str(refresh),

@@ -1,0 +1,73 @@
+{% extends "emails/base_email.html" %}
+
+{% block email_title %}Bienvenue sur GestAgro{% endblock %}
+
+{% block preheader %}Bienvenue ! Découvrez comment GestAgro peut transformer votre activité agricole.{% endblock %}
+
+{% block email_content %}
+<h1 class="email-title">Bienvenue sur GestAgro ! 👋</h1>
+
+<p class="email-text">
+    Bonjour <strong>{{ user.first_name|default:user.username }}</strong>,
+</p>
+
+<p class="email-text">
+    Nous sommes ravis de vous accueillir sur <strong>GestAgro</strong>, la plateforme qui connecte les acteurs du secteur agricole gabonais. Votre compte a été créé avec succès et vous pouvez dès maintenant commencer à utiliser nos services.
+</p>
+
+<!-- CTA Button -->
+<div class="button-container">
+    <a href="https://gestagro.ga/dashboard" class="button">Accéder à mon tableau de bord</a>
+</div>
+
+<!-- Info Box -->
+<div class="info-box">
+    <p class="info-box-text">
+        <strong>🎯 Pour commencer :</strong>
+    </p>
+    <ul style="margin: 12px 0 0 0; padding-left: 20px; color: #475569; font-size: 14px; line-height: 1.8;">
+        <li>Complétez votre profil pour une meilleure expérience</li>
+        <li>Explorez les fonctionnalités adaptées à votre rôle</li>
+        <li>Connectez-vous avec d'autres acteurs du secteur agricole</li>
+        <li>Gérez vos commandes, stocks et productions en un seul endroit</li>
+    </ul>
+</div>
+
+<p class="email-text">
+    <strong>Votre rôle :</strong> {{ user_role|default:"Membre" }}<br>
+    <strong>Votre email :</strong> {{ user.email }}
+</p>
+
+{% if verify_url %}
+<hr class="divider">
+
+<p class="email-text" style="margin-bottom: 16px;">
+    <strong>🔐 Important :</strong> Pour sécuriser votre compte, veuillez vérifier votre adresse email en cliquant sur le bouton ci-dessous.
+</p>
+
+<div class="button-container">
+    <a href="{{ verify_url }}" class="button" style="background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);">
+        Vérifier mon email
+    </a>
+</div>
+
+<div class="security-notice">
+    <p class="security-notice-text">
+        ⚠️ <strong>Note de sécurité :</strong> Ce lien de vérification expirera dans 24 heures. Si vous n'avez pas créé de compte, vous pouvez ignorer cet email.
+    </p>
+</div>
+{% endif %}
+
+<p class="email-text" style="margin-top: 32px;">
+    Si vous avez des questions ou besoin d'assistance, n'hésitez pas à nous contacter. Notre équipe est là pour vous aider à tirer le meilleur parti de GestAgro.
+</p>
+
+<p class="email-text">
+    Bienvenue dans la communauté GestAgro ! 🌾
+</p>
+
+<p class="email-text" style="margin-top: 24px; color: #64748b; font-size: 14px;">
+    — L'équipe GestAgro
+</p>
+{% endblock %}
+

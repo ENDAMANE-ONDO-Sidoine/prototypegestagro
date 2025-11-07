@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="x-apple-disable-message-reformatting">
+    <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no">
+    <meta name="color-scheme" content="light">
+    <meta name="supported-color-schemes" content="light">
+    <title>{% block email_title %}GestAgro{% endblock %}</title>
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    </noscript>
+    <![endif]-->
+    <style>
+        /* Reset & Base Styles */
+        * {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background-color: #f3f4f6;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        table {
+            border-collapse: collapse;
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+        img {
+            border: 0;
+            height: auto;
+            line-height: 100%;
+            outline: none;
+            text-decoration: none;
+            -ms-interpolation-mode: bicubic;
+        }
+        /* Preheader */
+        .preheader {
+            display: none !important;
+            visibility: hidden;
+            opacity: 0;
+            color: transparent;
+            height: 0;
+            width: 0;
+        }
+        /* Main Container */
+        .email-wrapper {
+            width: 100%;
+            background-color: #f3f4f6;
+            padding: 40px 20px;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        /* Header */
+        .email-header {
+            background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
+            padding: 32px 40px;
+            text-align: center;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 1px;
+            margin: 0;
+            text-decoration: none;
+        }
+        .logo-tagline {
+            font-size: 12px;
+            color: #a7f3d0;
+            margin-top: 4px;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+        /* Content */
+        .email-content {
+            padding: 48px 40px;
+        }
+        .email-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0 0 16px 0;
+            line-height: 1.3;
+        }
+        .email-text {
+            font-size: 16px;
+            line-height: 1.7;
+            color: #475569;
+            margin: 0 0 24px 0;
+        }
+        .email-text strong {
+            color: #0f172a;
+            font-weight: 600;
+        }
+        /* Button */
+        .button-container {
+            margin: 32px 0;
+            text-align: center;
+        }
+        .button {
+            display: inline-block;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1.5;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .button:hover {
+            background: linear-gradient(135deg, #15803d 0%, #16a34a 100%);
+        }
+        /* Info Box */
+        .info-box {
+            background-color: #f8fafc;
+            border-left: 4px solid #16a34a;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+        .info-box-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #0f172a;
+            margin: 0 0 12px 0;
+        }
+        .info-box-link {
+            font-family: 'Courier New', Consolas, Monaco, monospace;
+            font-size: 13px;
+            color: #0f766e;
+            word-break: break-all;
+            margin: 0;
+        }
+        /* Divider */
+        .divider {
+            height: 1px;
+            background-color: #e2e8f0;
+            margin: 32px 0;
+            border: none;
+        }
+        /* Footer */
+        .email-footer {
+            background-color: #f8fafc;
+            padding: 32px 40px;
+            border-top: 1px solid #e2e8f0;
+        }
+        .footer-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #64748b;
+            margin: 0 0 12px 0;
+            text-align: center;
+        }
+        .footer-link {
+            color: #16a34a;
+            text-decoration: none;
+        }
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+        .footer-copyright {
+            font-size: 12px;
+            color: #94a3b8;
+            text-align: center;
+            margin: 24px 0 0 0;
+        }
+        .footer-company {
+            font-size: 13px;
+            color: #64748b;
+            text-align: center;
+            margin: 8px 0;
+            font-weight: 500;
+        }
+        /* Security Notice */
+        .security-notice {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 24px 0;
+        }
+        .security-notice-text {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #92400e;
+            margin: 0;
+        }
+        /* Responsive */
+        @media only screen and (max-width: 600px) {
+            .email-wrapper {
+                padding: 20px 12px;
+            }
+            .email-header,
+            .email-content,
+            .email-footer {
+                padding: 32px 24px !important;
+            }
+            .email-title {
+                font-size: 24px !important;
+            }
+            .email-text {
+                font-size: 15px !important;
+            }
+            .button {
+                padding: 14px 28px !important;
+                font-size: 15px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Preheader Text -->
+    <div class="preheader" style="display: none !important; visibility: hidden; opacity: 0; color: transparent; height: 0; width: 0;">
+        {% block preheader %}{% endblock %}
+    </div>
+
+    <!-- Email Wrapper -->
+    <div class="email-wrapper">
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+            <tr>
+                <td align="center">
+                    <!-- Email Container -->
+                    <table class="email-container" role="presentation" cellspacing="0" cellpadding="0" border="0" width="600">
+                        <!-- Header -->
+                        <tr>
+                            <td class="email-header">
+                                <h1 class="logo">🌾 GESTAGRO</h1>
+                                <div class="logo-tagline">Plateforme Agricole du Gabon</div>
+                            </td>
+                        </tr>
+
+                        <!-- Content -->
+                        <tr>
+                            <td class="email-content">
+                                {% block email_content %}{% endblock %}
+                            </td>
+                        </tr>
+
+                        <!-- Footer -->
+                        <tr>
+                            <td class="email-footer">
+                                <p class="footer-text">
+                                    Besoin d'aide ? Contactez notre équipe :<br>
+                                    <a href="mailto:support@gestagro.ga" class="footer-link">support@gestagro.ga</a>
+                                </p>
+                                <p class="footer-company">GestAgro • Libreville, Gabon</p>
+                                <p class="footer-copyright">
+                                    &copy; {% now "Y" %} GestAgro. Tous droits réservés.
+                                </p>
+                                <p class="footer-copyright" style="margin-top: 16px; font-size: 11px;">
+                                    Cet email vous a été envoyé automatiquement. Merci de ne pas y répondre directement.
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>
+
