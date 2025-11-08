@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from django.db.models import Count, Sum, Avg
+from django.db.models import Count, Sum, Avg, Q
 from apps.core.permissions import IsFarmerOrAdmin, IsOwnerOrAdmin
 from .models import Category, Product, ProductImage, FarmerProfile, ProductReview
 from .serializers import (
@@ -16,9 +16,17 @@ class CategoryListView(generics.ListCreateAPIView):
     """
     Liste et création des catégories de produits
     """
-    queryset = Category.objects.filter(is_active=True)
     serializer_class = CategorySerializer
     permission_classes = [IsFarmerOrAdmin]
+
+    def get_queryset(self):
+        queryset = Category.objects.filter(is_active=True)
+        product_type = self.request.query_params.get('product_type')
+        if product_type in ['crop', 'livestock', 'fishery']:
+            queryset = queryset.filter(
+                Q(product_type=product_type) | Q(product_type='mixed')
+            )
+        return queryset
 
     def perform_create(self, serializer):
         # Les agriculteurs peuvent créer des catégories
@@ -49,7 +57,11 @@ class ProductListView(generics.ListCreateAPIView):
     def get_queryset(self):
         # Filtrer par organisation de l'utilisateur
         user_organizations = self.request.user.memberships.values_list('organization', flat=True)
-        return Product.objects.filter(organization__in=user_organizations)
+        queryset = Product.objects.filter(organization__in=user_organizations)
+        product_type = self.request.query_params.get('product_type')
+        if product_type in ['crop', 'livestock', 'fishery']:
+            queryset = queryset.filter(product_type=product_type)
+        return queryset
 
     def perform_create(self, serializer):
         # Récupérer l'organisation de l'utilisateur
@@ -227,6 +239,12 @@ def farmer_products_stats(request):
     quality_stats = products.values('quality_grade').annotate(
         count=Count('id')
     )
+
+    # Statistiques par type de produit
+    type_stats = products.values('product_type').annotate(
+        count=Count('id'),
+        total_stock=Sum('stock_quantity')
+    )
     
     # Top 5 des produits les plus vendus
     from apps.buyers.models import OrderItem
@@ -243,4 +261,5 @@ def farmer_products_stats(request):
         'by_category': list(category_stats),
         'by_quality': list(quality_stats),
         'top_products': list(top_products),
+        'by_type': list(type_stats),
     })

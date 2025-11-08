@@ -4,8 +4,8 @@ from .models import Category, Product, ProductImage, FarmerProfile, ProductRevie
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ['name', 'parent', 'is_active', 'created_at']
-    list_filter = ['is_active', 'parent', 'created_at']
+    list_display = ['name', 'parent', 'product_type', 'is_active', 'created_at']
+    list_filter = ['product_type', 'is_active', 'parent', 'created_at']
     search_fields = ['name', 'description']
     readonly_fields = ['created_at', 'updated_at']
 
@@ -17,21 +17,28 @@ class ProductImageInline(admin.TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'sku', 'organization', 'category', 'price', 'currency', 'stock_quantity', 'status', 'created_at']
-    list_filter = ['status', 'quality_grade', 'organic_certified', 'category', 'organization', 'created_at']
+    list_display = ['name', 'sku', 'product_type', 'organization', 'category', 'price', 'currency', 'stock_quantity', 'status', 'created_at']
+    list_filter = ['product_type', 'status', 'quality_grade', 'organic_certified', 'category', 'organization', 'created_at']
     search_fields = ['name', 'sku', 'description']
     readonly_fields = ['created_at', 'updated_at']
     inlines = [ProductImageInline]
     
     fieldsets = (
         ('Informations de base', {
-            'fields': ('name', 'description', 'sku', 'organization', 'category', 'created_by')
+            'fields': ('name', 'description', 'sku', 'product_type', 'organization', 'category', 'created_by')
         }),
         ('Prix et stock', {
             'fields': ('price', 'currency', 'unit', 'stock_quantity', 'min_order_quantity', 'max_order_quantity')
         }),
         ('Qualité et statut', {
             'fields': ('quality_grade', 'status', 'organic_certified')
+        }),
+        ('Informations animales', {
+            'fields': (
+                'animal_species', 'animal_breed', 'animal_age', 'animal_age_unit',
+                'rearing_method', 'feeding_type', 'health_status', 'processing_type',
+                'slaughter_date', 'storage_temperature', 'animals_per_lot'
+            )
         }),
         ('Informations de production', {
             'fields': ('harvest_date', 'expiry_date', 'origin_country', 'weight', 'dimensions')

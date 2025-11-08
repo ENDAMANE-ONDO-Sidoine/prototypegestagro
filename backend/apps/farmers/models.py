@@ -13,9 +13,17 @@ class Category(models.Model):
     """
     Modèle pour les catégories de produits
     """
+    PRODUCT_TYPE_CHOICES = [
+        ('crop', _('Produits végétaux')),
+        ('livestock', _('Produits animaux (élevage)')),
+        ('fishery', _('Produits animaux (pêche)')),
+        ('mixed', _('Mixte')),
+    ]
+
     name = models.CharField(_('name'), max_length=100, unique=True)
     description = models.TextField(_('description'), blank=True)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
+    product_type = models.CharField(_('product type'), max_length=20, choices=PRODUCT_TYPE_CHOICES, default='crop')
     is_active = models.BooleanField(_('active'), default=True)
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
@@ -34,6 +42,26 @@ class Product(models.Model):
     """
     Modèle pour les produits agricoles vendus par les agriculteurs
     """
+    PRODUCT_TYPE_CHOICES = [
+        ('crop', _('Produit végétal')),
+        ('livestock', _('Produit animal - élevage')),
+        ('fishery', _('Produit animal - pêche')),
+    ]
+
+    AGE_UNIT_CHOICES = [
+        ('day', _('Jour(s)')),
+        ('week', _('Semaine(s)')),
+        ('month', _('Mois')),
+        ('year', _('Année(s)')),
+    ]
+
+    PROCESSING_CHOICES = [
+        ('live', _('Vivant')),
+        ('fresh', _('Frais / abattu')),
+        ('frozen', _('Congelé')),
+        ('processed', _('Transformé')),
+    ]
+
     QUALITY_CHOICES = [
         ('premium', _('Premium')),
         ('standard', _('Standard')),
@@ -51,6 +79,7 @@ class Product(models.Model):
     name = models.CharField(_('name'), max_length=255)
     description = models.TextField(_('description'))
     sku = models.CharField(_('SKU'), max_length=100, unique=True)
+    product_type = models.CharField(_('product type'), max_length=20, choices=PRODUCT_TYPE_CHOICES, default='crop')
     
     # Relations
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='products')
@@ -74,6 +103,19 @@ class Product(models.Model):
     expiry_date = models.DateField(_('expiry date'), null=True, blank=True)
     origin_country = models.CharField(_('origin country'), max_length=100, default='Gabon')
     organic_certified = models.BooleanField(_('organic certified'), default=False)
+
+    # Informations spécifiques aux produits animaux
+    animal_species = models.CharField(_('animal species'), max_length=100, blank=True)
+    animal_breed = models.CharField(_('animal breed'), max_length=100, blank=True)
+    animal_age = models.DecimalField(_('animal age'), max_digits=5, decimal_places=2, null=True, blank=True, validators=[MinValueValidator(0)])
+    animal_age_unit = models.CharField(_('animal age unit'), max_length=10, choices=AGE_UNIT_CHOICES, default='month', blank=True)
+    rearing_method = models.CharField(_('rearing method'), max_length=120, blank=True)
+    feeding_type = models.CharField(_('feeding type'), max_length=120, blank=True)
+    health_status = models.CharField(_('health status'), max_length=120, blank=True)
+    processing_type = models.CharField(_('processing type'), max_length=20, choices=PROCESSING_CHOICES, blank=True)
+    slaughter_date = models.DateField(_('slaughter date'), null=True, blank=True)
+    storage_temperature = models.DecimalField(_('storage temperature (°C)'), max_digits=4, decimal_places=1, null=True, blank=True)
+    animals_per_lot = models.PositiveIntegerField(_('animals per lot'), null=True, blank=True)
     
     # Caractéristiques physiques
     weight = models.DecimalField(_('weight'), max_digits=8, decimal_places=2, null=True, blank=True)
