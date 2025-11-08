@@ -2,7 +2,7 @@
 Configuration pour Django Admin Développement
 Fonctionnalités avancées pour le développement
 """
-from .render_local import *
+from .development import *
 
 # Configuration spécifique au développement
 DEBUG = True
@@ -13,17 +13,20 @@ ADMIN_SITE_TITLE = "GestAgro Dev"
 ADMIN_INDEX_TITLE = "Interface de Développement"
 
 # Fonctionnalités de développement
+# Ajout des outils de développement s'ils sont disponibles
 INSTALLED_APPS += [
     'django_extensions',
-    'debug_toolbar',
 ]
 
-MIDDLEWARE += [
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
-]
+try:
+    import debug_toolbar  # type: ignore
 
-# Configuration Debug Toolbar
-INTERNAL_IPS = ['127.0.0.1', 'localhost']
+    INSTALLED_APPS += ['debug_toolbar']
+    MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
+    INTERNAL_IPS = ['127.0.0.1', 'localhost']
+except ImportError:
+    # Debug Toolbar non installée dans l'environnement actuel
+    pass
 
 # Logging avancé pour développement
 LOGGING = {
