@@ -1,6 +1,6 @@
 from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.db.models import Count, Sum, Avg, Q
@@ -263,3 +263,75 @@ def farmer_products_stats(request):
         'top_products': list(top_products),
         'by_type': list(type_stats),
     })
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def farmer_meta(request):
+    """
+    Renvoie les listes de référence pour faciliter les formulaires côté frontend (produits & catégories).
+    """
+
+    def _choices_to_list(choices):
+        return [
+            {
+                'valeur': value,
+                'libelle': str(label),
+            }
+            for value, label in choices
+        ]
+
+    # Types de produit possibles
+    types_produit = _choices_to_list(Product.PRODUCT_TYPE_CHOICES)
+
+    # Classes de qualité reconnues
+    classes_qualite = _choices_to_list(Product.QUALITY_CHOICES)
+
+    # Types de transformation (produits animaux)
+    types_transformation = _choices_to_list(Product.PROCESSING_CHOICES)
+
+    # Unités d'âge pour les animaux
+    unites_age = _choices_to_list(Product.AGE_UNIT_CHOICES)
+
+    # Statuts que l'utilisateur peut sélectionner volontairement
+    etats_produit = _choices_to_list(Product.STATUS_CHOICES)
+
+    # Catégories actives
+    categories_queryset = Category.objects.filter(is_active=True).order_by('name')
+    categories = [
+        {
+            'id': categorie.id,
+            'nom': categorie.name,
+            'description': categorie.description,
+            'typeProduit': categorie.product_type,
+            'typeProduitLibelle': categorie.get_product_type_display(),
+            'parentId': categorie.parent_id,
+        }
+        for categorie in categories_queryset
+    ]
+
+    # Organisations accessibles pour l'utilisateur connecté (si présent)
+    organisations = []
+    user = request.user if request.user.is_authenticated else None
+    if user and hasattr(user, 'memberships'):
+        organisations = [
+            {
+                'id': membership.organization.id,
+                'nom': membership.organization.name,
+                'role': membership.role,
+                'roleLibelle': membership.get_role_display(),
+            }
+            for membership in user.memberships.filter(status='active').select_related('organization')
+        ]
+
+    payload = {
+        'typesProduit': types_produit,
+        'classesQualite': classes_qualite,
+        'typesTransformation': types_transformation,
+        'unitesAgeAnimal': unites_age,
+        'etatsProduit': etats_produit,
+        'categories': categories,
+        'organisationsDisponibles': organisations,
+        'message': 'Référentiels agriculteur chargés avec succès.',
+    }
+    return Response(payload)

@@ -4,11 +4,11 @@ Vues pour l'application payments
 import logging
 from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from django.utils import timezone
 
-from .models import Payment, WebhookEvent
+from .models import Payment, WebhookEvent, PaymentAttempt
 from .serializers import (
     PaymentSerializer,
     CreatePaymentSerializer,
@@ -17,6 +17,7 @@ from .serializers import (
 from .services import PaymentService, PaymentProviderError
 from apps.core.permissions import IsBuyerOrAdmin, IsFarmerOrAdmin
 from .permissions import CanCreatePayment
+from django.utils.translation import gettext as _
 
 logger = logging.getLogger(__name__)
 
@@ -191,3 +192,83 @@ class WebhookEventListView(generics.ListAPIView):
         return WebhookEvent.objects.filter(
             payment__payer=self.request.user
         ).select_related('payment').order_by('-received_at')
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def payments_meta(request):
+    """
+    Renvoie les listes de référence utiles aux expériences de paiement côté utilisateur.
+    """
+
+    def _choices_to_list(choices):
+        return [
+            {
+                'valeur': valeur,
+                'libelle': str(libelle),
+            }
+            for valeur, libelle in choices
+        ]
+
+    # Type de paiement (commande, expédition)
+    types_paiement = _choices_to_list(Payment.PAYMENT_TYPE_CHOICES)
+
+    # Providers disponibles
+    fournisseurs = _choices_to_list(Payment.PROVIDER_CHOICES)
+
+    # Statuts de paiement (pour affichage / filtres)
+    statuts_paiement = _choices_to_list(Payment.STATUS_CHOICES)
+
+    # Statuts des tentatives
+    statuts_tentative = _choices_to_list(PaymentAttempt.STATUS_CHOICES)
+
+    # Transactions liées (commandes / expéditions) si l'utilisateur est connecté
+    transactions = []
+    user = request.user if request.user.is_authenticated else None
+    if user:
+        from apps.buyers.models import Order
+        from apps.transport.models import Shipment
+
+        commandes = Order.objects.filter(buyer=user).values('id', 'order_number', 'status', 'total_amount', 'currency')
+        expeditions = Shipment.objects.filter(order__buyer=user).values('id', 'tracking_number', 'status', 'transport_cost', 'currency')
+
+        transactions.extend([
+            {
+                'type': 'commande',
+                'id': c['id'],
+                'reference': c['order_number'],
+                'status': c['status'],
+                'montant': c['total_amount'],
+                'devise': c['currency'],
+            }
+            for c in commandes
+        ])
+
+        transactions.extend([
+            {
+                'type': 'expedition',
+                'id': e['id'],
+                'reference': e['tracking_number'],
+                'status': e['status'],
+                'montant': e['transport_cost'],
+                'devise': e['currency'],
+            }
+            for e in expeditions
+        ])
+
+    payload = {
+        'typesPaiement': types_paiement,
+        'fournisseursPaiement': [
+            {
+                'valeur': valeur,
+                'libelle': str(libelle),
+                'exposeAuClient': valeur in ['airtel_money', 'moov_money']
+            }
+            for valeur, libelle in Payment.PROVIDER_CHOICES
+        ],
+        'statutsPaiement': statuts_paiement,
+        'statutsTentative': statuts_tentative,
+        'transactionsDisponibles': transactions,
+        'message': _('Référentiels paiement chargés avec succès.'),
+    }
+    return Response(payload)

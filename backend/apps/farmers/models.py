@@ -63,9 +63,9 @@ class Product(models.Model):
     ]
 
     QUALITY_CHOICES = [
-        ('premium', _('Premium')),
-        ('standard', _('Standard')),
-        ('economy', _('Economy')),
+        ('extra', _('Qualité Extra')),
+        ('class_i', _('Classe I')),
+        ('class_ii', _('Classe II')),
     ]
 
     STATUS_CHOICES = [

@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     CategoryListView, CategoryDetailView, ProductListView, ProductDetailView, ProductImageUploadView,
     FarmerProfileView, ProductReviewListView, ProductReviewDetailView,
-    farmer_dashboard_stats, farmer_products_stats
+    farmer_dashboard_stats, farmer_products_stats, farmer_meta
 )
 
 router = DefaultRouter()
@@ -28,4 +28,7 @@ urlpatterns = [
     # Statistiques
     path('dashboard/stats/', farmer_dashboard_stats, name='farmer_dashboard_stats'),
     path('products/stats/', farmer_products_stats, name='farmer_products_stats'),
+
+    # Métadonnées / listes de référence
+    path('meta/', farmer_meta, name='farmer_meta'),
 ]

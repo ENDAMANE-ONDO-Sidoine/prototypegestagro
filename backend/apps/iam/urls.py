@@ -7,7 +7,8 @@ from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 from .views import (
     CustomTokenObtainPairView, UserRegistrationView, UserProfileView,
     UserLogoutView, MembershipListView, MembershipDetailView, RoleListView, PermissionListView,
-    user_organizations, join_organization, PasswordResetRequestView, PasswordResetConfirmView,
+    user_organizations, join_organization, auth_meta,
+    PasswordResetRequestView, PasswordResetConfirmView,
     EmailVerificationRequestView, EmailVerificationConfirmView
 )
 
@@ -31,6 +32,7 @@ urlpatterns = [
     path('profile/', UserProfileView.as_view(), name='user_profile'),
     path('my-organizations/', user_organizations, name='user_organizations'),
     path('join-organization/', join_organization, name='join_organization'),
+    path('meta/', auth_meta, name='auth_meta'),
     
     # Organizations (déplacées vers apps.organizations)
     # Les organisations sont maintenant gérées dans /api/v1/organizations/

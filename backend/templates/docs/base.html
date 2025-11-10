@@ -121,6 +121,37 @@
         .dark .from-green-50 { --tw-gradient-from: rgba(16,185,129,0.10) !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(16,185,129,0)); }
         .dark .to-blue-50 { --tw-gradient-to: rgba(59,130,246,0.10) !important; }
 
+        /* Custom scrollbars */
+        .scroll-thin {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(148, 163, 184, 0.6) transparent;
+        }
+        .scroll-thin::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .scroll-thin::-webkit-scrollbar-track {
+            background: transparent;
+            border-radius: 8px;
+        }
+        .scroll-thin::-webkit-scrollbar-thumb {
+            background-color: rgba(148, 163, 184, 0.6);
+            border-radius: 8px;
+        }
+        .scroll-thin::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(148, 163, 184, 0.8);
+        }
+        .dark .scroll-thin {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(226, 232, 240, 0.35) transparent;
+        }
+        .dark .scroll-thin::-webkit-scrollbar-thumb {
+            background-color: rgba(226, 232, 240, 0.35);
+        }
+        .dark .scroll-thin::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(226, 232, 240, 0.55);
+        }
+
         /* Ensure text inside cards remains readable */
         .dark .rounded-lg, .dark .p-6, .dark .p-8 { color: #e5e7eb; }
         .dark .bg-white .text-gray-600 { color: #cbd5e1 !important; }
@@ -164,6 +195,9 @@
                         </a>
                         <a href="{% url 'docs-examples' %}" class="{% if 'docs-examples' in request.resolver_match|safe_url_name %}bg-green-600 text-white{% else %}bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600{% endif %} px-4 py-2 rounded-md font-medium transition-colors duration-200 flex items-center justify-center min-h-[38px]">
                             Exemples
+                        </a>
+                        <a href="{% url 'docs-frontend-demo' %}" class="{% if request.resolver_match|safe_url_name == 'docs-frontend-demo' %}bg-green-600 text-white{% else %}bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600{% endif %} px-4 py-2 rounded-md font-medium transition-colors duration-200 flex items-center justify-center min-h-[38px]">
+                            Démos&nbsp;Next.js
                         </a>
                         <a href="{% url 'docs-reference' %}" class="{% if request.resolver_match|safe_url_name == 'docs-reference' %}bg-green-600 text-white{% else %}bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600{% endif %} px-4 py-2 rounded-md font-medium transition-colors duration-200 flex items-center justify-center min-h-[38px]">
                             Référence
@@ -219,6 +253,7 @@
                     <li><a href="{% url 'docs-quickstart' %}" class="block py-1 text-gray-700 hover:text-green-600"><i class="fas fa-rocket mr-2"></i>Démarrage rapide</a></li>
                     <li><a href="{% url 'docs-concepts' %}" class="block py-1 text-gray-700 hover:text-green-600"><i class="fas fa-book mr-2"></i>Concepts</a></li>
                     <li><a href="{% url 'docs-examples' %}" class="block py-1 text-gray-700 hover:text-green-600"><i class="fas fa-code mr-2"></i>Exemples</a></li>
+                    <li><a href="{% url 'docs-frontend-demo' %}" class="block py-1 text-gray-700 hover:text-green-600"><i class="fas fa-laptop-code mr-2"></i>Démos Next.js</a></li>
                     <li><a href="{% url 'docs-reference' %}" class="block py-1 text-gray-700 hover:text-green-600"><i class="fas fa-file-code mr-2"></i>Référence API</a></li>
                     <li><a href="{% url 'docs-best-practices' %}" class="block py-1 text-gray-700 hover:text-green-600"><i class="fas fa-star mr-2"></i>Bonnes pratiques</a></li>
                     <li><a href="{% url 'docs-errors' %}" class="block py-1 text-gray-700 hover:text-green-600"><i class="fas fa-exclamation-triangle mr-2"></i>Gestion des erreurs</a></li>
@@ -249,13 +284,14 @@
                         <input id="docs-search" type="search" placeholder="Rechercher dans la doc..." 
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" autocomplete="off">
                     </div>
-                    <nav id="docs-sidebar-nav" class="bg-white rounded-lg shadow-sm p-4 max-h-[calc(100vh-120px)] overflow-y-auto pr-1 pb-24">
+                    <nav id="docs-sidebar-nav" class="bg-white rounded-lg shadow-sm p-4 max-h-[calc(100vh-120px)] overflow-y-auto scroll-thin pr-1 pb-24">
                         <h3 class="font-semibold text-gray-900 mb-3">Documentation</h3>
                         <ul class="space-y-2">
                             <li><a data-searchable="1" href="{% url 'docs-home' %}" class="{% if request.resolver_match|safe_url_name == 'docs-home' %}text-green-600 font-medium{% else %}text-gray-600 hover:text-green-600{% endif %} block py-1"><i class="fas fa-home mr-2"></i>Accueil</a></li>
                             <li><a data-searchable="1" href="{% url 'docs-quickstart' %}" class="{% if request.resolver_match|safe_url_name == 'docs-quickstart' %}text-green-600 font-medium{% else %}text-gray-600 hover:text-green-600{% endif %} block py-1"><i class="fas fa-rocket mr-2"></i>Démarrage rapide</a></li>
                             <li><a data-searchable="1" href="{% url 'docs-concepts' %}" class="{% if request.resolver_match|safe_url_name == 'docs-concepts' %}text-green-600 font-medium{% else %}text-gray-600 hover:text-green-600{% endif %} block py-1"><i class="fas fa-book mr-2"></i>Concepts</a></li>
                             <li><a data-searchable="1" href="{% url 'docs-authentication' %}" class="{% if request.resolver_match|safe_url_name == 'docs-authentication' %}text-green-600 font-medium{% else %}text-gray-600 hover:text-green-600{% endif %} block py-1"><i class="fas fa-lock mr-2"></i>Authentification</a></li>
+                            <li><a data-searchable="1" href="{% url 'docs-frontend-demo' %}" class="{% if request.resolver_match|safe_url_name == 'docs-frontend-demo' %}text-green-600 font-medium{% else %}text-gray-600 hover:text-green-600{% endif %} block py-1"><i class="fas fa-laptop-code mr-2"></i>Démos Next.js</a></li>
                             {# Accordéon Exemples #}
                             <li>
                                 <button id="examples-toggle" type="button" class="w-full flex items-center justify-between py-1 group {% if request.resolver_match|safe_url_name == 'docs-examples' or request.resolver_match|safe_url_name == 'docs-examples-actor' %}text-green-600 font-medium{% else %}text-gray-600 hover:text-green-600{% endif %}">

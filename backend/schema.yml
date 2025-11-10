@@ -8114,14 +8114,14 @@ components:
         * `out_of_stock` - Out of Stock
     QualityGradeEnum:
       enum:
-      - premium
-      - standard
-      - economy
+      - extra
+      - class_i
+      - class_ii
       type: string
       description: |-
-        * `premium` - Premium
-        * `standard` - Standard
-        * `economy` - Economy
+        * `extra` - Qualité Extra
+        * `class_i` - Classe I
+        * `class_ii` - Classe II
     RatingEnum:
       enum:
       - 1

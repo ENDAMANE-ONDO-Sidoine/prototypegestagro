@@ -13,7 +13,7 @@ from apps.core.docs_views import (
 from apps.core.media_views import MinIOMediaView, MinIOStaticView
 from apps.core.docs_views import (
     docs_home, docs_concepts, docs_authentication, 
-    docs_examples, docs_examples_actor,
+    docs_examples, docs_examples_actor, docs_frontend_demo,
     docs_quickstart, docs_reference, docs_errors, 
     docs_setup, docs_support, docs_best_practices,
     docs_webhooks, docs_rate_limiting, docs_security,
@@ -40,6 +40,7 @@ urlpatterns = [
     path("docs/authentication/", docs_authentication, name="docs-authentication"),
     path("docs/examples/", docs_examples, name="docs-examples"),
     path("docs/examples/<str:actor_slug>/", docs_examples_actor, name="docs-examples-actor"),
+    path("docs/frontend-demo/", docs_frontend_demo, name="docs-frontend-demo"),
     path("docs/reference/", docs_reference, name="docs-reference"),
     path("docs/errors/", docs_errors, name="docs-errors"),
     path("docs/setup/", docs_setup, name="docs-setup"),

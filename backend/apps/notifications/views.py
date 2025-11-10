@@ -60,3 +60,29 @@ class NotificationViewSet(viewsets.ModelViewSet):
         """Retourner le nombre de notifications non lues"""
         count = Notification.objects.filter(user=request.user, read_at__isnull=True).count()
         return Response({"unread_count": count})
+
+    @action(
+        detail=False,
+        methods=["get"],
+        permission_classes=[permissions.AllowAny],
+        url_path="meta",
+    )
+    def meta(self, request):
+        """Référentiels pour les formulaires de notification (type, canal, statut)"""
+
+        def _choices_to_list(choices):
+            return [
+                {
+                    "valeur": value,
+                    "libelle": label,
+                }
+                for value, label in choices
+            ]
+
+        payload = {
+            "typesNotification": _choices_to_list(Notification.TYPE_CHOICES),
+            "canauxNotification": _choices_to_list(NotificationChannel.CHANNEL_CHOICES),
+            "statutsCanal": _choices_to_list(NotificationChannel.STATUS_CHOICES),
+            "message": "Référentiels notifications chargés avec succès.",
+        }
+        return Response(payload)

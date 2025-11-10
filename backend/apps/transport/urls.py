@@ -10,7 +10,7 @@ from .views import (
     ShipmentListView, ShipmentDetailView, ShipmentTrackingView,
     TransportOfferListView, TransportOfferDetailView,
     TransporterProfileView,
-    transporter_dashboard_stats, available_vehicles, available_drivers
+    transporter_dashboard_stats, available_vehicles, available_drivers, transport_meta
 )
 
 router = DefaultRouter()
@@ -44,4 +44,7 @@ urlpatterns = [
     
     # Statistiques
     path('dashboard/stats/', transporter_dashboard_stats, name='transporter_dashboard_stats'),
+    
+    # Métadonnées / listes de référence
+    path('meta/', transport_meta, name='transport_meta'),
 ]

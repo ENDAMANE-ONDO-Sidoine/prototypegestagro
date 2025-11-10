@@ -25,6 +25,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from apps.core.services.email_service import EmailService
 from rest_framework.permissions import AllowAny
+from django.utils.translation import gettext as _
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -235,6 +236,64 @@ def user_organizations(request):
     organizations = [membership.organization for membership in memberships]
     serializer = OrganizationSerializer(organizations, many=True)
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def auth_meta(request):
+    """
+    Fournit les listes utiles au frontend pour les formulaires IAM / organisations
+    """
+    # Rôles d'adhésion (libellés déjà traduits via gettext_lazy)
+    membership_role_field = Membership._meta.get_field('role')
+    roles = [
+        {
+            'valeur': value,
+            'libelle': str(label),
+        }
+        for value, label in membership_role_field.choices
+    ]
+
+    # Types d'organisation
+    organization_type_field = Organization._meta.get_field('type')
+    organization_types = [
+        {
+            'valeur': value,
+            'libelle': str(label),
+        }
+        for value, label in organization_type_field.choices
+    ]
+
+    # Plans (tarifs) des organisations
+    organization_plan_field = Organization._meta.get_field('plan')
+    organization_plans = [
+        {
+            'valeur': value,
+            'libelle': str(label),
+        }
+        for value, label in organization_plan_field.choices
+    ]
+
+    # Organisations actives (limitées pour ne pas surcharger la réponse)
+    organisations_actives = [
+        {
+            'id': organisation.id,
+            'nom': organisation.name,
+            'type': organisation.get_type_display(),
+            'plan': organisation.get_plan_display(),
+            'pays': organisation.country,
+        }
+        for organisation in Organization.objects.filter(is_active=True).order_by('name')[:100]
+    ]
+
+    payload = {
+        'roles': roles,
+        'typesOrganisation': organization_types,
+        'plansOrganisation': organization_plans,
+        'organisations': organisations_actives,
+        'message': _('Listes de référence chargées avec succès.'),
+    }
+    return Response(payload)
 
 
 @api_view(['POST'])

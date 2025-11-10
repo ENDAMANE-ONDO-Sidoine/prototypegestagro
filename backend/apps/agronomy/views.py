@@ -1,7 +1,7 @@
 """
 Vues pour l'application agronomy
 """
-from rest_framework import status, generics, permissions, filters
+from rest_framework import status, generics, permissions, filters, serializers
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -9,6 +9,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q, Count, Sum, Avg
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.utils.translation import gettext as _
 from apps.core.permissions import IsAgronomistOrAdmin, IsOwnerOrAdmin
 from .models import (
     Field, Crop, FieldVisit, Diagnostic, Recommendation, WeatherAlert, AgronomistProfile
@@ -484,3 +485,171 @@ def active_weather_alerts(request):
     
     serializer = WeatherAlertSerializer(alerts, many=True)
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def agronomy_meta(request):
+    """
+    Fournit les référentiels nécessaires aux formulaires agronomes (select, dropdown, autocomplete).
+    """
+
+    def _choices_to_list(choices):
+        return [
+            {
+                'valeur': valeur,
+                'libelle': str(libelle),
+            }
+            for valeur, libelle in choices
+        ]
+
+    # Types de sols
+    types_sol = _choices_to_list(Field.SOIL_TYPES)
+
+    # Types d'irrigation
+    types_irrigation = _choices_to_list(Field.IRRIGATION_TYPES)
+
+    # Types de cultures
+    types_culture = _choices_to_list(Crop.CROP_TYPES)
+
+    # Saisons
+    saisons = _choices_to_list(Crop.SEASONS)
+
+    # Statuts de culture (pertinents pour la saisie)
+    statuts_culture = _choices_to_list([
+        ('planted', _('Plantée')),
+        ('growing', _('En croissance')),
+        ('flowering', _('Floraison')),
+        ('fruiting', _('Fructification')),
+        ('harvested', _('Récoltée')),
+        ('failed', _('Perdue')),
+    ])
+
+    # Types de visite
+    types_visite = _choices_to_list(FieldVisit.VISIT_TYPES)
+
+    # Types de diagnostic
+    types_diagnostic = _choices_to_list(Diagnostic.DIAGNOSTIC_TYPES)
+
+    # Niveaux de sévérité
+    severites = _choices_to_list(Diagnostic.SEVERITY_LEVELS)
+
+    # Types de recommandation
+    types_recommandation = _choices_to_list(Recommendation.RECOMMENDATION_TYPES)
+
+    # Priorités de recommandation
+    priorites_recommandation = _choices_to_list(Recommendation.PRIORITY_LEVELS)
+
+    # Types d'alerte météo
+    types_alerte = _choices_to_list(WeatherAlert.ALERT_TYPES)
+
+    # Severités d'alerte météo
+    severites_alerte = _choices_to_list(WeatherAlert.SEVERITY_LEVELS)
+
+    # Statuts d'alerte météo
+    statuts_alerte = _choices_to_list([
+        ('active', _('Active')),
+        ('expired', _('Expirée')),
+        ('cancelled', _('Annulée')),
+    ])
+
+    # Ressources liées disponibles pour l'utilisateur courant
+    champs_disponibles = []
+    cultures_disponibles = []
+    diagnostics_disponibles = []
+    recommandations_disponibles = []
+    user = request.user if request.user.is_authenticated else None
+
+    if user and hasattr(user, 'memberships'):
+        org_ids = list(user.memberships.filter(
+            status='active',
+            role__in=['admin', 'manager', 'member']
+        ).values_list('organization_id', flat=True))
+
+        if org_ids:
+            champs = Field.objects.filter(
+                organization_id__in=org_ids,
+                is_active=True
+            ).values('id', 'name', 'soil_type', 'irrigation_type', 'area_hectares')
+
+            cultures = Crop.objects.filter(
+                field__organization_id__in=org_ids
+            ).values('id', 'name', 'crop_type', 'season', 'status', 'field_id')
+
+            diagnostics = Diagnostic.objects.filter(
+                field__organization_id__in=org_ids
+            ).values('id', 'diagnostic_type', 'severity', 'status', 'field_id', 'crop_id')
+
+            recommandations = Recommendation.objects.filter(
+                field__organization_id__in=org_ids
+            ).values('id', 'title', 'recommendation_type', 'priority', 'status', 'field_id', 'crop_id')
+
+            champs_disponibles = [
+                {
+                    'id': f['id'],
+                    'nom': f['name'],
+                    'typeSol': f['soil_type'],
+                    'typeIrrigation': f['irrigation_type'],
+                    'superficieHectares': f['area_hectares'],
+                }
+                for f in champs
+            ]
+
+            cultures_disponibles = [
+                {
+                    'id': c['id'],
+                    'nom': c['name'],
+                    'typeCulture': c['crop_type'],
+                    'saison': c['season'],
+                    'etat': c['status'],
+                    'champId': c['field_id'],
+                }
+                for c in cultures
+            ]
+
+            diagnostics_disponibles = [
+                {
+                    'id': d['id'],
+                    'typeDiagnostic': d['diagnostic_type'],
+                    'severite': d['severity'],
+                    'etat': d['status'],
+                    'champId': d['field_id'],
+                    'cultureId': d['crop_id'],
+                }
+                for d in diagnostics
+            ]
+
+            recommandations_disponibles = [
+                {
+                    'id': r['id'],
+                    'titre': r['title'],
+                    'typeRecommandation': r['recommendation_type'],
+                    'priorite': r['priority'],
+                    'etat': r['status'],
+                    'champId': r['field_id'],
+                    'cultureId': r['crop_id'],
+                }
+                for r in recommandations
+            ]
+
+    payload = {
+        'typesSol': types_sol,
+        'typesIrrigation': types_irrigation,
+        'typesCulture': types_culture,
+        'saisons': saisons,
+        'statutsCulture': statuts_culture,
+        'typesVisite': types_visite,
+        'typesDiagnostic': types_diagnostic,
+        'niveauxSeverite': severites,
+        'typesRecommandation': types_recommandation,
+        'prioritesRecommandation': priorites_recommandation,
+        'typesAlerteMeteo': types_alerte,
+        'niveauxAlerteMeteo': severites_alerte,
+        'statutsAlerteMeteo': statuts_alerte,
+        'champsDisponibles': champs_disponibles,
+        'culturesDisponibles': cultures_disponibles,
+        'diagnosticsDisponibles': diagnostics_disponibles,
+        'recommandationsDisponibles': recommandations_disponibles,
+        'message': _('Référentiels agronomie chargés avec succès.'),
+    }
+    return Response(payload)

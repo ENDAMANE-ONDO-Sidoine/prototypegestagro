@@ -11,7 +11,7 @@ from .views import (
     RecommendationListView, RecommendationDetailView,
     WeatherAlertListView, WeatherAlertDetailView,
     AgronomistProfileView,
-    agronomist_dashboard_stats, field_yield_analysis, active_weather_alerts
+    agronomist_dashboard_stats, field_yield_analysis, active_weather_alerts, agronomy_meta
 )
 
 router = DefaultRouter()
@@ -48,4 +48,7 @@ urlpatterns = [
     
     # Statistiques
     path('dashboard/stats/', agronomist_dashboard_stats, name='agronomist_dashboard_stats'),
+    
+    # Métadonnées / listes de référence
+    path('meta/', agronomy_meta, name='agronomy_meta'),
 ]

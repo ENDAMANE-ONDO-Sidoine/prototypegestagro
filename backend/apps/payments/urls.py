@@ -10,6 +10,7 @@ urlpatterns = [
     # Paiements
     path('', views.PaymentListView.as_view(), name='payment-list'),
     path('<uuid:payment_id>/', views.PaymentDetailView.as_view(), name='payment-detail'),
+    path('meta/', views.payments_meta, name='payments-meta'),
     
     # Webhooks
     path('webhooks/<str:provider>/', views.webhook_handler, name='webhook-handler'),

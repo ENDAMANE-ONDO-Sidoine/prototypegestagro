@@ -1,7 +1,7 @@
 """
 Vues pour l'application transport
 """
-from rest_framework import status, generics, permissions, filters
+from rest_framework import status, generics, permissions, filters, serializers
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -9,6 +9,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q, Count, Sum
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.utils.translation import gettext as _
 from apps.core.permissions import IsTransporterOrAdmin, IsOwnerOrAdmin
 from .models import (
     Vehicle, Driver, Route, Shipment, ShipmentTracking, TransportOffer, TransporterProfile
@@ -468,3 +469,120 @@ def available_drivers(request):
     
     serializer = DriverSerializer(drivers, many=True)
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def transport_meta(request):
+    """
+    Renvoie les listes de référence pour les formulaires transport (select, dropdown, autocomplete).
+    """
+
+    def _choices_to_list(choices):
+        return [
+            {
+                'valeur': valeur,
+                'libelle': str(libelle),
+            }
+            for valeur, libelle in choices
+        ]
+
+    # Types de véhicule
+    types_vehicule = _choices_to_list(Vehicle.VEHICLE_TYPES)
+
+    # Statuts de véhicule
+    statuts_vehicule = _choices_to_list(Vehicle.STATUS_CHOICES)
+
+    # Types de permis
+    types_permis = _choices_to_list(Driver.LICENSE_TYPES)
+
+    # Statuts chauffeur
+    statuts_chauffeur = _choices_to_list(Driver.STATUS_CHOICES)
+
+    # Priorités d'expédition
+    priorites_expedition = _choices_to_list(Shipment.PRIORITY_CHOICES)
+
+    # Statuts expédition
+    statuts_expedition = _choices_to_list(Shipment.STATUS_CHOICES)
+
+    # Statuts paiement expédition
+    statuts_paiement = _choices_to_list(Shipment.PAYMENT_STATUS_CHOICES)
+
+    # Statuts offre transport
+    statuts_offre = _choices_to_list(TransportOffer.STATUS_CHOICES)
+
+    # Véhicules disponibles pour l'utilisateur courant
+    vehicules_disponibles = []
+    chauffeurs_disponibles = []
+    routes_disponibles = []
+    user = request.user if request.user.is_authenticated else None
+
+    if user and hasattr(user, 'memberships'):
+        org_ids = list(user.memberships.filter(
+            status='active',
+            role__in=['admin', 'manager', 'member']
+        ).values_list('organization_id', flat=True))
+
+        if org_ids:
+            vehicules = Vehicle.objects.filter(
+                organization_id__in=org_ids,
+                status='available'
+            ).values('id', 'license_plate', 'make', 'model', 'vehicle_type')
+
+            chauffeurs = Driver.objects.filter(
+                organization_id__in=org_ids,
+                status='available'
+            ).select_related('user').values('id', 'user__first_name', 'user__last_name', 'license_number', 'license_type')
+
+            routes = Route.objects.filter(
+                organization_id__in=org_ids,
+                is_active=True
+            ).values('id', 'name', 'origin_city', 'destination_city', 'required_vehicle_type')
+
+            vehicules_disponibles = [
+                {
+                    'id': v['id'],
+                    'immatriculation': v['license_plate'],
+                    'marque': v['make'],
+                    'modele': v['model'],
+                    'type': v['vehicle_type'],
+                }
+                for v in vehicules
+            ]
+
+            chauffeurs_disponibles = [
+                {
+                    'id': c['id'],
+                    'nomComplet': f"{c['user__first_name']} {c['user__last_name']}".strip(),
+                    'numeroPermis': c['license_number'],
+                    'typePermis': c['license_type'],
+                }
+                for c in chauffeurs
+            ]
+
+            routes_disponibles = [
+                {
+                    'id': r['id'],
+                    'nom': r['name'],
+                    'depart': r['origin_city'],
+                    'arrivee': r['destination_city'],
+                    'typeVehiculeRequis': r['required_vehicle_type'],
+                }
+                for r in routes
+            ]
+
+    payload = {
+        'typesVehicule': types_vehicule,
+        'statutsVehicule': statuts_vehicule,
+        'typesPermis': types_permis,
+        'statutsChauffeur': statuts_chauffeur,
+        'prioritesExpedition': priorites_expedition,
+        'statutsExpedition': statuts_expedition,
+        'statutsPaiementExpedition': statuts_paiement,
+        'statutsOffreTransport': statuts_offre,
+        'vehiculesDisponibles': vehicules_disponibles,
+        'chauffeursDisponibles': chauffeurs_disponibles,
+        'routesDisponibles': routes_disponibles,
+        'message': _('Référentiels transport chargés avec succès.'),
+    }
+    return Response(payload)
