@@ -83,7 +83,7 @@ class VehicleListView(generics.ListCreateAPIView):
         # Un transporteur ne peut voir que les véhicules de ses organisations
         user_orgs = self.request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'transporter']
         ).values_list('organization_id', flat=True)
         
         return Vehicle.objects.filter(organization_id__in=user_orgs)
@@ -92,7 +92,7 @@ class VehicleListView(generics.ListCreateAPIView):
         # Déterminer l'organisation de l'utilisateur
         user_orgs = self.request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'transporter']
         ).values_list('organization_id', flat=True)
         
         if not user_orgs:
@@ -112,7 +112,7 @@ class VehicleDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         user_orgs = self.request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'transporter']
         ).values_list('organization_id', flat=True)
         
         return Vehicle.objects.filter(organization_id__in=user_orgs)
@@ -135,7 +135,7 @@ class DriverListView(generics.ListCreateAPIView):
     def get_queryset(self):
         user_orgs = self.request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'transporter']
         ).values_list('organization_id', flat=True)
         
         return Driver.objects.filter(organization_id__in=user_orgs).select_related('user', 'organization')
@@ -143,7 +143,7 @@ class DriverListView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         user_orgs = self.request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'transporter']
         ).values_list('organization_id', flat=True)
         
         if not user_orgs:
@@ -163,7 +163,7 @@ class DriverDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         user_orgs = self.request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'transporter']
         ).values_list('organization_id', flat=True)
         
         return Driver.objects.filter(organization_id__in=user_orgs).select_related('user', 'organization')
@@ -186,7 +186,7 @@ class RouteListView(generics.ListCreateAPIView):
     def get_queryset(self):
         user_orgs = self.request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'transporter']
         ).values_list('organization_id', flat=True)
         
         return Route.objects.filter(organization_id__in=user_orgs)
@@ -194,7 +194,7 @@ class RouteListView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         user_orgs = self.request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'transporter']
         ).values_list('organization_id', flat=True)
         
         if not user_orgs:
@@ -214,7 +214,7 @@ class RouteDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         user_orgs = self.request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'transporter']
         ).values_list('organization_id', flat=True)
         
         return Route.objects.filter(organization_id__in=user_orgs)
@@ -241,7 +241,7 @@ class ShipmentListView(generics.ListCreateAPIView):
     def get_queryset(self):
         user_orgs = self.request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'transporter']
         ).values_list('organization_id', flat=True)
         
         return Shipment.objects.filter(
@@ -264,7 +264,7 @@ class ShipmentDetailView(generics.RetrieveUpdateAPIView):
     def get_queryset(self):
         user_orgs = self.request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'transporter']
         ).values_list('organization_id', flat=True)
         
         return Shipment.objects.filter(
@@ -291,7 +291,7 @@ class ShipmentTrackingView(APIView):
         # Vérifier que l'utilisateur peut modifier cette expédition
         user_orgs = request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'transporter']
         ).values_list('organization_id', flat=True)
         
         can_modify = (
@@ -333,7 +333,7 @@ class TransportOfferListView(generics.ListCreateAPIView):
     def get_queryset(self):
         user_orgs = self.request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'transporter']
         ).values_list('organization_id', flat=True)
         
         return TransportOffer.objects.filter(transporter_id__in=user_orgs).select_related(
@@ -343,7 +343,7 @@ class TransportOfferListView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         user_orgs = self.request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'transporter']
         ).values_list('organization_id', flat=True)
         
         if not user_orgs:
@@ -363,7 +363,7 @@ class TransportOfferDetailView(generics.RetrieveUpdateAPIView):
     def get_queryset(self):
         user_orgs = self.request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'transporter']
         ).values_list('organization_id', flat=True)
         
         return TransportOffer.objects.filter(transporter_id__in=user_orgs).select_related(
@@ -381,7 +381,7 @@ def transporter_dashboard_stats(request):
     """
     user_orgs = request.user.memberships.filter(
         status='active',
-        role__in=['admin', 'manager', 'member']
+        role__in=['admin', 'manager', 'member', 'transporter']
     ).values_list('organization_id', flat=True)
     
     if not user_orgs:
@@ -439,7 +439,7 @@ def available_vehicles(request):
     """
     user_orgs = request.user.memberships.filter(
         status='active',
-        role__in=['admin', 'manager', 'member']
+        role__in=['admin', 'manager', 'member', 'transporter']
     ).values_list('organization_id', flat=True)
     
     vehicles = Vehicle.objects.filter(
@@ -459,7 +459,7 @@ def available_drivers(request):
     """
     user_orgs = request.user.memberships.filter(
         status='active',
-        role__in=['admin', 'manager', 'member']
+        role__in=['admin', 'manager', 'member', 'transporter']
     ).values_list('organization_id', flat=True)
     
     drivers = Driver.objects.filter(
@@ -520,7 +520,7 @@ def transport_meta(request):
     if user and hasattr(user, 'memberships'):
         org_ids = list(user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'transporter']
         ).values_list('organization_id', flat=True))
 
         if org_ids:

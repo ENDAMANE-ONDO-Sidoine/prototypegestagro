@@ -78,11 +78,17 @@ WHITENOISE_AUTOREFRESH = False  # Désactivé en production
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Configuration CORS
-CORS_ALLOWED_ORIGINS = [
+# Configuration CORS (prend la valeur définie dans base.py, mais permet un fallback spécifique prod)
+_fallback_cors = [
     "https://votre-frontend.onrender.com",
     "http://localhost:3000",
 ]
+
+cors_env = config('CORS_ALLOWED_ORIGINS', default=None)
+if cors_env:
+    CORS_ALLOWED_ORIGINS = [origin.strip() for origin in cors_env.split(',') if origin.strip()]
+else:
+    CORS_ALLOWED_ORIGINS = _fallback_cors
 
 # Configuration JWT
 SIMPLE_JWT = {

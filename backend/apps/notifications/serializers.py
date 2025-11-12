@@ -51,6 +51,7 @@ class NotificationCreateSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
+        validated_data.pop("user", None)
         send_email_to = validated_data.pop("send_email_to", None)
         webhook_url = validated_data.pop("webhook_url", None)
         user = self.context["request"].user

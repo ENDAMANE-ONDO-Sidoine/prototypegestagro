@@ -82,7 +82,7 @@ class FieldListView(generics.ListCreateAPIView):
         # Un agronome peut voir les champs des organisations dont il est membre
         user_orgs = self.request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'agronomist']
         ).values_list('organization_id', flat=True)
         
         return Field.objects.filter(organization_id__in=user_orgs)
@@ -91,7 +91,7 @@ class FieldListView(generics.ListCreateAPIView):
         # Déterminer l'organisation de l'utilisateur
         user_orgs = self.request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'agronomist']
         ).values_list('organization_id', flat=True)
         
         if not user_orgs:
@@ -111,7 +111,7 @@ class FieldDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         user_orgs = self.request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'agronomist']
         ).values_list('organization_id', flat=True)
         
         return Field.objects.filter(organization_id__in=user_orgs).prefetch_related(
@@ -136,7 +136,7 @@ class CropListView(generics.ListCreateAPIView):
     def get_queryset(self):
         user_orgs = self.request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'agronomist']
         ).values_list('organization_id', flat=True)
         
         return Crop.objects.filter(field__organization_id__in=user_orgs).select_related('field')
@@ -155,7 +155,7 @@ class CropDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         user_orgs = self.request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'agronomist']
         ).values_list('organization_id', flat=True)
         
         return Crop.objects.filter(field__organization_id__in=user_orgs).select_related(
@@ -180,7 +180,7 @@ class FieldVisitListView(generics.ListCreateAPIView):
     def get_queryset(self):
         user_orgs = self.request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'agronomist']
         ).values_list('organization_id', flat=True)
         
         return FieldVisit.objects.filter(
@@ -201,7 +201,7 @@ class FieldVisitDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         user_orgs = self.request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'agronomist']
         ).values_list('organization_id', flat=True)
         
         return FieldVisit.objects.filter(
@@ -226,7 +226,7 @@ class DiagnosticListView(generics.ListCreateAPIView):
     def get_queryset(self):
         user_orgs = self.request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'agronomist']
         ).values_list('organization_id', flat=True)
         
         return Diagnostic.objects.filter(
@@ -247,7 +247,7 @@ class DiagnosticDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         user_orgs = self.request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'agronomist']
         ).values_list('organization_id', flat=True)
         
         return Diagnostic.objects.filter(
@@ -272,7 +272,7 @@ class RecommendationListView(generics.ListCreateAPIView):
     def get_queryset(self):
         user_orgs = self.request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'agronomist']
         ).values_list('organization_id', flat=True)
         
         return Recommendation.objects.filter(
@@ -293,7 +293,7 @@ class RecommendationDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         user_orgs = self.request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'agronomist']
         ).values_list('organization_id', flat=True)
         
         return Recommendation.objects.filter(
@@ -318,7 +318,7 @@ class WeatherAlertListView(generics.ListCreateAPIView):
     def get_queryset(self):
         user_orgs = self.request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'agronomist']
         ).values_list('organization_id', flat=True)
         
         return WeatherAlert.objects.filter(
@@ -328,7 +328,7 @@ class WeatherAlertListView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         user_orgs = self.request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'agronomist']
         ).values_list('organization_id', flat=True)
         
         if not user_orgs:
@@ -348,7 +348,7 @@ class WeatherAlertDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         user_orgs = self.request.user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'agronomist']
         ).values_list('organization_id', flat=True)
         
         return WeatherAlert.objects.filter(
@@ -366,7 +366,7 @@ def agronomist_dashboard_stats(request):
     """
     user_orgs = request.user.memberships.filter(
         status='active',
-        role__in=['admin', 'manager', 'member']
+        role__in=['admin', 'manager', 'member', 'agronomist']
     ).values_list('organization_id', flat=True)
     
     if not user_orgs:
@@ -430,7 +430,7 @@ def field_yield_analysis(request, field_id):
     # Vérifier que l'utilisateur peut accéder à ce champ
     user_orgs = request.user.memberships.filter(
         status='active',
-        role__in=['admin', 'manager', 'member']
+        role__in=['admin', 'manager', 'member', 'agronomist']
     ).values_list('organization_id', flat=True)
     
     if field.organization_id not in user_orgs:
@@ -474,7 +474,7 @@ def active_weather_alerts(request):
     """
     user_orgs = request.user.memberships.filter(
         status='active',
-        role__in=['admin', 'manager', 'member']
+        role__in=['admin', 'manager', 'member', 'agronomist']
     ).values_list('organization_id', flat=True)
     
     alerts = WeatherAlert.objects.filter(
@@ -563,7 +563,7 @@ def agronomy_meta(request):
     if user and hasattr(user, 'memberships'):
         org_ids = list(user.memberships.filter(
             status='active',
-            role__in=['admin', 'manager', 'member']
+            role__in=['admin', 'manager', 'member', 'agronomist']
         ).values_list('organization_id', flat=True))
 
         if org_ids:
