@@ -178,8 +178,8 @@ class RouteListView(generics.ListCreateAPIView):
     serializer_class = RouteSerializer
     permission_classes = [IsTransporterOrAdmin]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['origin_city', 'destination_city', 'requires_refrigeration', 'is_active']
-    search_fields = ['name', 'origin_city', 'destination_city']
+    filterset_fields = ['origin_city_fk', 'destination_city_fk', 'requires_refrigeration', 'is_active']
+    search_fields = ['name', 'origin_city_fk__name', 'destination_city_fk__name', 'origin_city_old', 'destination_city_old']
     ordering_fields = ['created_at', 'distance_km', 'base_price']
     ordering = ['-created_at']
 
@@ -537,7 +537,10 @@ def transport_meta(request):
             routes = Route.objects.filter(
                 organization_id__in=org_ids,
                 is_active=True
-            ).values('id', 'name', 'origin_city', 'destination_city', 'required_vehicle_type')
+            ).select_related('origin_city_fk', 'destination_city_fk').values(
+                'id', 'name', 'origin_city_fk__name', 'destination_city_fk__name', 
+                'origin_city_old', 'destination_city_old', 'required_vehicle_type'
+            )
 
             vehicules_disponibles = [
                 {
@@ -564,8 +567,8 @@ def transport_meta(request):
                 {
                     'id': r['id'],
                     'nom': r['name'],
-                    'depart': r['origin_city'],
-                    'arrivee': r['destination_city'],
+                    'depart': r['origin_city_fk__name'] or r['origin_city_old'] or '',
+                    'arrivee': r['destination_city_fk__name'] or r['destination_city_old'] or '',
                     'typeVehiculeRequis': r['required_vehicle_type'],
                 }
                 for r in routes

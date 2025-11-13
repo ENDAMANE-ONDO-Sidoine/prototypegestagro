@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 from django.contrib.auth import login, logout
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -26,8 +26,14 @@ from django.utils.encoding import force_bytes
 from apps.core.services.email_service import EmailService
 from rest_framework.permissions import AllowAny
 from django.utils.translation import gettext as _
+from drf_spectacular.utils import extend_schema
 
 
+@extend_schema(
+    tags=['Authentication & Registration'],
+    summary="Connexion (Login)",
+    description="Obtention des tokens JWT pour l'authentification"
+)
 class CustomTokenObtainPairView(TokenObtainPairView):
     """
     Vue personnalisée pour l'obtention des tokens JWT
@@ -48,6 +54,35 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema(
+    tags=['Authentication & Registration'],
+    summary="Rafraîchir le token (Refresh Token)",
+    description="Utilise le refresh token pour obtenir un nouveau token d'accès sans se reconnecter"
+)
+class CustomTokenRefreshView(TokenRefreshView):
+    """
+    Vue personnalisée pour le rafraîchissement des tokens JWT
+    """
+    pass
+
+
+@extend_schema(
+    tags=['Authentication & Registration'],
+    summary="Vérifier le token (Verify Token)",
+    description="Vérifie la validité d'un token d'accès sans le rafraîchir"
+)
+class CustomTokenVerifyView(TokenVerifyView):
+    """
+    Vue personnalisée pour la vérification des tokens JWT
+    """
+    pass
+
+
+@extend_schema(
+    tags=['Authentication & Registration'],
+    summary="Inscription (Register)",
+    description="Création d'un nouveau compte utilisateur avec organisation"
+)
 class UserRegistrationView(APIView):
     """
     Vue pour l'inscription d'un utilisateur
@@ -106,6 +141,11 @@ class UserRegistrationView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema(
+    tags=['Profile & Permissions'],
+    summary="Profil utilisateur",
+    description="Récupération et mise à jour du profil utilisateur"
+)
 class UserProfileView(APIView):
     """
     Vue pour le profil utilisateur
@@ -124,6 +164,11 @@ class UserProfileView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema(
+    tags=['Authentication & Registration'],
+    summary="Déconnexion (Logout)",
+    description="Déconnexion de l'utilisateur et invalidation du token"
+)
 class UserLogoutView(APIView):
     """
     Vue pour la déconnexion
@@ -149,6 +194,11 @@ class UserLogoutView(APIView):
             return Response({'error': f'Erreur lors de la déconnexion: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema(
+    tags=['Organizations'],
+    summary="Liste des organisations",
+    description="Liste et création d'organisations"
+)
 class OrganizationListView(generics.ListCreateAPIView):
     """
     Vue pour lister et créer des organisations
@@ -168,6 +218,11 @@ class OrganizationListView(generics.ListCreateAPIView):
         )
 
 
+@extend_schema(
+    tags=['Organizations'],
+    summary="Détails d'une organisation",
+    description="Récupération, mise à jour et suppression d'une organisation"
+)
 class OrganizationDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
     Vue pour les détails d'une organisation
@@ -182,6 +237,11 @@ class OrganizationDetailView(generics.RetrieveUpdateDestroyAPIView):
         return Organization.objects.filter(id__in=user_orgs)
 
 
+@extend_schema(
+    tags=['Memberships'],
+    summary="Liste des adhésions",
+    description="Liste et création d'adhésions aux organisations"
+)
 class MembershipListView(generics.ListCreateAPIView):
     """
     Vue pour lister et créer des adhésions
@@ -197,6 +257,11 @@ class MembershipListView(generics.ListCreateAPIView):
         serializer.save(user=self.request.user, status='pending')
 
 
+@extend_schema(
+    tags=['Memberships'],
+    summary="Détails d'une adhésion",
+    description="Récupération, mise à jour et suppression d'une adhésion"
+)
 class MembershipDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
     Vue pour les détails d'une adhésion
@@ -208,24 +273,31 @@ class MembershipDetailView(generics.RetrieveUpdateDestroyAPIView):
         return Membership.objects.filter(user=self.request.user)
 
 
+@extend_schema(exclude=True)
 class RoleListView(generics.ListAPIView):
     """
-    Vue pour lister les rôles
+    Vue pour lister les rôles (masquée de la documentation publique)
     """
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 
+@extend_schema(exclude=True)
 class PermissionListView(generics.ListAPIView):
     """
-    Vue pour lister les permissions
+    Vue pour lister les permissions (masquée de la documentation publique)
     """
     queryset = Permission.objects.all()
     serializer_class = PermissionSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 
+@extend_schema(
+    tags=['Profile & Permissions'],
+    summary="Organisations de l'utilisateur",
+    description="Récupère les organisations auxquelles l'utilisateur appartient"
+)
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
 def user_organizations(request):
@@ -238,6 +310,11 @@ def user_organizations(request):
     return Response(serializer.data)
 
 
+@extend_schema(
+    tags=['Authentication & Registration'],
+    summary="Métadonnées d'authentification",
+    description="Fournit les listes utiles au frontend pour les formulaires IAM / organisations (rôles, types d'organisation, etc.)"
+)
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def auth_meta(request):
@@ -296,6 +373,11 @@ def auth_meta(request):
     return Response(payload)
 
 
+@extend_schema(
+    tags=['Memberships'],
+    summary="Rejoindre une organisation",
+    description="Demande d'adhésion à une organisation"
+)
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def join_organization(request):
@@ -329,6 +411,11 @@ def join_organization(request):
         }, status=status.HTTP_404_NOT_FOUND)
 
 
+@extend_schema(
+    tags=['Authentication & Registration'],
+    summary="Demande de réinitialisation de mot de passe",
+    description="Demande de réinitialisation de mot de passe par email"
+)
 class PasswordResetRequestView(APIView):
     permission_classes = [permissions.AllowAny]
     throttle_classes = [PasswordResetThrottle]
@@ -362,6 +449,11 @@ class PasswordResetRequestView(APIView):
         return Response({'message': 'Si un compte existe, un email a été envoyé.'})
 
 
+@extend_schema(
+    tags=['Authentication & Registration'],
+    summary="Confirmation de réinitialisation de mot de passe",
+    description="Confirme et applique la réinitialisation du mot de passe"
+)
 class PasswordResetConfirmView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -386,6 +478,11 @@ class PasswordResetConfirmView(APIView):
         return Response({'message': 'Mot de passe réinitialisé avec succès.'})
 
 
+@extend_schema(
+    tags=['Authentication & Registration'],
+    summary="Demande de vérification d'email",
+    description="Demande d'envoi d'un email de vérification"
+)
 class EmailVerificationRequestView(APIView):
     permission_classes = [AllowAny]
     throttle_classes = [EmailVerificationThrottle]
@@ -416,6 +513,11 @@ class EmailVerificationRequestView(APIView):
         return Response({'message': 'Si un compte existe, un email de vérification a été envoyé.'})
 
 
+@extend_schema(
+    tags=['Authentication & Registration'],
+    summary="Confirmation de vérification d'email",
+    description="Confirme la vérification de l'adresse email"
+)
 class EmailVerificationConfirmView(APIView):
     permission_classes = [AllowAny]
 

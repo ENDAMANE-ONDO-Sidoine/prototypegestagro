@@ -309,6 +309,11 @@ def admin_approve_organization(request, organization_id):
         )
 
 
+@extend_schema(
+    tags=['Core'],
+    summary="Recherche de produits",
+    description="Recherche full-text basique sur les produits via Elasticsearch. Les résultats incluent les informations de localisation du producteur."
+)
 @api_view(['GET'])
 @permission_classes([permissions.AllowAny])
 def search_products(request):
@@ -432,6 +437,11 @@ def admin_activate_user(request, user_id):
         )
 
 
+@extend_schema(
+    tags=['Core'],
+    summary="Liste des provinces",
+    description="Liste des provinces du Gabon (accessible à tous pour filtrage)"
+)
 class ProvinceListView(generics.ListAPIView):
     """
     Liste des provinces du Gabon (accessible à tous pour filtrage)
@@ -441,6 +451,11 @@ class ProvinceListView(generics.ListAPIView):
     permission_classes = [permissions.AllowAny]
 
 
+@extend_schema(
+    tags=['Core'],
+    summary="Liste des villes",
+    description="Liste des villes du Gabon (accessible à tous pour filtrage). Peut être filtrée par province_id."
+)
 class CityListView(generics.ListAPIView):
     """
     Liste des villes du Gabon (accessible à tous pour filtrage)
