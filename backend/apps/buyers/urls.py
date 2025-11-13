@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
     CartView, CartItemView,
-    OrderListView, OrderDetailView,
+    OrderListView, OrderDetailView, OrderShipmentDetailView,
     BuyerProfileView,
     WishlistListView, WishlistDetailView, WishlistItemView,
     buyer_dashboard_stats, buyer_orders_stats
@@ -18,6 +18,7 @@ urlpatterns = [
     # Commandes
     path('orders/', OrderListView.as_view(), name='buyer_order_list'),
     path('orders/<int:pk>/', OrderDetailView.as_view(), name='buyer_order_detail'),
+    path('orders/<int:order_id>/shipment/', OrderShipmentDetailView.as_view(), name='buyer_order_shipment'),
     
     # Profil acheteur
     path('profile/', BuyerProfileView.as_view(), name='buyer_profile'),

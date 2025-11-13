@@ -32,6 +32,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             ('buyer', 'Acheteur'),
             ('transporter', 'Transporteur'),
             ('agronomist', 'Agronome'),
+            ('supplier', 'Fournisseur'),
             ('admin', 'Administrateur'),
         ],
         write_only=True,
@@ -99,6 +100,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             'buyer': 'buyer',             # Acheteur
             'transporter': 'transporter', # Transporteur
             'agronomist': 'agronomist',   # Agronome
+            'supplier': 'supplier',       # Fournisseur
             'admin': 'admin'              # Admin
         }
         return role_mapping.get(user_role, 'member')

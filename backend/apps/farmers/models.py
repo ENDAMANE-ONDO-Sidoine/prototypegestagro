@@ -7,6 +7,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from apps.iam.models import User
 from apps.organizations.models import Organization
 from apps.core.storage import MinIOProductImagesStorage, MinIOUserAvatarsStorage
+from apps.core.models import Province, City
 
 
 class Category(models.Model):
@@ -185,6 +186,8 @@ class FarmerProfile(models.Model):
     # Informations de contact
     farm_address = models.TextField(_('farm address'), blank=True)
     farm_coordinates = models.JSONField(_('farm coordinates'), null=True, blank=True)
+    province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True, blank=True, related_name='farmer_profiles', verbose_name=_('province'))
+    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True, related_name='farmer_profiles', verbose_name=_('city'))
     
     # Métadonnées
     bio = models.TextField(_('bio'), blank=True)

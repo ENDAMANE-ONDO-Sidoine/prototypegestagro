@@ -50,6 +50,7 @@ class Membership(models.Model):
         ('buyer', _('Buyer')),
         ('transporter', _('Transporter')),
         ('agronomist', _('Agronomist')),
+        ('supplier', _('Supplier')),
         ('member', _('Member')),
         ('viewer', _('Viewer')),
     ])

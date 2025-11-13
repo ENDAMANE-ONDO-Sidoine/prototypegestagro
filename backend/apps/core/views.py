@@ -17,6 +17,8 @@ from apps.transport.models import Vehicle, Driver, Shipment
 from apps.iam.serializers import UserProfileSerializer, OrganizationSerializer, MembershipSerializer
 from gestagro.utils.search_client import get_es_client
 from drf_spectacular.utils import extend_schema
+from apps.core.models import Province, City
+from apps.core.serializers import ProvinceSerializer, CitySerializer
 
 
 @extend_schema(exclude=True)
@@ -312,24 +314,47 @@ def admin_approve_organization(request, organization_id):
 def search_products(request):
     """
     Recherche full-text basique sur les produits via Elasticsearch.
+    Note: Les résultats incluent maintenant les informations de localisation du producteur
+    via le ProductSerializer (producer_province, producer_city, producer_address, producer_coordinates).
     """
     query = request.query_params.get('q', '')
     size = int(request.query_params.get('size', 10))
+    province_id = request.query_params.get('province_id')
+    city_id = request.query_params.get('city_id')
 
     es = get_es_client()
     try:
+        # Construire la requête de recherche
+        search_query = {
+            'multi_match': {
+                'query': query,
+                'fields': [
+                    'name^2', 'description',
+                    'name.folded^2', 'description.folded',
+                    'category.folded'
+                ]
+            }
+        }
+        
+        # Ajouter des filtres de localisation si fournis
+        filters = []
+        if province_id:
+            filters.append({'term': {'producer_province_id': int(province_id)}})
+        if city_id:
+            filters.append({'term': {'producer_city_id': int(city_id)}})
+        
+        query_dict = {'query': search_query}
+        if filters:
+            query_dict['query'] = {
+                'bool': {
+                    'must': [search_query],
+                    'filter': filters
+                }
+            }
+        
         resp = es.search(
             index='products',
-            query={
-                'multi_match': {
-                    'query': query,
-                    'fields': [
-                        'name^2', 'description',
-                        'name.folded^2', 'description.folded',
-                        'category.folded'
-                    ]
-                }
-            },
+            query=query_dict.get('query', search_query),
             size=size
         )
         hits = [
@@ -405,3 +430,28 @@ def admin_activate_user(request, user_id):
             {'error': 'Utilisateur non trouvé.'},
             status=status.HTTP_404_NOT_FOUND
         )
+
+
+class ProvinceListView(generics.ListAPIView):
+    """
+    Liste des provinces du Gabon (accessible à tous pour filtrage)
+    """
+    queryset = Province.objects.filter(is_active=True).prefetch_related('cities')
+    serializer_class = ProvinceSerializer
+    permission_classes = [permissions.AllowAny]
+
+
+class CityListView(generics.ListAPIView):
+    """
+    Liste des villes du Gabon (accessible à tous pour filtrage)
+    """
+    queryset = City.objects.filter(is_active=True).select_related('province')
+    serializer_class = CitySerializer
+    permission_classes = [permissions.AllowAny]
+    
+    def get_queryset(self):
+        queryset = City.objects.filter(is_active=True).select_related('province')
+        province_id = self.request.query_params.get('province_id')
+        if province_id:
+            queryset = queryset.filter(province_id=province_id)
+        return queryset

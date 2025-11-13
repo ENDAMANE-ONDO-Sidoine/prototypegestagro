@@ -7,6 +7,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from apps.iam.models import User
 from apps.organizations.models import Organization
 from apps.core.storage import MinIOUserAvatarsStorage
+from apps.core.models import Province, City
 from apps.buyers.models import Order
 
 
@@ -104,7 +105,9 @@ class TransporterProfile(models.Model):
     
     # Spécialisations
     specializations = models.JSONField(_('specializations'), default=list, blank=True)  # ['refrigerated', 'hazardous', 'oversized']
-    service_areas = models.JSONField(_('service areas'), default=list, blank=True)  # ['Libreville', 'Port-Gentil']
+    service_areas = models.JSONField(_('service areas'), default=list, blank=True)  # ['Libreville', 'Port-Gentil'] (déprécié, utiliser service_provinces)
+    service_provinces = models.ManyToManyField(Province, blank=True, related_name='transporters', verbose_name=_('service provinces'))
+    service_cities = models.ManyToManyField(City, blank=True, related_name='transporters', verbose_name=_('service cities'))
     
     # Certifications
     has_hazmat_certification = models.BooleanField(_('hazmat certification'), default=False)
@@ -210,13 +213,29 @@ class Route(models.Model):
     description = models.TextField(_('description'), blank=True)
     
     # Points de départ et d'arrivée
-    origin_city = models.CharField(_('origin city'), max_length=100)
-    origin_country = models.CharField(_('origin country'), max_length=100)
+    origin_city_old = models.CharField(_('origin city (old)'), max_length=100, blank=True)  # Déprécié, utiliser origin_city_fk
+    origin_city_fk = models.ForeignKey(City, on_delete=models.PROTECT, null=True, blank=True, related_name='routes_origin', verbose_name=_('origin city'))
+    origin_country = models.CharField(_('origin country'), max_length=100, default='Gabon')
     origin_coordinates = models.JSONField(_('origin coordinates'), default=dict, blank=True)
     
-    destination_city = models.CharField(_('destination city'), max_length=100)
-    destination_country = models.CharField(_('destination country'), max_length=100)
+    destination_city_old = models.CharField(_('destination city (old)'), max_length=100, blank=True)  # Déprécié, utiliser destination_city_fk
+    destination_city_fk = models.ForeignKey(City, on_delete=models.PROTECT, null=True, blank=True, related_name='routes_destination', verbose_name=_('destination city'))
+    destination_country = models.CharField(_('destination country'), max_length=100, default='Gabon')
     destination_coordinates = models.JSONField(_('destination coordinates'), default=dict, blank=True)
+    
+    @property
+    def origin_city(self):
+        """Retourne le nom de la ville d'origine (compatibilité)"""
+        if self.origin_city_fk:
+            return self.origin_city_fk.name
+        return self.origin_city_old or ''
+    
+    @property
+    def destination_city(self):
+        """Retourne le nom de la ville de destination (compatibilité)"""
+        if self.destination_city_fk:
+            return self.destination_city_fk.name
+        return self.destination_city_old or ''
     
     # Informations de transport
     distance_km = models.DecimalField(_('distance (km)'), max_digits=8, decimal_places=2)
@@ -247,7 +266,7 @@ class Route(models.Model):
         ordering = ['-created_at']
         indexes = [
             models.Index(fields=['organization', 'is_active']),
-            models.Index(fields=['origin_city', 'destination_city']),
+            models.Index(fields=['origin_city_fk', 'destination_city_fk']),
         ]
 
     def __str__(self):

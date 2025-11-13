@@ -63,14 +63,44 @@ class OrderItemSerializer(serializers.ModelSerializer):
     """
     product_name = serializers.CharField(source='product.name', read_only=True)
     product_sku = serializers.CharField(source='product.sku', read_only=True)
+    product_origin = serializers.SerializerMethodField()
     
     class Meta:
         model = OrderItem
         fields = [
-            'id', 'product', 'product_name', 'product_sku',
+            'id', 'product', 'product_name', 'product_sku', 'product_origin',
             'quantity', 'unit_price', 'total_price'
         ]
         read_only_fields = ['id', 'total_price']
+    
+    def get_product_origin(self, obj):
+        """Récupérer le lieu de production du produit"""
+        try:
+            farmer_profile = obj.product.organization.farmer_profiles.first()
+            if farmer_profile:
+                origin_info = {
+                    'country': obj.product.origin_country or 'Gabon',
+                }
+                if farmer_profile.province:
+                    origin_info['province'] = {
+                        'id': farmer_profile.province.id,
+                        'name': farmer_profile.province.name
+                    }
+                if farmer_profile.city:
+                    origin_info['city'] = {
+                        'id': farmer_profile.city.id,
+                        'name': farmer_profile.city.name
+                    }
+                if farmer_profile.farm_address:
+                    origin_info['address'] = farmer_profile.farm_address
+                if farmer_profile.farm_coordinates:
+                    origin_info['coordinates'] = farmer_profile.farm_coordinates
+                return origin_info
+        except:
+            pass
+        return {
+            'country': obj.product.origin_country or 'Gabon'
+        }
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -80,6 +110,7 @@ class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
     buyer_name = serializers.CharField(source='buyer.get_full_name', read_only=True)
     seller_name = serializers.CharField(source='seller.name', read_only=True)
+    shipment_info = serializers.SerializerMethodField()
     
     class Meta:
         model = Order
@@ -88,13 +119,88 @@ class OrderSerializer(serializers.ModelSerializer):
             'order_number', 'status', 'payment_status', 'billing_address',
             'shipping_address', 'subtotal', 'tax_amount', 'shipping_fee',
             'total_amount', 'currency', 'notes', 'tracking_number',
-            'items', 'created_at', 'updated_at', 'confirmed_at',
+            'items', 'shipment_info', 'created_at', 'updated_at', 'confirmed_at',
             'shipped_at', 'delivered_at'
         ]
         read_only_fields = [
             'id', 'buyer', 'order_number', 'created_at', 'updated_at',
             'confirmed_at', 'shipped_at', 'delivered_at'
         ]
+    
+    def get_shipment_info(self, obj):
+        """Récupérer les informations d'expédition de la commande"""
+        try:
+            shipment = obj.shipments.first()  # Une commande peut avoir plusieurs expéditions
+            if shipment:
+                shipment_info = {
+                    'id': shipment.id,
+                    'tracking_number': shipment.tracking_number,
+                    'status': shipment.status,
+                    'status_display': shipment.get_status_display(),
+                    'current_location': shipment.current_location,
+                    'scheduled_pickup_date': shipment.scheduled_pickup_date,
+                    'scheduled_delivery_date': shipment.scheduled_delivery_date,
+                    'actual_pickup_date': shipment.actual_pickup_date,
+                    'actual_delivery_date': shipment.actual_delivery_date,
+                    'transport_cost': str(shipment.transport_cost) if shipment.transport_cost else None,
+                    'currency': shipment.currency,
+                    'progress_percentage': shipment.progress_percentage,
+                    'is_delayed': shipment.is_delayed,
+                }
+                
+                # Informations de la route
+                if shipment.route:
+                    route_info = {
+                        'id': shipment.route.id,
+                        'name': shipment.route.name,
+                        'origin': {
+                            'city': shipment.route.origin_city,
+                            'province': shipment.route.origin_city_fk.province.name if shipment.route.origin_city_fk else None,
+                            'country': shipment.route.origin_country,
+                            'coordinates': shipment.route.origin_coordinates
+                        } if shipment.route.origin_city_fk else {
+                            'city': shipment.route.origin_city_old or shipment.route.origin_city,
+                            'country': shipment.route.origin_country
+                        },
+                        'destination': {
+                            'city': shipment.route.destination_city,
+                            'province': shipment.route.destination_city_fk.province.name if shipment.route.destination_city_fk else None,
+                            'country': shipment.route.destination_country,
+                            'coordinates': shipment.route.destination_coordinates
+                        } if shipment.route.destination_city_fk else {
+                            'city': shipment.route.destination_city_old or shipment.route.destination_city,
+                            'country': shipment.route.destination_country
+                        },
+                        'distance_km': str(shipment.route.distance_km) if shipment.route.distance_km else None,
+                        'estimated_duration_hours': str(shipment.route.estimated_duration_hours) if shipment.route.estimated_duration_hours else None,
+                    }
+                    shipment_info['route'] = route_info
+                
+                # Informations du véhicule
+                if shipment.vehicle:
+                    shipment_info['vehicle'] = {
+                        'id': shipment.vehicle.id,
+                        'license_plate': shipment.vehicle.license_plate,
+                        'make': shipment.vehicle.make,
+                        'model': shipment.vehicle.model,
+                        'vehicle_type': shipment.vehicle.get_vehicle_type_display(),
+                        'current_location': shipment.vehicle.current_location,
+                    }
+                
+                # Informations du chauffeur
+                if shipment.driver:
+                    shipment_info['driver'] = {
+                        'id': shipment.driver.id,
+                        'name': shipment.driver.get_full_name(),
+                        'phone': shipment.driver.phone,
+                        'license_number': shipment.driver.license_number,
+                    }
+                
+                return shipment_info
+        except Exception as e:
+            # En cas d'erreur, retourner None plutôt que de faire planter la requête
+            return None
+        return None
 
 
 class BuyerProfileSerializer(serializers.ModelSerializer):

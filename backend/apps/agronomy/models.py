@@ -8,6 +8,7 @@ from apps.iam.models import User
 from apps.organizations.models import Organization
 from apps.farmers.models import Product
 from apps.core.storage import MinIOUserAvatarsStorage
+from apps.core.models import Province, City
 
 
 class AgronomistProfile(models.Model):
@@ -34,6 +35,9 @@ class AgronomistProfile(models.Model):
     # Informations de contact
     phone_emergency = models.CharField(_('emergency phone'), max_length=20, blank=True)
     current_location = models.JSONField(_('current location'), default=dict, blank=True)  # {lat, lng, address}
+    province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True, blank=True, related_name='agronomist_profiles', verbose_name=_('province'))
+    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True, related_name='agronomist_profiles', verbose_name=_('city'))
+    intervention_provinces = models.ManyToManyField(Province, blank=True, related_name='agronomists', verbose_name=_('intervention provinces'))
     
     # Préférences
     preferred_working_hours = models.JSONField(_('preferred working hours'), default=dict, blank=True)
@@ -90,6 +94,8 @@ class Field(models.Model):
     
     # Localisation
     location = models.JSONField(_('location'), default=dict, blank=True)  # {lat, lng, address}
+    province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True, blank=True, related_name='fields', verbose_name=_('province'))
+    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True, related_name='fields', verbose_name=_('city'))
     area_hectares = models.DecimalField(_('area (hectares)'), max_digits=8, decimal_places=2)
     
     # Caractéristiques du sol

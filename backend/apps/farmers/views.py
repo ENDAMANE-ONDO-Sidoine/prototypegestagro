@@ -57,7 +57,15 @@ class ProductListView(generics.ListCreateAPIView):
     def get_queryset(self):
         # Filtrer par organisation de l'utilisateur
         user_organizations = self.request.user.memberships.values_list('organization', flat=True)
-        queryset = Product.objects.filter(organization__in=user_organizations)
+        queryset = Product.objects.filter(organization__in=user_organizations).select_related(
+            'organization',
+            'category',
+            'created_by'
+        ).prefetch_related(
+            'images',
+            'organization__farmer_profiles__province',
+            'organization__farmer_profiles__city'
+        )
         product_type = self.request.query_params.get('product_type')
         if product_type in ['crop', 'livestock', 'fishery']:
             queryset = queryset.filter(product_type=product_type)
@@ -81,7 +89,15 @@ class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         user_organizations = self.request.user.memberships.values_list('organization', flat=True)
-        return Product.objects.filter(organization__in=user_organizations)
+        return Product.objects.filter(organization__in=user_organizations).select_related(
+            'organization',
+            'category',
+            'created_by'
+        ).prefetch_related(
+            'images',
+            'organization__farmer_profiles__province',
+            'organization__farmer_profiles__city'
+        )
 
 
 class ProductImageUploadView(generics.CreateAPIView):

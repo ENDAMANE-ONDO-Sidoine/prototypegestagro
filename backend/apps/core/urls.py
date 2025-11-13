@@ -11,7 +11,9 @@ from .views import (
     admin_dashboard_stats, admin_analytics,
     admin_approve_organization, admin_approve_membership,
     admin_suspend_user, admin_activate_user,
-    search_products
+    search_products,
+    ProvinceListView,
+    CityListView
 )
 # views_admin supprimé - endpoints d'urgence supprimés
 
@@ -60,5 +62,7 @@ urlpatterns = [
     path('admin/analytics/', admin_analytics, name='admin_analytics'),
     # Recherche (publique)
     path('search/products/', search_products, name='search_products'),
+    path('provinces/', ProvinceListView.as_view(), name='province_list'),
+    path('cities/', CityListView.as_view(), name='city_list'),
     
 ]

@@ -45,6 +45,12 @@ class ProductSerializer(serializers.ModelSerializer):
     created_by_name = serializers.CharField(source='created_by.get_full_name', read_only=True)
     product_type_display = serializers.CharField(source='get_product_type_display', read_only=True)
     
+    # Informations de localisation du producteur
+    producer_province = serializers.SerializerMethodField()
+    producer_city = serializers.SerializerMethodField()
+    producer_address = serializers.SerializerMethodField()
+    producer_coordinates = serializers.SerializerMethodField()
+    
     class Meta:
         model = Product
         fields = [
@@ -57,9 +63,59 @@ class ProductSerializer(serializers.ModelSerializer):
             'animal_species', 'animal_breed', 'animal_age', 'animal_age_unit',
             'rearing_method', 'feeding_type', 'health_status', 'processing_type',
             'slaughter_date', 'storage_temperature', 'animals_per_lot',
-            'weight', 'dimensions', 'tags', 'images', 'created_at', 'updated_at'
+            'weight', 'dimensions', 'tags', 'images',
+            'producer_province', 'producer_city', 'producer_address', 'producer_coordinates',
+            'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_by', 'created_at', 'updated_at']
+    
+    def get_producer_province(self, obj):
+        """Récupérer la province du producteur"""
+        try:
+            farmer_profile = obj.organization.farmer_profiles.first()
+            if farmer_profile and farmer_profile.province:
+                return {
+                    'id': farmer_profile.province.id,
+                    'name': farmer_profile.province.name,
+                    'chef_lieu': farmer_profile.province.chef_lieu
+                }
+        except:
+            pass
+        return None
+    
+    def get_producer_city(self, obj):
+        """Récupérer la ville du producteur"""
+        try:
+            farmer_profile = obj.organization.farmer_profiles.first()
+            if farmer_profile and farmer_profile.city:
+                return {
+                    'id': farmer_profile.city.id,
+                    'name': farmer_profile.city.name,
+                    'province': farmer_profile.city.province.name
+                }
+        except:
+            pass
+        return None
+    
+    def get_producer_address(self, obj):
+        """Récupérer l'adresse de la ferme"""
+        try:
+            farmer_profile = obj.organization.farmer_profiles.first()
+            if farmer_profile:
+                return farmer_profile.farm_address
+        except:
+            pass
+        return None
+    
+    def get_producer_coordinates(self, obj):
+        """Récupérer les coordonnées GPS de la ferme"""
+        try:
+            farmer_profile = obj.organization.farmer_profiles.first()
+            if farmer_profile:
+                return farmer_profile.farm_coordinates
+        except:
+            pass
+        return None
     
     def create(self, validated_data):
         """

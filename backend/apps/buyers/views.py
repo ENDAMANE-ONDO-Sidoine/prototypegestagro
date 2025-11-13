@@ -2,6 +2,7 @@ from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from django.db.models import Count, Sum, Avg
 from apps.core.permissions import IsBuyerOrAdmin, IsOwnerOrAdmin
@@ -10,6 +11,8 @@ from .serializers import (
     CartSerializer, CartItemSerializer, OrderSerializer, OrderItemSerializer,
     BuyerProfileSerializer, WishlistSerializer, WishlistItemSerializer
 )
+from apps.transport.models import Shipment
+from apps.transport.serializers import ShipmentDetailSerializer
 
 
 class CartView(generics.RetrieveUpdateAPIView):
@@ -61,7 +64,14 @@ class OrderDetailView(generics.RetrieveUpdateAPIView):
     permission_classes = [IsBuyerOrAdmin]
 
     def get_queryset(self):
-        return Order.objects.filter(buyer=self.request.user)
+        return Order.objects.filter(buyer=self.request.user).prefetch_related(
+            'items__product__organization__farmer_profiles__province',
+            'items__product__organization__farmer_profiles__city',
+            'shipments__route__origin_city_fk__province',
+            'shipments__route__destination_city_fk__province',
+            'shipments__vehicle',
+            'shipments__driver'
+        )
 
 
 class BuyerProfileView(generics.RetrieveUpdateAPIView):
@@ -223,3 +233,40 @@ def buyer_orders_stats(request):
         'by_month': list(monthly_stats),
         'top_products': list(top_products),
     })
+
+
+class OrderShipmentDetailView(APIView):
+    """
+    Vue pour récupérer les détails d'expédition d'une commande (pour les acheteurs)
+    """
+    permission_classes = [IsBuyerOrAdmin]
+    
+    def get(self, request, order_id):
+        """
+        Récupérer les détails d'expédition d'une commande
+        """
+        # Vérifier que la commande appartient à l'acheteur
+        order = get_object_or_404(Order, id=order_id, buyer=request.user)
+        
+        # Récupérer les expéditions liées à cette commande
+        shipments = Shipment.objects.filter(order=order).select_related(
+            'route__origin_city_fk__province',
+            'route__destination_city_fk__province',
+            'vehicle',
+            'driver'
+        ).prefetch_related('tracking_events')
+        
+        if not shipments.exists():
+            return Response({
+                'message': 'Aucune expédition trouvée pour cette commande',
+                'order_id': order.id,
+                'order_number': order.order_number,
+                'shipments': []
+            }, status=status.HTTP_200_OK)
+        
+        serializer = ShipmentDetailSerializer(shipments, many=True)
+        return Response({
+            'order_id': order.id,
+            'order_number': order.order_number,
+            'shipments': serializer.data
+        }, status=status.HTTP_200_OK)

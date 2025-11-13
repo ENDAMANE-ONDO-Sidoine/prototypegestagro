@@ -149,6 +149,38 @@ class IsAgronomistOrAdmin(permissions.BasePermission):
         ).exists()
 
 
+class IsSupplier(permissions.BasePermission):
+    """
+    Permission pour les fournisseurs uniquement
+    """
+    def has_permission(self, request, view):
+        if not request.user or not request.user.is_authenticated:
+            return False
+        
+        return request.user.memberships.filter(
+            role='supplier',
+            status='active'
+        ).exists()
+
+
+class IsSupplierOrAdmin(permissions.BasePermission):
+    """
+    Permission pour les fournisseurs et administrateurs
+    """
+    def has_permission(self, request, view):
+        if not request.user or not request.user.is_authenticated:
+            return False
+        
+        # Les superusers Django peuvent tout faire
+        if request.user.is_superuser:
+            return True
+        
+        return request.user.memberships.filter(
+            role__in=['supplier', 'admin'],
+            status='active'
+        ).exists()
+
+
 class IsOwnerOrAdmin(permissions.BasePermission):
     """
     Permission pour le propriétaire de l'objet ou un administrateur
